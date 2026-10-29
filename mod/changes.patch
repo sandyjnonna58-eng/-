@@ -1,0 +1,381 @@
+diff --git a/CombatSandbox.Demo/BootSequence.cs b/CombatSandbox.Demo/BootSequence.cs
+index 3fbed81..6986e8b 100644
+--- a/CombatSandbox.Demo/BootSequence.cs
++++ b/CombatSandbox.Demo/BootSequence.cs
+@@ -45,6 +45,7 @@ public sealed class BootSequence : MonoBehaviour
+ 
+ 	private void Awake()
+ 	{
++		LocRunner.Ensure();
+ 		GameSettings.Load();
+ 		Cursor.visible = false;
+ 		Camera main = Camera.main;
+diff --git a/CombatSandbox.Demo/CaptureMode.cs b/CombatSandbox.Demo/CaptureMode.cs
+index 7233289..6a42e5b 100644
+--- a/CombatSandbox.Demo/CaptureMode.cs
++++ b/CombatSandbox.Demo/CaptureMode.cs
+@@ -763,7 +763,7 @@ public sealed class CaptureMode : MonoBehaviour
+ 		bool flag = list3.Count > 1 && posture != Posture.Defensive && (float)num3 >= Mathf.Max(6f, (float)num4 * 1.35f);
+ 		CapturePoint secondary = (flag ? list3[1].Item1 : null);
+ 		List<CombatBrain> list4 = new List<CombatBrain>(list2);
+-		Dictionary<CombatBrain, (CapturePoint, bool)> dictionary = new Dictionary<CombatBrain, (CapturePoint, bool)>();
++		Dictionary<CombatBrain, (CapturePoint p, bool defend)> dictionary = new Dictionary<CombatBrain, (CapturePoint p, bool defend)>();
+ 		foreach (var item5 in threatened)
+ 		{
+ 			CapturePoint item2 = item5.p;
+@@ -829,7 +829,7 @@ public sealed class CaptureMode : MonoBehaviour
+ 		{
+ 			list5 = list5.OrderBy((CombatBrain b) => Vector3.Dot(Flat(Position(b) - primary.transform.position), Vector3.Cross(Vector3.up, Flat(primary.transform.position - ourCentre).normalized))).ToList();
+ 		}
+-		foreach (KeyValuePair<CombatBrain, (CapturePoint, bool)> item12 in dictionary)
++		foreach (KeyValuePair<CombatBrain, (CapturePoint p, bool defend)> item12 in dictionary)
+ 		{
+ 			CombatBrain key = item12.Key;
+ 			(CapturePoint, bool) value = item12.Value;
+diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
+index 9fd3d6c..29802de 100644
+--- a/CombatSandbox.Demo/GameMenu.cs
++++ b/CombatSandbox.Demo/GameMenu.cs
+@@ -38,14 +38,15 @@ public sealed class GameMenu : MonoBehaviour
+ 
+ 	private Text pauseStats;
+ 
+-	private static readonly (string Name, string Icon, string Blurb)[] SettingsTabs = new(string, string, string)[6]
++	private static readonly (string Name, string Icon, string Blurb)[] SettingsTabs = new(string, string, string)[7]
+ 	{
+ 		("Sound", "volume", "How loud everything is, and which sounds you hear."),
+ 		("Controls", "mouse", "The mouse and the keys."),
+ 		("Graphics", "display", "Picture quality, the screen and the frame rate."),
+ 		("Interface", "info", "What the battle shows on the screen."),
+ 		("Game", "flag", "How the battle plays: the enemy, the time, the numbers."),
+-		("Performance", "gear", "Keeping the frame rate up in a big battle.")
++		("Performance", "gear", "Keeping the frame rate up in a big battle."),
++		("Extra", "drop", "Language, blood and tanks.")
+ 	};
+ 
+ 	private readonly List<RectTransform> settingsPages = new List<RectTransform>();
+@@ -68,6 +69,7 @@ public sealed class GameMenu : MonoBehaviour
+ 	private void Awake()
+ 	{
+ 		GameSettings.Load();
++		LocRunner.Ensure();
+ 	}
+ 
+ 	private void Start()
+@@ -695,6 +697,19 @@ public sealed class GameMenu : MonoBehaviour
+ 		{
+ 			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
+ 		});
++		Page(6);
++		SelectRow("Language", "The language of menus and the battle screens.", GameSettings.LanguageNames, GameSettings.Language, delegate(int i)
++		{
++			GameSettings.Language = i;
++		});
++		SelectRow("Blood", "How much blood a hit throws out in drops, and how big the pools under the fallen grow.", GameSettings.BloodNames, GameSettings.Blood, delegate(int i)
++		{
++			GameSettings.Blood = i;
++		});
++		SwitchRow("Tanks", "A T-72 tank for each side at the start of the battle (from the next battle).", GameSettings.Tanks, delegate(bool b)
++		{
++			GameSettings.Tanks = b;
++		});
+ 		UIKit.Place((RectTransform)UIKit.MakeButton(panel.transform, "Reset all", "restart", UIKit.Muted, delegate
+ 		{
+ 			GameSettings.Reset();
+diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
+index d817002..3e5980b 100644
+--- a/CombatSandbox.Demo/GameSettings.cs
++++ b/CombatSandbox.Demo/GameSettings.cs
+@@ -9,6 +9,20 @@ public static class GameSettings
+ {
+ 	public static float Volume = 0.9f;
+ 
++	public static bool Tanks = true;
++
++	public static int Blood = 1;
++
++	public static readonly string[] BloodNames = new string[3] { "Normal", "Plenty", "Very much" };
++
++	public static readonly float[] BloodSplash = new float[3] { 1f, 2.2f, 3.5f };
++
++	public static readonly float[] BloodPool = new float[3] { 1f, 2f, 3f };
++
++	public static int Language = 0;
++
++	public static readonly string[] LanguageNames = new string[2] { "Русский", "English" };
++
+ 	public static float Sensitivity = 2.2f;
+ 
+ 	public static float FieldOfView = 65f;
+@@ -186,6 +200,9 @@ public static class GameSettings
+ 			RespawnWait = I("respawn", RespawnWait);
+ 			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
+ 			BodiesKept = I("bodies", BodiesKept);
++			Tanks = B("tanks", Tanks);
++			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
++			Language = Mathf.Clamp(I("language", Language), 0, 1);
+ 			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
+ 			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
+ 			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
+@@ -258,6 +275,9 @@ public static class GameSettings
+ 		I("respawn", RespawnWait);
+ 		I("waves", Waves);
+ 		I("bodies", BodiesKept);
++		B("tanks", Tanks);
++		I("blood", Blood);
++		I("language", Language);
+ 		PlayerPrefs.Save();
+ 		static void B(string k, bool v)
+ 		{
+@@ -304,6 +324,8 @@ public static class GameSettings
+ 		RespawnWait = 7;
+ 		Waves = 1;
+ 		BodiesKept = 16;
++		Tanks = true;
++		Blood = 1;
+ 		Apply();
+ 	}
+ 
+diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
+index 25a7bcd..9bd1738 100644
+--- a/CombatSandbox.Demo/GunMount.cs
++++ b/CombatSandbox.Demo/GunMount.cs
+@@ -107,6 +107,8 @@ public sealed class GunMount
+ 
+ 	public bool Casings = true;
+ 
++	public bool Cannon;
++
+ 	public Transform Turret;
+ 
+ 	public Transform Cradle;
+@@ -292,6 +294,11 @@ public sealed class GunMount
+ 			Vector2 vector4 = UnityEngine.Random.insideUnitCircle * num;
+ 			Vector3 normalized2 = (vector2 + normalized * vector4.x + vector3 * vector4.y).normalized;
+ 			Vector3 inherit = vehicle.PointVelocity(vector);
++			if (Cannon)
++			{
++				FireShell(instance, gunner, vector, normalized2, inherit);
++				return;
++			}
+ 			instance.Report(vector, Def, gunner);
+ 			if ((bool)Ballistics.Instance)
+ 			{
+@@ -314,6 +321,38 @@ public sealed class GunMount
+ 		}
+ 	}
+ 
++	private void FireShell(ReconstructionDemo instance, ArenaTarget gunner, Vector3 muzzle, Vector3 direction, Vector3 inherit)
++	{
++		float num = Mathf.Clamp(Vector3.Distance(Aim, muzzle), 20f, 3000f);
++		float num2 = num / Def.MuzzleVelocity;
++		direction = (direction * num + Vector3.up * 4.905f * num2 * num2).normalized;
++		TankShell.Fire(gunner, vehicle, muzzle, direction * Def.MuzzleVelocity + inherit);
++		instance.Report(muzzle, Def, gunner);
++		if ((bool)Acoustics.Instance)
++		{
++			Acoustics.Instance.Explosion(muzzle, rocket: true);
++		}
++		if ((bool)ShotEffects.Instance)
++		{
++			ShotEffects.Instance.Flash(muzzle, direction, Def.Flash);
++			ShotEffects.Instance.Flare(muzzle + direction * 0.5f, 1.4f);
++			ShotEffects.Instance.Sparks(muzzle, direction, 24, 18f);
++		}
++		if ((bool)RoomDust.Instance)
++		{
++			RoomDust.Instance.Blast(muzzle);
++		}
++		if ((bool)BattleDirector.Instance)
++		{
++			BattleDirector.Instance.Shake(muzzle, 0.6f);
++		}
++		vehicle.Body.AddForceAtPosition(-direction * 12f * Def.Recoil, muzzle, ForceMode.Impulse);
++		kick = 0.32f;
++		Rounds--;
++		fired++;
++		nextShot = Time.time + Def.Interval;
++	}
++
+ 	public void Visual()
+ 	{
+ 		if ((bool)Turret)
+diff --git a/CombatSandbox.Demo/GunnerSight.cs b/CombatSandbox.Demo/GunnerSight.cs
+index cf704f9..feb4ec7 100644
+--- a/CombatSandbox.Demo/GunnerSight.cs
++++ b/CombatSandbox.Demo/GunnerSight.cs
+@@ -280,6 +280,7 @@ public sealed class GunnerSight : MonoBehaviour
+ 		void Text(float x, float y, string s, GUIStyle st, TextAnchor a = TextAnchor.UpperLeft)
+ 		{
+ 			st.alignment = a;
++			s = Loc.T(s);
+ 			Rect position = new Rect(x - a switch
+ 			{
+ 				TextAnchor.UpperRight => 400f * u, 
+diff --git a/CombatSandbox.Demo/Motorpool.cs b/CombatSandbox.Demo/Motorpool.cs
+index 1642108..101cd05 100644
+--- a/CombatSandbox.Demo/Motorpool.cs
++++ b/CombatSandbox.Demo/Motorpool.cs
+@@ -401,7 +401,7 @@ public sealed class Motorpool : MonoBehaviour
+ 			select c.p).FirstOrDefault();
+ 		if (num == 0 && num2 == 0)
+ 		{
+-			List<(CombatBrain, Vector3)> list = (from b in Candidates(t)
++			List<(CombatBrain b, Vector3 goal)> list = (from b in Candidates(t)
+ 				select (b: b, goal: Goal(b))).ToList();
+ 			if ((bool)capturePoint)
+ 			{
+@@ -410,7 +410,7 @@ public sealed class Motorpool : MonoBehaviour
+ 			}
+ 			else if (list.Count > 0)
+ 			{
+-				IGrouping<int, (CombatBrain, Vector3)> source = (from g in list
++				IGrouping<int, (CombatBrain b, Vector3 goal)> source = (from g in list
+ 					group g by Key(g.goal) into g
+ 					orderby g.Count() descending
+ 					select g).First();
+@@ -447,7 +447,7 @@ public sealed class Motorpool : MonoBehaviour
+ 			}
+ 		}
+ 		bool flag = v.Riders.Any((ArenaTarget r) => (bool)r && r.Boarding);
+-		bool num5 = num >= num3 && !flag;
++		bool num5 = num3 > 0 && num >= num3 && !flag;
+ 		bool flag2 = !flag && ((num >= 2 && num2 == 0 && age > 8f) || (num >= 1 && num2 == 0 && age > 18f) || (num >= 1 && (bool)capturePoint && t.Point == capturePoint && age > 12f && num2 == 0) || (num >= 1 && age > 40f));
+ 		if (num5 || flag2)
+ 		{
+diff --git a/CombatSandbox.Demo/ReconstructionDemo.cs b/CombatSandbox.Demo/ReconstructionDemo.cs
+index d0e18db..c3096be 100644
+--- a/CombatSandbox.Demo/ReconstructionDemo.cs
++++ b/CombatSandbox.Demo/ReconstructionDemo.cs
+@@ -1450,13 +1450,20 @@ public sealed class ReconstructionDemo : MonoBehaviour
+ 			component.Rifle.Spatter(traces, position, direction, 0.025f);
+ 		}
+ 		BloodRng.Eject();
+-		for (int i = 0; i < 22; i++)
+-		{
+-			Vector3 vector = new Vector3(BloodRng.Range(-1f, 1f), BloodRng.Range(-0.4f, 1.2f), BloodRng.Range(-1f, 1f));
+-			float num = ((i < 12) ? BloodRng.Range(0.0013f, 0.0028f) : ((i < 19) ? BloodRng.Range(0.0028f, 0.0045f) : BloodRng.Range(0.0045f, 0.0062f)));
++		int num3 = Mathf.RoundToInt(22f * GameSettings.BloodSplash[Mathf.Clamp(GameSettings.Blood, 0, 2)]);
++		for (int i = 0; i < num3; i++)
++		{
++			int num4 = i % 22;
++			float num5 = ((i < 22) ? 1f : BloodRng.Range(0.7f, 1.45f));
++			Vector3 vector = new Vector3(BloodRng.Range(-1f, 1f), BloodRng.Range(-0.4f, 1.2f), BloodRng.Range(-1f, 1f)) * num5;
++			float num = ((num4 < 12) ? BloodRng.Range(0.0013f, 0.0028f) : ((num4 < 19) ? BloodRng.Range(0.0028f, 0.0045f) : BloodRng.Range(0.0045f, 0.0062f)));
++			if (i >= 22 && num4 < 12)
++			{
++				num *= BloodRng.Range(0.5f, 0.9f);
++			}
+ 			float num2 = MathF.PI / 6f * num * num * num * 1000000f;
+-			Vector3 velocity = direction * ((i < 19) ? 1f : 0.55f) + vector * ((i < 12) ? 0.75f : ((i < 19) ? 0.5f : 0.3f)) + zone.Body.GetPointVelocity(position);
+-			if (blood.Emit(position + direction.normalized * 0.015f, velocity, num, num2, DropKind.Spray, zone.Owner.GetInstanceID(), 6f, 0f, -1f, 0, -1))
++			Vector3 velocity = direction * ((num4 < 19) ? 1f : 0.55f) * num5 + vector * ((num4 < 12) ? 0.75f : ((num4 < 19) ? 0.5f : 0.3f)) + zone.Body.GetPointVelocity(position);
++			if (blood.Emit(position + direction.normalized * 0.015f, velocity, num, num2, DropKind.Spray, zone.Owner.GetInstanceID(), 6f, 0f, -1f, 0, -1) && i < 22)
+ 			{
+ 				zone.Owner.GetComponent<ArenaTarget>()?.ApplyBloodLoss(num2);
+ 			}
+diff --git a/CombatSandbox.Demo/UIKit.cs b/CombatSandbox.Demo/UIKit.cs
+index be2ff84..b0ac6a0 100644
+--- a/CombatSandbox.Demo/UIKit.cs
++++ b/CombatSandbox.Demo/UIKit.cs
+@@ -66,6 +66,7 @@ public static class UIKit
+ 	{
+ 		get
+ 		{
++			LocRunner.Ensure();
+ 			if ((bool)font)
+ 			{
+ 				return font;
+@@ -466,7 +467,7 @@ public static class UIKit
+ 			text2.fontSize = size;
+ 			text2.color = color;
+ 			text2.alignment = align;
+-			text2.text = text;
++			text2.text = Loc.T(text);
+ 			text2.raycastTarget = false;
+ 			text2.supportRichText = true;
+ 			text2.fontStyle = (bold ? FontStyle.Bold : FontStyle.Normal);
+@@ -707,6 +708,7 @@ public static class UIKit
+ 
+ 	public static float KeyCap(Transform parent, string key, Vector2 position, Vector2 anchor, int size = 15)
+ 	{
++		key = Loc.T(key);
+ 		float num = Mathf.Max(30f, (float)(key.Length * size) * 0.62f + 16f);
+ 		Image image = Box(parent, "Key " + key, new Color(0.85f, 0.87f, 0.86f, 0.95f));
+ 		Place(image.rectTransform, anchor, position, new Vector2(num, 28f));
+diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
+index 3a35c45..f7b83da 100644
+--- a/CombatSandbox.Demo/Vehicle.cs
++++ b/CombatSandbox.Demo/Vehicle.cs
+@@ -486,6 +486,13 @@ public abstract class Vehicle : MonoBehaviour
+ 					typeof(QuadBike),
+ 					typeof(QuadBike)
+ 				});
++				if (GameSettings.Tanks)
++				{
++					Type[] array2 = new Type[array.Length + 1];
++					array2[0] = typeof(T72);
++					Array.Copy(array, 0, array2, 1, array.Length);
++					array = array2;
++				}
+ 				for (int j = 0; j < array.Length; j++)
+ 				{
+ 					Place(array[j], i, @base.position, toward);
+@@ -518,6 +525,10 @@ public abstract class Vehicle : MonoBehaviour
+ 
+ 	private static Vector3 HalfSize(Type kind)
+ 	{
++		if (kind == typeof(T72))
++		{
++			return new Vector3(1.8f, 1.2f, 3.7f);
++		}
+ 		if (!(kind == typeof(Btr)))
+ 		{
+ 			if (!(kind == typeof(M113)))
+diff --git a/CombatSandbox/BloodDroplets.cs b/CombatSandbox/BloodDroplets.cs
+index 32950e7..69cfe9c 100644
+--- a/CombatSandbox/BloodDroplets.cs
++++ b/CombatSandbox/BloodDroplets.cs
+@@ -7,9 +7,9 @@ namespace CombatSandbox;
+ 
+ public sealed class BloodDroplets : IDisposable
+ {
+-	private readonly BloodDrop[] drops = new BloodDrop[2400];
++	private readonly BloodDrop[] drops = new BloodDrop[4000];
+ 
+-	private readonly ParticleSystem.Particle[] particles = new ParticleSystem.Particle[2400];
++	private readonly ParticleSystem.Particle[] particles = new ParticleSystem.Particle[4000];
+ 
+ 	private readonly ParticleSystem system;
+ 
+@@ -70,7 +70,7 @@ public sealed class BloodDroplets : IDisposable
+ 		ParticleSystem.MainModule main = system.main;
+ 		main.loop = true;
+ 		main.playOnAwake = false;
+-		main.maxParticles = 2400;
++		main.maxParticles = 4000;
+ 		main.simulationSpace = ParticleSystemSimulationSpace.World;
+ 		main.startSpeed = 0f;
+ 		main.startLifetime = 1000f;
+diff --git a/CombatSandbox/WoundBleeding.cs b/CombatSandbox/WoundBleeding.cs
+index 503ec9f..804992e 100644
+--- a/CombatSandbox/WoundBleeding.cs
++++ b/CombatSandbox/WoundBleeding.cs
+@@ -101,6 +101,8 @@ public sealed class WoundBleeding : MonoBehaviour
+ 
+ 	private System.Random random;
+ 
++	private static float Pool => CombatSandbox.Demo.GameSettings.BloodPool[Mathf.Clamp(CombatSandbox.Demo.GameSettings.Blood, 0, 2)];
++
+ 	public int WoundCount { get; private set; }
+ 
+ 	public float BloodLostMl { get; private set; }
+@@ -286,7 +288,7 @@ public sealed class WoundBleeding : MonoBehaviour
+ 		{
+ 			deadAge += num;
+ 		}
+-		float num2 = (body.Dead ? (Mathf.Exp((0f - deadAge) / 60f) * Mathf.Clamp01(1f - BloodLostMl / 4500f) * (Lying ? 3f : 0.5f)) : ((Pressure >= 0f) ? Pressure : Mathf.Clamp01(1f - BloodLostMl / 4500f)));
++		float num2 = (body.Dead ? (Mathf.Exp((0f - deadAge) / (60f * Pool)) * Mathf.Clamp01(1f - BloodLostMl / 4500f) * (Lying ? (3f * Pool) : 0.5f)) : ((Pressure >= 0f) ? Pressure : Mathf.Clamp01(1f - BloodLostMl / 4500f)));
+ 		float num3 = ((HeartPhase >= 0f) ? HeartPhase : (Time.time * 1.25f));
+ 		tokens = Mathf.Min(14f, tokens + num * (float)Mathf.Max(1, MaxDropsPerSecond));
+ 		for (int i = 0; i < WoundCount; i++)

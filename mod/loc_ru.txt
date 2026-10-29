@@ -1,0 +1,940 @@
+# ===== Main menu / pause / settings (GameMenu)
+Sound|Звук
+How loud everything is, and which sounds you hear.|Громкость и то, какие звуки слышны.
+Controls|Управление
+The mouse and the keys.|Мышь и клавиши.
+Graphics|Графика
+Picture quality, the screen and the frame rate.|Качество картинки, экран и частота кадров.
+Interface|Интерфейс
+What the battle shows on the screen.|Что показывается на экране во время боя.
+Game|Игра
+How the battle plays: the enemy, the time, the numbers.|Как идёт бой: противник, время, численность.
+Performance|Производительность
+Keeping the frame rate up in a big battle.|Как держать частоту кадров в большом бою.
+Extra|Дополнительно
+Language, blood and tanks.|Язык, кровь и танки.
+Language|Язык
+The language of menus and the battle screens.|Язык меню и боевого интерфейса.
+Blood|Кровь
+How much blood a hit throws out in drops, and how big the pools under the fallen grow.|Сколько крови разлетается каплями при попадании и насколько большие лужи растекаются под убитыми.
+Normal|Обычно
+Plenty|Много
+Very much|Очень много
+Tanks|Танки
+A T-72 tank for each side at the start of the battle (from the next battle).|Танк Т-72 у каждой стороны в начале боя (со следующего боя).
+ALPHA 0.0.3 · EARLY ACCESS|АЛЬФА 0.0.3 · РАННИЙ ДОСТУП
+Paused — the camera is free (P — resume)|Пауза — камера свободна (P — продолжить)
+The battle goes on|Бой продолжается
+Battle time|Время боя
+standing|в строю
+Main menu|Главное меню
+Play|Играть
+Teams|Команды
+Settings|Настройки
+Quit|Выход
+Join the community on Discord|Присоединяйтесь к сообществу в Discord
+Notice|Внимание
+The game may contain bugs. This is only a demonstration version:|Игра может содержать ошибки. Это лишь демонстрационная версия:
+character models and maps will be changed in the future.|модели персонажей и карты в будущем будут изменены.
+PAUSED|ПАУЗА
+Resume|Продолжить
+Restart level|Перезапустить уровень
+Quit game|Выйти из игры
+CONTROLS|УПРАВЛЕНИЕ
+OBSERVER|НАБЛЮДАТЕЛЬ
+RMB|ПКМ
+LMB|ЛКМ
+hold and move the mouse — look around|удерживать и двигать мышь — осмотреться
+fly the camera   Q / E — down / up|полёт камеры   Q / E — вниз / вверх
+faster / slower   wheel — speed|быстрее / медленнее   колесо — скорость
+select a soldier   double-click — take control|выбрать бойца   двойной щелчок — взять управление
+take control of the soldier under the cursor / selected|взять управление бойцом под курсором / выбранным
+follow the selected soldier|следовать за выбранным бойцом
+the chosen Alpha / Bravo soldier at the cursor (Shift — the whole group)|выбранный боец Альфы / Браво у курсора (Shift — вся группа)
+slow motion / pause without the menu|замедление / пауза без меню
+hide panels / pause menu|скрыть панели / меню паузы
+SOLDIER|БОЕЦ
+move   Shift — run   Ctrl — crouch|движение   Shift — бег   Ctrl — присесть
+Space|Пробел
+jump — or vault over / climb onto what is in front|прыжок — или перелезть / забраться на препятствие впереди
+rest the weapon on what is in front (a sill, sandbags, a wall)|упереть оружие во что-то впереди (подоконник, мешки, стену)
+fire / aim|огонь / прицел
+reload / pick up the weapon nearby|перезарядка / подобрать оружие рядом
+primary weapon / pistol|основное оружие / пистолет
+throw a grenade (where you aim)|бросить гранату (куда целитесь)
+Wheel|Колесо
+scope magnification (aiming through a scope)|кратность прицела (при прицеливании в оптику)
+drag a wounded comrade (again — let go)|тащить раненого товарища (ещё раз — отпустить)
+first-person view / leave the soldier|вид от первого лица / покинуть бойца
+fire mode: automatic / single shots|режим огня: автоматический / одиночный
+SETTINGS|НАСТРОЙКИ
+Hold|Удерживать
+Toggle|Переключать
+Master volume|Общая громкость
+Everything at once.|Всё сразу.
+Battle sounds|Звуки боя
+Gunfire, explosions, hits and the rest of the battle.|Стрельба, взрывы, попадания и прочие звуки боя.
+Gunfire echo|Эхо выстрелов
+The ring of shots off the houses and the hills far away.|Отзвук выстрелов от домов и далёких холмов.
+Footsteps|Шаги
+Boots on the ground (by what it is: wood, concrete, earth, metal...).|Шаги по поверхности (дерево, бетон, земля, металл...).
+Interface sounds|Звуки интерфейса
+Clicks and signals of the menus and the battle screens.|Щелчки и сигналы меню и боевого интерфейса.
+Echoes in streets and rooms|Эхо на улицах и в помещениях
+Shots answered by the walls around them.|Выстрелы, отражённые от окружающих стен.
+Distant battle|Далёкий бой
+Fighting somewhere beyond the map: far bursts and explosions.|Бой где-то за пределами карты: далёкие очереди и взрывы.
+Heartbeat when badly wounded|Сердцебиение при тяжёлом ранении
+Your soldier's heart heard as he bleeds.|Слышно сердце вашего бойца, пока он истекает кровью.
+Mouse sensitivity|Чувствительность мыши
+How fast the view turns.|Как быстро поворачивается взгляд.
+Aiming sensitivity|Чувствительность при прицеливании
+The view turning while aiming, against the normal speed.|Скорость поворота при прицеливании относительно обычной.
+Invert mouse|Инверсия мыши
+Mouse forward looks down.|Мышь вперёд — взгляд вниз.
+Field of view|Поле зрения
+How wide the view is.|Насколько широкий обзор.
+Aim (right mouse button)|Прицел (правая кнопка мыши)
+Hold to aim, or press once to aim and again to stop.|Удерживать для прицеливания или нажать один раз, чтобы прицелиться, и ещё раз — чтобы перестать.
+Crouch (Ctrl)|Присесть (Ctrl)
+Hold to stay low, or press to crouch and again to stand.|Удерживать, чтобы сидеть, или нажать, чтобы присесть, и ещё раз — чтобы встать.
+Run (Shift)|Бег (Shift)
+Hold to run, or press to run until you stop.|Удерживать для бега или нажать, чтобы бежать до остановки.
+Start in first person|Начинать от первого лица
+Taking over a soldier, see through his eyes (V switches).|При взятии бойца смотреть его глазами (V переключает).
+Graphics quality|Качество графики
+The overall level of detail.|Общий уровень детализации.
+Screen resolution|Разрешение экрана
+The size of the picture.|Размер изображения.
+Full screen|Полный экран
+The whole screen, or a window.|Весь экран или окно.
+Vertical sync|Вертикальная синхронизация
+No tearing; the frame rate follows the screen.|Без разрывов; частота кадров следует за экраном.
+Frame rate limit|Ограничение частоты кадров
+The most frames a second (with vertical sync off).|Максимум кадров в секунду (при выключенной синхронизации).
+No limit|Без ограничения
+Shadows|Тени
+How far off shadows are drawn (far costs frames).|Дальность прорисовки теней (дальние стоят кадров).
+Near|Близко
+Medium|Средне
+Far|Далеко
+Camera shake|Тряска камеры
+Shots and explosions shaking the view.|Тряска от выстрелов и взрывов.
+Frame rate counter|Счётчик кадров
+Frames a second, bottom right.|Кадры в секунду, справа внизу.
+Interface size|Размер интерфейса
+The battle screens, larger or smaller.|Боевой интерфейс крупнее или мельче.
+Names and health over soldiers|Имена и здоровье над бойцами
+A tag over each man in sight.|Метка над каждым бойцом в поле зрения.
+Control hints|Подсказки управления
+The keys along the bottom of the screen.|Клавиши внизу экрана.
+Hip-fire dot|Точка стрельбы от бедра
+Where the barrel points, when not aiming.|Куда направлен ствол, когда не целитесь.
+Kill feed|Лента убийств
+Who killed whom and what happens, top right.|Кто кого убил и что происходит, справа вверху.
+Point markers|Маркеры точек
+Capture mode: the points marked in the world with their distance.|Режим захвата: точки отмечены в мире с расстоянием до них.
+Compass|Компас
+The bearing you look along, bottom centre.|Направление взгляда, внизу по центру.
+Hit marker|Маркер попадания
+The cross flashing round the crosshair when your shot hits a man.|Крестик вокруг прицела, когда ваш выстрел попадает в человека.
+Difficulty|Сложность
+How well the enemy aims and how fast he reacts.|Насколько метко стреляет противник и как быстро реагирует.
+Motion-captured walk and run|Ходьба и бег из захвата движений
+The soldiers' legs, hips and spine move the way captured walking and running does (off: the plain worked-out walk).|Ноги, бёдра и спина бойцов двигаются как при записанной ходьбе и беге (выкл.: простая расчётная походка).
+Desperate acts of the dying (rare)|Отчаянные поступки умирающих (редко)
+A man at the very end may turn a grenade or his weapon on himself.|Умирающий может подорвать себя гранатой или застрелиться.
+Slow motion (T)|Замедление (T)
+How slow time runs.|Насколько замедляется время.
+Soldiers on the map|Бойцов на карте
+The most standing at once (the capture mode always fits both teams).|Максимум одновременно в строю (в режиме захвата всегда помещаются обе команды).
+Capture: tickets|Захват: очки подкрепления
+Each side's reserve of men - how long a round lasts (from the next round).|Резерв бойцов каждой стороны — сколько длится раунд (со следующего раунда).
+Capture: your respawn|Захват: ваше возрождение
+Seconds after being killed before you come back at a point.|Секунд после гибели до возвращения на точке.
+Capture: reinforcement waves|Захват: волны подкрепления
+How often the fallen of both sides come back together.|Как часто павшие обеих сторон возвращаются вместе.
+Clear debris when the frame rate drops|Убирать мусор при падении частоты кадров
+Spent cases, loose magazines and the like go first.|Сначала убираются гильзы, брошенные магазины и т. п.
+Keep the frame rate above|Держать частоту кадров выше
+When to start clearing.|Когда начинать уборку.
+Still the bodies of the dead after|Замораживать тела погибших через
+A body lying long enough stops being simulated.|Долго лежащее тело перестаёт симулироваться.
+min|мин
+never|никогда
+Capture: bodies on the map|Захват: тел на карте
+Beyond this the oldest far from you are taken away.|Сверх этого числа самые старые тела вдали от вас убираются.
+Reset all|Сбросить всё
+Done|Готово
+Easy|Легко
+Hard|Сложно
+Realistic|Реалистично
+Rare|Редко
+Often|Часто
+Low|Низкое
+High|Высокое
+Very high|Очень высокое
+Ultra|Ультра
+Very Low|Очень низкое
+Very low|Очень низкое
+# ===== Team menus
+Battle|Сражение
+Two sides, two bases. Watch the fight from above, send in your soldiers, take over any of them.|Две стороны, две базы. Наблюдайте за боем сверху, отправляйте бойцов в бой, берите управление любым из них.
+Capture the points|Захват точек
+You are one soldier of your side. Take the points on the map, come back at the ones you hold - take them all to win.|Вы — один из бойцов своей стороны. Захватывайте точки на карте и возрождайтесь на удерживаемых — захватите все, чтобы победить.
+NEW BATTLE|НОВЫЙ БОЙ
+Choose where to fight, how, and which of your teams take each side.|Выберите, где и как сражаться и какие команды выступят за каждую сторону.
+MAP|КАРТА
+Map|Карта
+MODE|РЕЖИМ
+Mode|Режим
+TEAMS|КОМАНДЫ
+Side|Сторона
+SIDE ONE|СТОРОНА ПЕРВАЯ
+SIDE TWO|СТОРОНА ВТОРАЯ
+Back|Назад
+Edit teams|Редактировать команды
+Start battle|Начать бой
+Team|Команда
+New|Новая
+Copy|Копировать
+Delete|Удалить
+Team name|Название команды
+ARMBAND|ПОВЯЗКА
+Click a soldier to change his name, job and kit.|Щёлкните по бойцу, чтобы изменить имя, специальность и снаряжение.
+Add soldier|Добавить бойца
+Save|Сохранить
+Soldier|Боец
+NAME|ИМЯ
+Name|Имя
+JOB|СПЕЦИАЛЬНОСТЬ
+WEAPON|ОРУЖИЕ
+Primary|Основное
+PISTOL|ПИСТОЛЕТ
+Pistol|Пистолет
+GRENADES|ГРАНАТЫ
+Grenade|Граната
+Remove soldier|Убрать бойца
+Armory|Арсенал
+ARMORY|АРСЕНАЛ
+← →  or  A / D — browse      drag — turn the weapon|← →  или  A / D — листать      тянуть — вращать оружие
+Damage|Урон
+Range|Дальность
+Rate of fire|Скорострельность
+Accuracy|Точность
+Handling|Управляемость
+Take this weapon|Взять это оружие
+New team|Новая команда
+copy|копия
+Commander|Командир
+Rifleman|Стрелок
+Machine gunner|Пулемётчик
+Sniper|Снайпер
+Saved|Сохранено
+Medic|Медик
+armbands|повязок
+soldiers|бойцов
+machine gun|пулемёт
+machine guns|пулемётов
+medic|медик
+medics|медиков
+grenades|гранат
+Drone operator|Оператор дрона
+RPG gunner|Гранатомётчик
+None|Нет
+PRIMARY WEAPON|ОСНОВНОЕ ОРУЖИЕ
+FOR|ДЛЯ
+automatic and single|автоматический и одиночный
+automatic only|только автоматический
+single shots|одиночные выстрелы
+reflex sight|коллиматорный прицел
+iron sights|открытый прицел
+× scope|× оптика
+Magazine|Магазин
+-round belt|-патронная лента
+rounds|патронов
+Fire|Огонь
+rpm|выстр./мин
+Muzzle speed|Нач. скорость
+m/s|м/с
+Sight|Прицел
+suppressed|с глушителем
+Weight|Масса
+kg|кг
+Effective|Эффективная
+CARRIED NOW|СЕЙЧАС В РУКАХ
+Officer|Офицер
+# ===== Weapons
+The Soviet army's rifle: light, forgiving and steady in long bursts. Iron sights.|Автомат Советской армии: лёгкий, неприхотливый и устойчивый в длинных очередях. Открытый прицел.
+A modernised AK-74M: DTK-1 compensator, foregrip and a reflex sight. Climbs less and is quicker on target.|Модернизированный АК-74М: компенсатор ДТК-1, рукоять и коллиматор. Меньше подбрасывает, быстрее наводится.
+Piston-driven 5.56 carbine: fast cycling, flat shooting, a precise rear aperture.|Карабин 5,56 с газовым поршнем: высокий темп, настильная траектория, точный диоптр.
+Special forces carbine with a SOCOM RC2 suppressor and a Vortex Razor 1–6× scope. Quiet, almost no flash.|Карабин спецназа с глушителем SOCOM RC2 и прицелом Vortex Razor 1–6×. Тихий, почти без вспышки.
+General-purpose machine gun on a 100-round belt. Heavy, slow to reload, keeps whole streets down. Green tracers.|Единый пулемёт с лентой на 100 патронов. Тяжёлый, долго перезаряжается, прижимает целые улицы. Зелёные трассеры.
+Semi-automatic marksman rifle with the PSO-1 4× scope and its rangefinder. Ten heavy rounds, each one aimed.|Самозарядная снайперская винтовка с прицелом ПСО-1 4× и дальномером. Десять тяжёлых патронов, каждый — прицельно.
+Polymer service pistol, 17 rounds, tritium night sights.|Служебный полимерный пистолет, 17 патронов, тритиевые ночные прицельные.
+The classic .45: seven heavy, slow rounds that hit hard.|Классический .45: семь тяжёлых медленных пуль, бьющих наповал.
+Shoulder-fired grenade launcher. The HEAT grenade leaves at 115 m/s, its rocket lights 11 m out and drives it to 295 m/s; it bursts through a wall or a window on whoever is behind. Twenty metres behind the tube are no place to stand.|Ручной противотанковый гранатомёт. Кумулятивная граната вылетает со скоростью 115 м/с, через 11 м включается двигатель и разгоняет её до 295 м/с; она пробивает стену или окно и поражает тех, кто за ними. В двадцати метрах позади трубы стоять нельзя.
+Grenade launcher|Гранатомёт
+Marksman rifle|Снайперская винтовка
+Machine gun|Пулемёт
+Assault rifle|Автомат
+# ===== Loading / boot
+Hold the right mouse button to aim. The dot shows where the barrel points - your rounds go there, not to the crosshair.|Удерживайте правую кнопку мыши, чтобы прицелиться. Точка показывает, куда смотрит ствол — пули летят туда, а не в перекрестие.
+Short bursts stay on target. A long burst climbs and spreads with the recoil.|Короткие очереди держатся на цели. Длинную очередь уводит вверх и в стороны отдачей.
+Soldiers notice movement and muzzle flashes first. Keep low behind cover and you stay unseen for longer.|Бойцы прежде всего замечают движение и вспышки выстрелов. Пригнитесь за укрытием — и вас дольше не заметят.
+Nobody opens fire beyond about 65 metres unless he is fired upon.|Никто не открывает огонь дальше примерно 65 метров, если по нему не стреляют.
+Double-click a soldier, or press F, to take control of him. F again returns you to the observer.|Дважды щёлкните по бойцу или нажмите F, чтобы взять его под управление. Повторное F вернёт к наблюдателю.
+Medics treat the wounded only once they lie out of the enemy's line of fire. Drag a wounded comrade to cover with G.|Медики лечат раненых только вне линии огня противника. Оттащите раненого товарища в укрытие клавишей H.
+A bandaged wound stops bleeding, but the man is still weak from the blood he has lost.|Перевязанная рана перестаёт кровоточить, но боец всё ещё слаб от потерянной крови.
+Press T for slow motion, or P to freeze the battle and fly around it.|Нажмите T для замедления или P, чтобы остановить бой и облететь его.
+Press 1 or 2 to send in Alpha or Bravo reinforcements where the cursor points. Shift sends five.|Нажмите 1 или 2, чтобы отправить подкрепление Альфы или Браво туда, куда указывает курсор. Shift — пятерых.
+Defenders hold their positions and watch their sector; attackers move from cover to cover while the rest watch.|Обороняющиеся держат позиции и следят за своим сектором; атакующие перебегают от укрытия к укрытию под прикрытием остальных.
+A soldier pinned down or hit in the same cover moves to another one.|Боец, прижатый огнём или раненый в одном укрытии, перебегает в другое.
+Kerbs, rubble and the dead are in the way: soldiers step over or walk round them.|Бордюры, обломки и убитые мешают: бойцы перешагивают или обходят их.
+Loading|Загрузка
+ENTERING THE COMBAT ZONE|ВХОД В ЗОНУ БОЕВЫХ ДЕЙСТВИЙ
+TIP|СОВЕТ
+LOADING|ЗАГРУЗКА
+WORK IN PROGRESS, NOT REPRESENTATIVE OF THE FINAL GAME|В РАЗРАБОТКЕ, НЕ ОТРАЖАЕТ ФИНАЛЬНУЮ ВЕРСИЮ ИГРЫ
+DUMMYWAR is an early prototype - it is not a finished or fully playable game.|DUMMYWAR — ранний прототип, а не законченная или полностью играбельная игра.
+Expect bugs, missing features and placeholder content that will change.|Ожидайте ошибок, отсутствующих функций и временного контента, который изменится.
+Questions, feedback and bug reports are welcome in the comments|Вопросы, отзывы и сообщения об ошибках приветствуются в комментариях
+on the game's|на странице игры на
+page.|.
+EARLY PROTOTYPE|РАННИЙ ПРОТОТИП
+Press any key to continue|Нажмите любую клавишу, чтобы продолжить
+# ===== Battle UI
+Paused|Пауза
+PAUSED  ·  P|ПАУЗА  ·  P
+COMMAND|КОМАНДОВАНИЕ
+Clear bodies|Убрать тела
+Pause  (P)|Пауза  (P)
+Menu  (Esc)|Меню  (Esc)
+SOLDIERS|БОЙЦЫ
+click — select, double-click — take control|щелчок — выбрать, двойной щелчок — взять управление
+Take control  F|Взять управление  F
+Follow  C|Следовать  C
+SUPPLIES|СНАБЖЕНИЕ
+low|мало
+CALLING|ВЫЗЫВАЕТ
+DOWN|РАНЕН
+WEAPONS|ОРУЖИЕ
+FIRST AID|ПЕРВАЯ ПОМОЩЬ
+move|движение
+run|бег
+crouch|присесть
+jump / climb|прыжок / залезть
+rest weapon|упор оружия
+fire|огонь
+aim|прицел
+fire mode|режим огня
+reload|перезарядка
+weapon|оружие
+grenade|граната
+pick up|подобрать
+drag wounded|тащить раненого
+view|вид
+redeploy|возродиться
+leave|покинуть
+menu|меню
+drone|дрон
+look|обзор
+fly|полёт
+select|выбор
+take control|взять управление
+slow motion|замедление
+panels|панели
+kills:|убийств:
+points:|точек:
+Attack|Атака
+Defend|Оборона
+Speed ×0.3|Скорость ×0.3
+Slow motion|Замедление
+Resume  (P)|Продолжить  (P)
+CONTROLLING|УПРАВЛЕНИЕ
+FOLLOWING|СЛЕЖЕНИЕ
+tickets|очки
+headshot|в голову
+blood loss|потеря крови
+suffocation|удушье
+trauma|травма
+finished off|добит
+executed|казнён
+surrenders|сдаётся
+takes command|принимает командование
+finishes off|добивает
+shoots|стреляет
+left lying|оставлен лежать
+back on his feet|снова на ногах
+killed|убит
+surrendering|сдаётся
+led away captive|уведён в плен
+condemned|приговорён
+player, dragging wounded|игрок, тащит раненого
+player controlled|под управлением игрока
+being carried out|его выносят
+in combat|в бою
+firing|ведёт огонь
+changing position|меняет позицию
+reloading|перезаряжается
+taking position|занимает позицию
+holding position|держит позицию
+watching the enemy|наблюдает за противником
+advancing|наступает
+running to wounded|бежит к раненому
+carrying wounded|несёт раненого
+bandaging|перевязывает
+in cover|в укрытии
+holding base|держит базу
+escorting prisoner|конвоирует пленного
+executing|казнит
+under fire|под огнём
+panicking|в панике
+picking up weapon|подбирает оружие
+falling|падает
+bleeding|кровотечение
+unconscious|без сознания
+wounded, down|ранен, лежит
+patrolling|патрулирует
+rank|звание
+Release  C|Отпустить  C
+bleeding ×|кровотечений ×
+bandaged ×|перевязано ×
+fracture|перелом
+legs paralysed|ноги парализованы
+shock|шок
+unarmed|безоружен
+Unhurt|Невредим
+Unarmed|Безоружен
+SINGLE|ОДИНОЧНЫЙ
+AUTO|АВТОМАТ
+B  switch|B  переключить
+RELOADING|ПЕРЕЗАРЯДКА
+EMPTY  —  R  RELOAD|ПУСТО  —  R  ПЕРЕЗАРЯДКА
+LOW  —  R  RELOAD|МАЛО  —  R  ПЕРЕЗАРЯДКА
+RPG-7|РПГ-7
+GRENADE|ГРАНАТА
+DRONE|ДРОН
+DRESS · TQ|ПЕРЕВЯЗКА · ЖГУТ
+DRESSING|ПЕРЕВЯЗКА
+PAINKILLER|ОБЕЗБОЛИВАЮЩЕЕ
+COMING|ИДЁТ
+CALL MEDIC|ВЫЗВАТЬ МЕДИКА
+MEDIC BAG   seals|СУМКА МЕДИКА   пластыри
+splints|шины
+fluids|растворы
+throttle|газ
+steer|руль
+brake|тормоз
+get out|выйти
+sight|прицел
+get out of the|выйти из
+get in the|сесть в
+look at another place to choose it|посмотрите на другое место, чтобы выбрать его
+let go of|отпустить
+walk to drag him to cover|идите, чтобы оттащить его в укрытие
+treat|лечить
+drag to cover|оттащить в укрытие
+down|ранен
+take supplies|взять снабжение
+Supplies - you have all you need|Снабжение — у вас есть всё необходимое
+pick up the weapon|подобрать оружие
+orders|приказы
+HEAVY BLEEDING|СИЛЬНОЕ КРОВОТЕЧЕНИЕ
+BLEEDING|КРОВОТЕЧЕНИЕ
+INTERNAL BLEEDING|ВНУТРЕННЕЕ КРОВОТЕЧЕНИЕ
+SHOCK|ШОК
+LUNG HIT|РАНЕНИЕ ЛЁГКОГО
+FRACTURE|ПЕРЕЛОМ
+LEGS PARALYSED|НОГИ ПАРАЛИЗОВАНЫ
+ARMS PARALYSED|РУКИ ПАРАЛИЗОВАНЫ
+PASSING OUT|ТЕРЯЕТ СОЗНАНИЕ
+DAZED|ОГЛУШЁН
+PAIN|БОЛЬ
+SUPPRESSED|ПОДАВЛЕН
+Falling|Падает
+Down|Лежит
+Unconscious|Без сознания
+Sinking|Оседает
+Getting up|Встаёт
+Picking up weapon|Подбирает оружие
+Staggering|Шатается
+Badly wounded|Тяжело ранен
+Fit to fight|Боеспособен
+Wounded|Ранен
+passenger|пассажир
+troop seat|десант
+commander|командир
+front seat|переднее место
+driver|водитель
+Hit from|Попадание с
+# ===== Capture UI
+REINFORCEMENTS|ПОДКРЕПЛЕНИЕ
+man|чел.
+men|чел.
+back in the fight at|снова в бою на
+CAPTURE THE POINTS|ЗАХВАТ ТОЧЕК
+CHOOSE YOUR SIDE|ВЫБЕРИТЕ СТОРОНУ
+points between the bases|точек между базами
+tickets each|очков у каждой стороны
+Join|Вступить
+JOIN|ВСТУПИТЬ В
+Stand in a point's ring to take it - the more of you, the faster; an enemy there stops it. Hold every point to win.|Встаньте в круг точки, чтобы захватить её — чем вас больше, тем быстрее; враг на точке останавливает захват. Удержите все точки, чтобы победить.
+Each fallen soldier sent back costs a ticket, and the side holding fewer points loses tickets over time.|Каждый возвращённый в бой павший стоит одно очко, а сторона с меньшим числом точек со временем теряет очки.
+Starts at|Начинает на
+Deploy|Высадка
+TACTICAL MAP|ТАКТИЧЕСКАЯ КАРТА
+Rings: who holds a point  ·  pulsing: it is changing hands  ·|Кольца: кто удерживает точку  ·  пульсирует: переходит из рук в руки  ·
+your side's target  ·  dots: your men  ·  click a point or a man|цель вашей стороны  ·  точки: ваши бойцы  ·  щёлкните по точке или бойцу
+REINFORCE AT A POINT|ПОДКРЕПЛЕНИЕ НА ТОЧКЕ
+TAKE OVER A SOLDIER|ВЗЯТЬ БОЙЦА
+bring a fallen soldier back  ·  1 ticket|вернуть павшего бойца  ·  1 очко
+join a man in the field where he stands  ·  free|взять бойца на поле там, где он стоит  ·  бесплатно
+WHERE|ГДЕ
+Play again|Играть снова
+THE BATTLE BEGINS|БОЙ НАЧИНАЕТСЯ
+Take the points - hold them all to win|Захватите точки — удержите все, чтобы победить
+Choose one of your men in the field|Выберите одного из своих бойцов на поле
+He is down|Он ранен
+Nobody has fallen - take over a man in the field|Никто не пал — возьмите бойца на поле
+Choose a fallen soldier|Выберите павшего бойца
+Choose a point you hold|Выберите удерживаемую точку
+No reinforcements left at|Не осталось подкреплений на
+- hold it to earn more, or come back at the base|— удерживайте её, чтобы получить ещё, или возродитесь на базе
+Enemy on|Враг на
+No tickets left|Очки закончились
+READY|ГОТОВ
+your side holds no points - take over a man in the field|ваша сторона не удерживает точек — возьмите бойца на поле
+points your side holds|точки вашей стороны
+BASE|БАЗА
+POINT|ТОЧКА
+NO REINFORCEMENTS|НЕТ ПОДКРЕПЛЕНИЙ
+UNDER ATTACK|ПОД АТАКОЙ
+ENEMY NEARBY|ВРАГ РЯДОМ
+FRONT LINE|ЛИНИЯ ФРОНТА
+SECURE|В БЕЗОПАСНОСТИ
+WHO|КТО
+your men in the field|ваши бойцы на поле
+fallen soldiers waiting to come back|павшие бойцы, ожидающие возвращения
+Nobody of your side is standing.|Никого из вашей стороны не осталось в строю.
+Nobody has fallen - all your men are in the field. Take one of them over instead.|Никто не пал — все ваши бойцы на поле. Возьмите под управление одного из них.
+ON|НА
+NEAR|РЯДОМ С
+FIGHTING|БОЙ
+NO TICKETS|НЕТ ОЧКОВ
+IN|ЧЕРЕЗ
+waiting for you - choose and deploy to start the battle|ждут вас — выберите и высадитесь, чтобы начать бой
+your side is losing tickets|ваша сторона теряет очки
+DEPLOY AT|ВЫСАДКА НА
+DEPLOY|ВЫСАДКА
+TAKE OVER|ВЗЯТЬ
+READY IN|ГОТОВ ЧЕРЕЗ
+comes back at|вернётся на
+1 ticket,|1 очко,
+left|осталось
+you join the fight where he stands  ·  no ticket|вы вступаете в бой там, где он стоит  ·  без очков
+HOLDING|УДЕРЖИВАЕМ
+ON THE ATTACK|В АТАКЕ
+DEFEND|ОБОРОНЯТЬ
+CAPTURE|ЗАХВАТИТЬ
+ATTACK|АТАКОВАТЬ
+CONTESTED|ОСПАРИВАЕТСЯ
+NEUTRALISING|НЕЙТРАЛИЗАЦИЯ
+CAPTURING|ЗАХВАТ
+LOSING|ТЕРЯЕМ
+friendly|своих
+enemy|врагов
+ENEMY IS TAKING|ВРАГ ЗАХВАТЫВАЕТ
+YOUR BASE|ВАШУ БАЗУ
+Get back there and hold it|Вернитесь туда и удержите её
+YOUR SIDE IS LOSING TICKETS|ВАША СТОРОНА ТЕРЯЕТ ОЧКИ
+The enemy holds more points - take some back|У врага больше точек — отбейте часть
+CAPTURED|ЗАХВАЧЕНА
++ held by your side|+ удерживается вашей стороной
+Your side holds it|Её удерживает ваша сторона
+TAKEN BY THE ENEMY|ЗАХВАЧЕНА ВРАГОМ
+LOST|ПОТЕРЯНА
+The enemy has taken down your flag|Враг сорвал ваш флаг
+NEUTRALISED|НЕЙТРАЛИЗОВАНА
+The enemy flag is down|Вражеский флаг сорван
+RUNNING OUT OF REINFORCEMENTS|ПОДКРЕПЛЕНИЯ НА ИСХОДЕ
+THE ENEMY IS RUNNING OUT OF REINFORCEMENTS|У ВРАГА ЗАКАНЧИВАЮТСЯ ПОДКРЕПЛЕНИЯ
+A quarter of the tickets left|Осталась четверть очков
+Keep the pressure on|Продолжайте давить
+WINS|ПОБЕЖДАЕТ
+VICTORY|ПОБЕДА
+DEFEAT|ПОРАЖЕНИЕ
+holds every point on the map|удерживает все точки на карте
+has no one left to fight|некому больше сражаться
+Your kills|Ваши убийства
+Deaths|Смерти
+points|точки
+kills|убийства
+# ===== Battle director / capture mode / motorpool messages
+Alpha|Альфа
+Bravo|Браво
+Soldier limit reached:|Достигнут лимит бойцов:
+group of|группа из
+deployed|высажена
+: attack|: атаковать
+: defend|: оборонять
+attack|атаковать
+defend|оборонять
+Bodies cleared:|Тел убрано:
+is a prisoner|в плену
+Controlling:|Управление:
+was killed|убит
+Following:|Слежение:
+(WASD — let go)|(WASD — отпустить)
+Drone up -|Дрон в воздухе —
+No drones left|Дронов не осталось
+A drone is already up|Дрон уже в воздухе
+Fire mode:|Режим огня:
+single|одиночный
+automatic|автоматический
+Volume|Громкость
+takes command of|принимает командование над
+takes over prisoner|принимает пленного
+takes prisoner|берёт в плен
+shoots the surrendering|расстреливает сдающегося
+finishes off the wounded|добивает раненого
+left lying: cannot walk|оставлен лежать: не может идти
+No commander|Нет командира
+keep prisoner|оставить пленного
+execute prisoner|казнить пленного
+base|база
+The battle for the points has begun|Битва за точки началась
+captured|захватывает
+lost|теряет
+point|точку
+is running out of reinforcements|остаётся без подкреплений
+holds every point|удерживает все точки
+has no one left|никого не осталось
+wins:|побеждает:
+every point taken|все точки захвачены
+the enemy is spent|враг истощён
+: reinforcements -|: подкрепление —
+at|на
+the officer's orders|приказ офицера
+command:|командование:
+hold what we have|удерживать то, что есть
+go on the attack|переходить в атаку
+keep up the pressure|продолжать давить
+gather for the assault on|собираться для штурма
+ready|готовы
+storm|штурмовать
+take|взять
+advance on|наступать на
+from two sides|с двух сторон
+hold every point|удерживать все точки
+also attack|также атаковать
+the assault on|штурм
+goes in|начинается
+calls for support|запрашивает поддержку
+has lost its driver - the men get out|лишился водителя — бойцы выходят
+ambushed - the men get out where it is|попал в засаду — бойцы высаживаются на месте
+has put|высадил
+for point|для точки
+takes|везёт
+to|на
+goes to support|выдвигается на поддержку
+the front|фронта
+goes over to help point|выдвигается на помощь точке
+# ===== Orders (CommandWheel / CommandOrders)
+Command|Команды
+ORDERS|ПРИКАЗЫ
+Point at an order, let go of Q (or click) to give it  ·  back to the middle or RMB: cancel|Наведите на приказ и отпустите Q (или щёлкните), чтобы отдать его  ·  в центр или ПКМ: отмена
+THERE|ТУДА
+YOUR ORDER|ВАШ ПРИКАЗ
+CANCEL|ОТМЕНА
+no order given|приказ не отдан
+fill up, then on|пополниться, затем дальше
+keep round me|держаться рядом со мной
+the staff's orders|приказы штаба
+Order:|Приказ:
+RESUPPLY|ПОПОЛНИТЬСЯ
+HOLD THERE|ДЕРЖАТЬ ТАМ
+FOLLOW ME|ЗА МНОЙ
+AS YOU WERE|ОТСТАВИТЬ
+(you): carry on as before|(вы): действовать как прежде
+hold there|держать там
+on me, follow me|ко мне, за мной
+there|там
+go and fill up at the supplies|пополниться на складе снабжения
+(you):|(вы):
+# ===== Combat brain notices
+TREATING|ЛЕЧИТ
+INJECTING|УКОЛ
+BANDAGING|ПЕРЕВЯЗКА
+TOURNIQUET|ЖГУТ
+A pistol is not rested|Пистолет не упирают
+Nothing to rest the weapon on here|Здесь не во что упереть оружие
+launches an FPV drone|запускает FPV-дрон
+signal lost|сигнал потерян
+"Drone!"|«Дрон!»
+No RPG grenades left|Гранат к РПГ не осталось
+fires an RPG|стреляет из РПГ
+takes aim at the|целится в
+throws away the empty RPG|бросает пустой РПГ
+goes back for his RPG|возвращается за своим РПГ
+"Medic!"|«Медик!»
+puts a tourniquet on|накладывает жгут
+gets|ставит
+gives you a dressing|перевязывает вас
+Nothing to dress|Нечего перевязывать
+No dressings left - call a medic (6)|Бинтов не осталось — вызовите медика (6)
+Your arms will not do it - call a medic (6)|Руки не слушаются — вызовите медика (6)
+No injectors left|Шприц-тюбиков не осталось
+The last one is still working|Предыдущий ещё действует
+You call for a medic|Вы зовёте медика
+Broke off to fire|Отвлёкся на стрельбу
+is seen to|получил помощь
+surrendered|сдался
+Supplies: took|Снабжение: взято
+Nothing here you are short of|Здесь нет ничего, чего вам не хватает
+medical supplies|медикаменты
+first aid|первая помощь
+RPG grenades|гранаты к РПГ
+drones|дроны
+Supplies|Снабжение
+# ===== Drone / sights
+abandoned|брошен
+detonated|подорван
+on target|в цель
+impact|столкновение
+battery dead|батарея разряжена
+BATTERY DEAD|БАТАРЕЯ РАЗРЯЖЕНА
+SIGNAL LOST|СИГНАЛ ПОТЕРЯН
+LOW BATTERY|НИЗКИЙ ЗАРЯД
+WEAK SIGNAL|СЛАБЫЙ СИГНАЛ
+HOME|ДОМ
+crashed|разбился
+shot down|сбит
+shoots down a drone|сбивает дрон
+knocked down|сбит
+knocks a drone out of the air|сбивает дрон в воздухе
+Mouse - direction   W/S - speed   A/D - sideways   Space/Ctrl - up/down   Shift - full throttle   LMB - detonate   X - drop it|Мышь — направление   W/S — скорость   A/D — вбок   Пробел/Ctrl — вверх/вниз   Shift — полный газ   ЛКМ — подрыв   X — бросить
+LMB fire      RMB / WHEEL power      V leave the sight|ЛКМ огонь      ПКМ / КОЛЕСО кратность      V выйти из прицела
+BELT|ЛЕНТА
+a new belt going in|заправляется новая лента
+rounds in the belt  /|патронов в ленте  /
+NARROW|УЗКОЕ
+WIDE|ШИРОКОЕ
+TURRET|БАШНЯ
+ELEV|ВОЗВ
+DAY|ДЕНЬ
+TV|ТВ
+AMMO|БК
+RDY|ГОТОВ
+WHEEL zoom   N mode   LMB fire   RMB exit|КОЛЕСО зум   N режим   ЛКМ огонь   ПКМ выход
+# ===== Treatment screen
+Drag an instrument from the bag onto him|Перетащите инструмент из сумки на раненого
+Drag an instrument onto him      RMB — put it down      E / ESC — back to the fight|Перетащите инструмент на раненого      ПКМ — положить      E / ESC — вернуться в бой
+PATIENT MONITOR|МОНИТОР ПАЦИЕНТА
+HEART RATE|ПУЛЬС
+BLOOD PRESSURE|ДАВЛЕНИЕ
+OXYGEN (SpO2)|КИСЛОРОД (SpO2)
+BREATHING|ДЫХАНИЕ
+TEMPERATURE|ТЕМПЕРАТУРА
+BLOOD LOST|ПОТЕРЯ КРОВИ
+CONSCIOUS|СОЗНАНИЕ
+RISK OF DEATH|РИСК СМЕРТИ
+HIS BODY — drag an instrument from the bag onto a part|ТЕЛО — перетащите инструмент из сумки на часть тела
+Neck|Шея
+Head|Голова
+Chest|Грудь
+Belly and pelvis|Живот и таз
+Belly|Живот
+Right|Правая
+Left|Левая
+upper arm|плечо
+forearm|предплечье
+hand|кисть
+thigh|бедро
+shin|голень
+foot|стопа
+Right upper arm|Правое плечо
+Left upper arm|Левое плечо
+Right thigh|Правое бедро
+Left thigh|Левое бедро
+WHAT IS WRONG|ЧТО С НИМ
+GET HIM BACK ON HIS FEET|ПОСТАВИТЬ НА НОГИ
+TOURNIQUET|ЖГУТ
+CHEST SEAL|ОККЛЮЗИОННАЯ ПОВЯЗКА
+NEEDLE|ИГЛА
+SPLINT|ШИНА
+BLOOD BAG|ПАКЕТ КРОВИ
+THERMOMETER|ТЕРМОМЕТР
+FIRST AID  —|ПЕРВАЯ ПОМОЩЬ  —
+(no medic's bag: what you carry yourself)|(нет сумки медика: только то, что при себе)
+On his feet|На ногах
+Unconscious, down|Без сознания, лежит
+Down, conscious|Лежит, в сознании
+in shock|в шоке
+cannot move his legs|не может двигать ногами
+bpm|уд/мин
+/min|/мин
+— take it|— измерьте
+ml|мл
+Stable|Стабильно
+Serious|Серьёзно
+Critical|Критично
+Dying|Умирает
+about|около
+min at this bleeding|мин при таком кровотечении
+ARREST|ОСТАНОВКА
+RACING|ОЧЕНЬ ЧАСТЫЙ
+HIGH|ВЫСОКОЕ
+VERY LOW|ОЧЕНЬ НИЗКОЕ
+LOW|НИЗКОЕ
+NORMAL|НОРМА
+FAST|ЧАСТОЕ
+SLOW|РЕДКОЕ
+NOT TAKEN|НЕ ИЗМЕРЕНО
+COLD|ХОЛОДНЫЙ
+COOL|ПРОХЛАДНЫЙ
+SEVERE|ТЯЖЁЛАЯ
+HEAVY|БОЛЬШАЯ
+SOME|НЕБОЛЬШАЯ
+NONE|НЕТ
+OUT|БЕЗ СОЗНАНИЯ
+DROWSY|СОНЛИВ
+AWAKE|В СОЗНАНИИ
+STOP THE BLEEDING FIRST|СНАЧАЛА ОСТАНОВИТЕ КРОВОТЕЧЕНИЕ
+None left:|Не осталось:
+No open wound there to dress|Здесь нет открытой раны для перевязки
+A tourniquet goes on an arm or a leg above heavy bleeding|Жгут накладывается на руку или ногу выше сильного кровотечения
+A chest seal goes on the chest (once)|Окклюзионная повязка накладывается на грудь (один раз)
+No air trapped in the chest to let out|В груди нет воздуха, который нужно выпустить
+Nothing broken there to splint|Здесь нет перелома для шинирования
+Inject into a thigh or the upper arm|Колоть в бедро или плечо
+The line goes into an arm|Капельница ставится в руку
+Hold the thermometer to his head|Поднесите термометр к голове
+NEXT:|ДАЛЕЕ:
+drag the|перетащите
+onto the|на
+All seen to|Всё сделано
+— get him back on his feet (the green button)|— поставьте его на ноги (зелёная кнопка)
+All you can do here|Это всё, что можно сделать здесь
+— he cannot walk: drag him out (H) once you are back in the fight|— он не может идти: вытащите его (H), когда вернётесь в бой
+Let go to use the|Отпустите, чтобы применить
+on the|на
+Bring the|Поднесите
+onto a|к
+green|зелёной
+part|части тела
+Hold the button and sweep across the|Удерживайте кнопку и ведите по
+to wind the dressing on|чтобы намотать бинт
+Hold the button and pull down, again and again, to turn the windlass tight|Удерживайте кнопку и тяните вниз снова и снова, чтобы закрутить вороток
+Hold the button to press the seal down over the wound|Удерживайте кнопку, чтобы прижать пластырь к ране
+Hold the button to push the needle in at the marked spot|Удерживайте кнопку, чтобы ввести иглу в отмеченном месте
+Laying the boards along the|Укладываем шину вдоль
+Click each green mark to fasten a strap|Щёлкните по каждой зелёной метке, чтобы затянуть ремень
+Hold the button to press the injector into the|Удерживайте кнопку, чтобы вколоть шприц-тюбик в
+Lead the line from the bag to the blue vein in his|Проведите трубку от пакета к синей вене на
+Hold the button to keep the thermometer to his head|Удерживайте кнопку, чтобы держать термометр у головы
+RMB — stop|ПКМ — стоп
+Dressed the|Перевязано:
+Tourniquet on the|Жгут на
+- the bleeding below it stops|— кровотечение ниже прекращается
+Chest sealed|Грудь загерметизирована
+Air out with a hiss - his chest rises again|Воздух выходит с шипением — грудь снова поднимается
+Splinted the|Наложена шина:
+Painkiller in|Обезболивающее введено
+The line is in - blood running|Капельница стоит — кровь поступает
+Temperature|Температура
+- he is cold: shock|— он холодный: шок
+That did nothing|Это ничего не дало
+Transfusion done|Переливание завершено
+is back on his feet|снова на ногах
+torn away - a tourniquet above it|оторвана — жгут выше
+artery bleeding|артериальное кровотечение
+- spurting.|— бьёт струёй.
+Tourniquet above it, now.|Жгут выше, немедленно.
+Press and dress it.|Прижмите и перевяжите.
+heavy bleeding|сильное кровотечение
+from a vein -|из вены —
+tourniquet, or dress it tight.|жгут или тугая повязка.
+dress it tight.|туго перевяжите.
+open wound|открытая рана
+, deep|, глубокая
+- dress it.|— перевяжите.
+wound|рана
+under a tourniquet|под жгутом
+dressed|перевязана
+broken|перелом
+- splinted|— шина наложена
+- splint it.|— наложите шину.
+Chest: lung hit|Грудь: ранение лёгкого
+- air in the chest crushing the lung (|— воздух в груди сдавливает лёгкое (
+Sealed.|Загерметизировано.
+Seal the wound,|Закройте рану пластырем,
+needle done.|игла введена.
+then a needle at the marked spot.|затем игла в отмеченном месте.
+Internal bleeding|Внутреннее кровотечение
+- nothing to press on here: blood in through a line, and get him out.|— здесь нечего прижать: кровь через капельницу и эвакуация.
+Shock|Шок
+- too little blood going round: cold, pale, fast weak pulse. Stop the bleeding, give blood.|— слишком мало крови в обращении: холодный, бледный, частый слабый пульс. Остановите кровотечение, перелейте кровь.
+Spine hit|Ранение позвоночника
+- his legs do not move. He will not walk again: carry him.|— ноги не двигаются. Он больше не пойдёт: несите его.
+In bad pain|Сильная боль
+(painkiller working)|(обезболивающее действует)
+- a painkiller in the thigh.|— обезболивающее в бедро.
+Nothing more to see to.|Больше ничего делать не нужно.
+Click a part of him to look at it closely.|Щёлкните по части тела, чтобы рассмотреть её.
+· wound, tourniquet on|· рана, наложен жгут
+· wound, dressed|· рана, перевязана
+an artery open - spurting bright red|вскрыта артерия — бьёт ярко-красной струёй
+a vein torn - dark blood welling|разорвана вена — сочится тёмная кровь
+· a wound, bleeding a little|· рана, немного кровоточит
+· broken, splinted|· перелом, наложена шина
+broken - the limb bends where it should not|перелом — конечность гнётся там, где не должна
+breathing fast and shallow, one side not rising|дыхание частое и поверхностное, одна сторона не поднимается
+Nothing wrong here.|Здесь всё в порядке.
+artery|артерия
+lung|лёгкое
+Spine|Позвоночник
+torn|оторвана
+pain|боль
+tourniquet|жгут
+now|сейчас
+wounds|ранения
+# ===== Kill feed / falls / misc
+sank or tipped|осел или опрокинулся
+lost footing|потерял опору
+missed step|оступился
+jumped off the vehicle|спрыгнул с машины
+slid off the vehicle|соскользнул с машины
+knocked by|сбит
+Dead|Мёртв
+Engine damage|Двигатель повреждён
+# ===== Rosters / teams
+Spetsnaz Group|Группа спецназа
+Spetsnaz Vityaz|Спецназ «Витязь»
+Alpha Squad|Отряд «Альфа»
+Bravo Squad|Отряд «Браво»
+Task Force Raven|Оперативная группа «Ворон»
+Militia Battalion|Батальон ополчения
+Marine Raiders|Морские рейдеры
+Airborne Assault|Десантно-штурмовые
+Teams could not be read, the ready-made ones are used:|Не удалось прочитать команды, используются готовые:
+Teams could not be saved:|Не удалось сохранить команды:
+Blue|Синяя
+Red|Красная
+Yellow|Жёлтая
+Green|Зелёная
+White|Белая
+Orange|Оранжевая
+Cyan|Голубая
+Purple|Фиолетовая
+Pink|Розовая
+Black|Чёрная
+Lead|Командир
+Gunner|Наводчик
+Marksman|Снайпер
+# ===== Tank
+T-72B|Т-72Б
+2A46M 125 mm|2А46М 125 мм
+reinforcements|подкрепление
+support|поддержку
+Gunner's sight|Прицел наводчика
