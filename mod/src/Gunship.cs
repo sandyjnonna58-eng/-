@@ -30,9 +30,20 @@ public abstract class Gunship : Helicopter
 
 	protected override float CruiseSpeed => 30f;
 
-	protected override string PilotHelp => "Gunship: W / S - forward / back, A / D - turn, Space - up, Ctrl - down, LMB - rockets";
+	protected override string PilotHelp => "Gunship: W / S - forward / back, A / D - turn, Space - up, Ctrl - down, LMB - rockets, M - ATGM";
 
 	public int Rockets => Mathf.Max(0, rockets);
+
+	public Vector3 NosePoint()
+	{
+		Vector3 position = base.transform.TransformPoint(new Vector3(0f, 1.2f, 8f));
+		Vector3 vector = base.Rotation * Quaternion.Euler(4f, 0f, 0f) * Vector3.forward;
+		if (Physics.Raycast(position, vector, out var hitInfo, 2500f, -261, QueryTriggerInteraction.Ignore) && !Holds(hitInfo.collider))
+		{
+			return hitInfo.point;
+		}
+		return position + vector * 2500f;
+	}
 
 	protected override void FixedUpdate()
 	{
@@ -130,6 +141,15 @@ public abstract class Gunship : Helicopter
 		float num3 = Vector3.SignedAngle(Helicopter.Flat(base.Rotation * Vector3.forward), Helicopter.Flat(vector - here), Vector3.up);
 		yawRate = Mathf.Clamp(num3 * 1.5f, -45f, 45f);
 		ArenaTarget arenaTarget = base.Riders[0];
+		if ((bool)strikeVehicle && strikeVehicle.Armoured && (bool)arenaTarget && AtgmReady && Mathf.Abs(num3) < 20f && magnitude > 200f && magnitude < 2200f)
+		{
+			Vehicle aimed = strikeVehicle;
+			FireAtgm(arenaTarget, () => ((bool)aimed && !aimed.Wrecked && (bool)aimed.Body) ? new Vector3?(aimed.Body.worldCenterOfMass + Vector3.up * 0.2f) : null, vector);
+			if (aimed.ArmourRating >= 20f)
+			{
+				return;
+			}
+		}
 		if (rockets <= 0 || !arenaTarget || Mathf.Abs(num3) > 7f || magnitude < 140f || magnitude > 950f || height < 6f || Time.time < nextRocket)
 		{
 			return;

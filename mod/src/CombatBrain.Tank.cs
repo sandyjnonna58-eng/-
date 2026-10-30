@@ -8,6 +8,8 @@ public sealed partial class CombatBrain
 
 	private float armourCheckAt;
 
+	private float atgmTryAt;
+
 	private void CannonTarget(Vehicle v, GunMount gun, ref Vector3 point, ref bool engage)
 	{
 		if (Time.time >= armourCheckAt)
@@ -26,6 +28,17 @@ public sealed partial class CombatBrain
 			point = armourTarget.Body.worldCenterOfMass;
 			engage = true;
 			flag2 = armourTarget.Armoured;
+		}
+		if ((bool)armourTarget && armourTarget.Armoured && v.AtgmReady && Time.time >= atgmTryAt && (!gun.Autocannon || armourTarget.ArmourRating >= gun.ApEnergy))
+		{
+			atgmTryAt = Time.time + UnityEngine.Random.Range(1.5f, 3f);
+			Vehicle aimed = armourTarget;
+			Vector3 worldCenterOfMass = aimed.Body.worldCenterOfMass;
+			float magnitude = (worldCenterOfMass - gun.SightAt).magnitude;
+			if (magnitude > 100f && magnitude < 2200f && ClearOfFriends(gun.SightAt, (worldCenterOfMass - gun.SightAt).normalized, magnitude))
+			{
+				v.FireAtgm(target, () => ((bool)aimed && !aimed.Wrecked && (bool)aimed.Body) ? new Vector3?(aimed.Body.worldCenterOfMass + Vector3.up * 0.2f) : null, worldCenterOfMass);
+			}
 		}
 		if (gun.Coax != null)
 		{
@@ -80,7 +93,7 @@ public sealed partial class CombatBrain
 				continue;
 			}
 			float num2 = magnitude - ((item.Gun != null && item.Gun.Cannon) ? 600f : 0f) - (item.Armoured ? 200f : 0f);
-			if (gun.Autocannon && item.ArmourRating >= gun.ApEnergy)
+			if (gun.Autocannon && item.ArmourRating >= gun.ApEnergy && !v.AtgmReady)
 			{
 				num2 += 900f;
 			}

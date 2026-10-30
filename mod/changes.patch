@@ -91,7 +91,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1323,15 @@
+@@ -1303,6 +1323,33 @@
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
@@ -104,10 +104,28 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
 +			vehicle.Gun.PendingShell = 1 - vehicle.Gun.Shell;
 +			Notice?.Invoke("Loading " + (vehicle.Gun.Autocannon ? GunMount.AutoNames : GunMount.ShellNames)[1 - vehicle.Gun.Shell]);
 +		}
++		bool flagPilot = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Driver && vehicle is Gunship && !vehicle.Wrecked;
++		if ((flag2 || flagPilot) && vehicle.HasAtgm && Input.GetKeyDown(KeyCode.M) && Cursor.lockState == CursorLockMode.Locked && !CommandWheel.Open)
++		{
++			ArenaTarget me = possessed.Body;
++			Vehicle launcher = vehicle;
++			GunMount sight = vehicle.Gun;
++			Gunship gunship = vehicle as Gunship;
++			bool byNose = !flag2;
++			Func<Vector3?> guide = () => ((bool)me && (bool)launcher && me.Seated && me.Vehicle == launcher && !me.Body.Dead) ? new Vector3?(byNose ? gunship.NosePoint() : sight.Aim) : null;
++			if (vehicle.FireAtgm(me, guide, byNose ? gunship.NosePoint() : sight.Aim))
++			{
++				Notice?.Invoke(byNose ? "ATGM away - keep the nose on the target" : "ATGM away - keep the sight on the target");
++			}
++			else
++			{
++				Notice?.Invoke((vehicle.Missiles <= 0) ? "No ATGMs left" : "ATGM not ready");
++			}
++		}
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1625,29 @@
+@@ -1596,6 +1643,40 @@
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -123,6 +141,17 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
 +		body2.ReachBoth = body2.Ragdolled && Input.GetMouseButton(1);
 +		body2.PullUp = body2.Ragdolled && Input.GetKey(KeyCode.Space);
 +		body2.ReachAt = aimPoint;
++		if (Input.GetKeyDown(KeyCode.L))
++		{
++			if (AirStrike.Call(possessed.Team, possessed.Body, aimPoint))
++			{
++				Notice?.Invoke("Air strike: a jet is coming in on your mark");
++			}
++			else
++			{
++				Notice?.Invoke("Air support not ready: " + Mathf.CeilToInt(Mathf.Max(1f, AirStrike.Ready(possessed.Team))) + " s");
++			}
++		}
 +		if (Input.GetKeyDown(KeyCode.J) && (bool)Artillery.Instance)
 +		{
 +			if (Artillery.Instance.Call(possessed.Team, aimPoint))
@@ -668,7 +697,7 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
  		UIKit.Place(UIKit.IconImage(guide.transform, "keyboard", UIKit.Accent, 34f).rectTransform, new Vector2(0f, 1f), new Vector2(34f, -34f), new Vector2(34f, 34f));
  		UIKit.Place(UIKit.Label(guide.transform, "CONTROLS", 30, UIKit.Text, TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(84f, -32f), new Vector2(500f, 40f));
  		float gy = -96f;
-@@ -458,7 +461,10 @@
+@@ -458,7 +461,12 @@
  		Row(new string[1] { "Wheel" }, "scope magnification (aiming through a scope)");
  		Row(new string[1] { "H" }, "drag a wounded comrade (again — let go)");
  		Row(new string[2] { "V", "F" }, "first-person view / leave the soldier");
@@ -676,11 +705,13 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
 +		Row(new string[1] { "B" }, "fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)");
 +		Row(new string[1] { "Z" }, "ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand");
 +		Row(new string[1] { "J" }, "call artillery where you aim");
++		Row(new string[1] { "L" }, "call an air strike where you aim (once in 90 s)");
++		Row(new string[1] { "M" }, "launch an ATGM (BMP-2, Bradley, Mi-24, Apache): it flies where you keep the sight");
 +		Row(new string[1] { "Tab" }, "order wheel (hold, point, let go): attack, drive there, mount up, fire there...");
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +701,44 @@
+@@ -695,6 +703,44 @@
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -864,7 +895,7 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  	public Transform Turret;
  
  	public Transform Cradle;
-@@ -149,7 +193,9 @@
+@@ -149,10 +193,14 @@
  
  	public Quaternion BoreRotation => Bore;
  
@@ -875,7 +906,12 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  
  	public float Kick => kick;
  
-@@ -246,9 +292,13 @@
++	public Vehicle Owner => vehicle;
++
+ 	public GunMount(Vehicle vehicle, int seat, Vector3 pivot, WeaponDef def)
+ 	{
+ 		this.vehicle = vehicle;
+@@ -246,9 +294,13 @@
  			wantPitch = Mathf.Clamp(-8f, Lowest(yaw), MaxPitch);
  		}
  		float num2 = ((MaxTraverse >= 180f) ? Mathf.DeltaAngle(yaw, wantYaw) : (wantYaw - yaw));
@@ -890,7 +926,7 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  		yaw += yawVelocity * dt;
  		if (MaxTraverse >= 180f)
  		{
-@@ -261,6 +311,13 @@
+@@ -261,6 +313,13 @@
  		}
  		pitch = Mathf.MoveTowards(pitch, Mathf.Max(wantPitch, Lowest(yaw)), dt * (flag ? (90f * num) : 20f));
  		kick = Mathf.MoveTowards(kick, 0f, dt * 0.9f);
@@ -904,7 +940,7 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  		if (Rounds <= 0 && flag)
  		{
  			if (reloadUntil <= 0f)
-@@ -273,7 +330,26 @@
+@@ -273,7 +332,26 @@
  				reloadUntil = 0f;
  			}
  		}
@@ -932,7 +968,7 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  		{
  			Shoot(arenaTarget);
  		}
-@@ -292,6 +368,11 @@
+@@ -292,6 +370,11 @@
  			Vector2 vector4 = UnityEngine.Random.insideUnitCircle * num;
  			Vector3 normalized2 = (vector2 + normalized * vector4.x + vector3 * vector4.y).normalized;
  			Vector3 inherit = vehicle.PointVelocity(vector);
@@ -944,7 +980,7 @@ diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
  			instance.Report(vector, Def, gunner);
  			if ((bool)Ballistics.Instance)
  			{
-@@ -314,6 +395,91 @@
+@@ -314,6 +397,91 @@
  		}
  	}
  
@@ -1044,10 +1080,10 @@ diff --git a/CombatSandbox.Demo/GunnerSight.cs b/CombatSandbox.Demo/GunnerSight.
  		float num35 = num2 - num14 - 150f * u;
  		Text(num14 + 14f * u, num35, "RNG " + ((range < 0f) ? "----" : Mathf.RoundToInt(range).ToString("0000")) + " m", big);
 -		Text(num14 + 14f * u, num35 + 32f * u, gun.Reloading ? "RELOADING" : ("AMMO " + gun.Rounds.ToString("000") + "  RDY"), big);
-+		Text(num14 + 14f * u, num35 + 32f * u, (gun.Cannon ? (gun.ShellName + "  ") : "") + (gun.Reloading ? "RELOADING" : ("AMMO " + gun.Rounds.ToString("000") + "  RDY")), big);
++		Text(num14 + 14f * u, num35 + 32f * u, (gun.Cannon ? (gun.ShellName + "  ") : "") + (gun.Reloading ? "RELOADING" : ("AMMO " + gun.Rounds.ToString("000") + "  RDY")) + (((bool)gun.Owner && gun.Owner.HasAtgm) ? ("   ATGM " + gun.Owner.Missiles) : ""), big);
  		Text(num14 + 14f * u, num35 + 64f * u, "x" + Magnification.ToString("0.0") + "   " + Modes[Mode] + "   " + gun.Def.Name.ToUpperInvariant(), big);
 -		Text(num14 + 14f * u, num35 + 98f * u, "WHEEL zoom   N mode   LMB fire   RMB exit", small);
-+		Text(num14 + 14f * u, num35 + 98f * u, gun.Cannon ? "WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   RMB exit" : "WHEEL zoom   N mode   LMB fire   RMB exit", small);
++		Text(num14 + 14f * u, num35 + 98f * u, (((bool)gun.Owner && gun.Owner.HasAtgm) ? (gun.Cannon ? "WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   M ATGM   RMB exit" : "WHEEL zoom   N mode   LMB fire   M ATGM   RMB exit") : (gun.Cannon ? "WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   RMB exit" : "WHEEL zoom   N mode   LMB fire   RMB exit")), small);
  		bool flag2 = Mathf.Repeat(Time.unscaledTime, 1f) < 0.6f;
  		Text(num - num14 - 14f * u, num14 + 14f * u, (flag2 ? "● " : "  ") + "REC  " + DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss"), small, TextAnchor.UpperRight);
  		Text(num - num14 - 14f * u, num14 + 38f * u, Vehicle.Kind.ToUpperInvariant() + "  RWS  CH1  " + (Time.time - since).ToString("000.0"), small, TextAnchor.UpperRight);

@@ -87,6 +87,13 @@ public sealed class Bradley : Ifv
 		};
 		Ifv.Troops(list, new float[3] { -1f, -1.75f, -2.5f }, 0.8f, 1f, 0.38f, 0.5f, outward: false, new Vector3(0f, 1f, -3.35f));
 		places = list.ToArray();
+		atgmLoad = 4;
+		atgmOnTurret = true;
+		atgmRails = new Vector3[2]
+		{
+			new Vector3(-1.22f, 0.33f, 0.5f),
+			new Vector3(-1.22f, 0.51f, 0.5f)
+		};
 		gun = new GunMount(this, 1, pivot, Ifv.M242)
 		{
 			MaxTraverse = 180f,

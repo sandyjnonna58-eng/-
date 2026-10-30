@@ -29,9 +29,13 @@ public sealed class TankShell : MonoBehaviour
 
 	private bool done;
 
+	private TrailRenderer smokeTrail;
+
+	private static Material smokePaint;
+
 	private readonly HashSet<Collider> pierced = new HashSet<Collider>();
 
-	public static TankShell Fire(ArenaTarget shooter, Vehicle own, Vector3 at, Vector3 velocity, int kind, float power = 2.4f, bool tracer = true, float life = 6f)
+	public static TankShell Fire(ArenaTarget shooter, Vehicle own, Vector3 at, Vector3 velocity, int kind, float power = 2.4f, bool tracer = true, float life = 6f, bool smoke = false)
 	{
 		GameObject gameObject = new GameObject(kind switch
 		{
@@ -50,6 +54,10 @@ public sealed class TankShell : MonoBehaviour
 		tankShell.power = power;
 		tankShell.life = life;
 		tankShell.Build(tracer);
+		if (smoke)
+		{
+			tankShell.Smoke();
+		}
 		return tankShell;
 	}
 
@@ -101,6 +109,36 @@ public sealed class TankShell : MonoBehaviour
 		}
 	}
 
+	private void Smoke()
+	{
+		if (!smokePaint)
+		{
+			smokePaint = new Material(Shader.Find("Sprites/Default"));
+		}
+		GameObject gameObject = new GameObject("Smoke trail");
+		gameObject.transform.SetParent(base.transform, worldPositionStays: false);
+		smokeTrail = gameObject.AddComponent<TrailRenderer>();
+		smokeTrail.sharedMaterial = smokePaint;
+		smokeTrail.time = 2.5f;
+		smokeTrail.minVertexDistance = 1.5f;
+		smokeTrail.widthCurve = new AnimationCurve(new Keyframe(0f, 0.25f), new Keyframe(1f, 1.4f));
+		smokeTrail.startColor = new Color(1f, 1f, 1f, 0.75f);
+		smokeTrail.endColor = new Color(0.92f, 0.92f, 0.92f, 0f);
+		smokeTrail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		smokeTrail.receiveShadows = false;
+	}
+
+	private void Release()
+	{
+		if ((bool)smokeTrail)
+		{
+			smokeTrail.transform.SetParent(null, worldPositionStays: true);
+			smokeTrail.emitting = false;
+			Object.Destroy(smokeTrail.gameObject, smokeTrail.time + 0.1f);
+			smokeTrail = null;
+		}
+	}
+
 	private void Update()
 	{
 		float deltaTime = Time.deltaTime;
@@ -144,6 +182,7 @@ public sealed class TankShell : MonoBehaviour
 				if (kind == 1 || kind == 2)
 				{
 					done = true;
+					Release();
 					Object.Destroy(base.gameObject);
 				}
 				else
@@ -231,6 +270,7 @@ public sealed class TankShell : MonoBehaviour
 				ShotEffects.Instance.Explosion(hit.point + hit.normal * 0.1f, 0.35f);
 			}
 		}
+		Release();
 		Object.Destroy(base.gameObject);
 	}
 
@@ -259,6 +299,7 @@ public sealed class TankShell : MonoBehaviour
 				ShotEffects.Instance.Sparks(hit.point, hit.normal, 8, 7f);
 			}
 		}
+		Release();
 		Object.Destroy(base.gameObject);
 	}
 
@@ -281,6 +322,7 @@ public sealed class TankShell : MonoBehaviour
 				Ballistics.Instance.Fragment(shooter, centre, onUnitSphere, Random.Range(500f, 1100f), Random.Range(0.002f, 0.008f));
 			}
 		}
+		Release();
 		Object.Destroy(base.gameObject);
 	}
 }

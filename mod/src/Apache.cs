@@ -118,6 +118,18 @@ public sealed class Apache : Gunship
 				Lean = 6f
 			}
 		};
+		atgmLoad = 8;
+		atgmRails = new Vector3[8]
+		{
+			new Vector3(-2.3f, 1.45f, 1.3f),
+			new Vector3(2.3f, 1.45f, 1.3f),
+			new Vector3(-2f, 1.45f, 1.3f),
+			new Vector3(2f, 1.45f, 1.3f),
+			new Vector3(-2.3f, 1.22f, 1.3f),
+			new Vector3(2.3f, 1.22f, 1.3f),
+			new Vector3(-2f, 1.22f, 1.3f),
+			new Vector3(2f, 1.22f, 1.3f)
+		};
 		gun = new GunMount(this, 1, ApacheMeshes.ChinGun, M230)
 		{
 			MaxTraverse = 100f,

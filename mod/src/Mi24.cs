@@ -153,6 +153,14 @@ public sealed class Mi24 : Gunship
 			Bench(1, 1.8f),
 			Bench(1, 0.9f)
 		};
+		atgmLoad = 4;
+		atgmRails = new Vector3[4]
+		{
+			new Vector3(-3.36f, 1.2f, 0.7f),
+			new Vector3(3.36f, 1.2f, 0.7f),
+			new Vector3(-3.36f, 1.44f, 0.7f),
+			new Vector3(3.36f, 1.44f, 0.7f)
+		};
 		gun = new GunMount(this, 1, Mi24Meshes.ChinGun, YakB)
 		{
 			MaxTraverse = 60f,

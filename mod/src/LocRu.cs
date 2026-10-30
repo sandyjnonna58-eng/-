@@ -1050,5 +1050,17 @@ internal static class LocRu
 		yield return ("Out of rockets - land to rearm", "НУРы кончились — сядьте, чтобы пополнить");
 		yield return ("Tanks and infantry fighting vehicles: T-72, T-90M and BMP-2 for one side, M1 Abrams, Leopard 2A6 and M2 Bradley for the other (from the next battle).", "Танки и БМП: Т-72, Т-90М и БМП-2 у одной стороны, M1 «Абрамс», «Леопард» 2A6 и M2 «Брэдли» у другой (со следующего боя).");
 		yield return ("Mi-8 and Mi-24 for one side, UH-60 Black Hawk and AH-64 Apache for the other: transports carry troops, gunships strike with rockets and cannon (from the next battle).", "Ми-8 и Ми-24 у одной стороны, UH-60 «Блэк Хок» и AH-64 «Апач» у другой: транспортные возят десант, ударные бьют НУРами и из пушки (со следующего боя).");
+		yield return ("ATGM", "ПТУР");
+		yield return ("ATGM away - keep the sight on the target", "ПТУР пошёл — держите прицел на цели");
+		yield return ("ATGM away - keep the nose on the target", "ПТУР пошёл — держите нос вертолёта на цели");
+		yield return ("No ATGMs left", "ПТУРы кончились");
+		yield return ("ATGM not ready", "ПТУР ещё не готов");
+		yield return ("WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   M ATGM   RMB exit", "КОЛЕСО зум   N режим   B снаряд   ЛКМ огонь   ПРОБЕЛ пулемёт   M ПТУР   ПКМ выход");
+		yield return ("WHEEL zoom   N mode   LMB fire   M ATGM   RMB exit", "КОЛЕСО зум   N режим   ЛКМ огонь   M ПТУР   ПКМ выход");
+		yield return ("Gunship: W / S - forward / back, A / D - turn, Space - up, Ctrl - down, LMB - rockets, M - ATGM", "Ударный вертолёт: W / S — вперёд / назад, A / D — поворот, Пробел — вверх, Ctrl — вниз, ЛКМ — НУРы, M — ПТУР");
+		yield return ("Air strike: a jet is coming in on your mark", "Авиаудар: штурмовик заходит на вашу точку");
+		yield return ("Air support not ready:", "Авиаподдержка не готова:");
+		yield return ("call an air strike where you aim (once in 90 s)", "вызвать авиаудар туда, куда целитесь (раз в 90 с)");
+		yield return ("launch an ATGM (BMP-2, Bradley, Mi-24, Apache): it flies where you keep the sight", "пуск ПТУР (БМП-2, «Брэдли», Ми-24, «Апач»): ракета летит туда, куда вы держите прицел");
 	}
 }

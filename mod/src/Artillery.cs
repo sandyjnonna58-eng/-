@@ -198,7 +198,7 @@ public sealed class Artillery : MonoBehaviour
 			Vector2 vector2 = Random.insideUnitCircle * 14f;
 			Vector3 vector3 = at + new Vector3(vector2.x, 0f, vector2.y);
 			Vector3 vector4 = new Vector3(Random.Range(-25f, 25f), -300f, Random.Range(-25f, 25f));
-			TankShell.Fire(null, null, vector3 - vector4 * 1.4f, vector4, 0, 3f, tracer: false, 12f);
+			TankShell.Fire(null, null, vector3 - vector4 * 1.4f, vector4, 0, 3f, tracer: false, 12f, smoke: true);
 			yield return new WaitForSeconds(Random.Range(0.35f, 0.9f));
 		}
 		yield return new WaitForSeconds(2f);

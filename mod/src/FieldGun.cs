@@ -237,7 +237,7 @@ public sealed class FieldGun : MonoBehaviour
 			float num = 5f + magnitude / 90f;
 			Vector3 vector3 = vector2 / num + Vector3.up * (vector.y / num + 4.905f * num);
 			barrel.rotation = Quaternion.LookRotation(vector3);
-			TankShell.Fire(null, null, muzzle, vector3, 0, 1.6f, tracer: false, num + 4f);
+			TankShell.Fire(null, null, muzzle, vector3, 0, 1.6f, tracer: false, num + 4f, smoke: true);
 			Flash();
 		}
 	}

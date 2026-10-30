@@ -87,6 +87,12 @@ public sealed class Bmp2 : Ifv
 		};
 		Ifv.Troops(list, new float[3] { -1f, -1.7f, -2.4f }, 0.3f, 0.72f, 0.72f, 0.48f, outward: true, new Vector3(0f, 0.95f, -3.4f));
 		places = list.ToArray();
+		atgmLoad = 4;
+		atgmOnTurret = true;
+		atgmRails = new Vector3[1]
+		{
+			new Vector3(0.02f, 0.86f, 0.75f)
+		};
 		gun = new GunMount(this, 1, pivot, Ifv.Gun2A42)
 		{
 			MaxTraverse = 180f,
