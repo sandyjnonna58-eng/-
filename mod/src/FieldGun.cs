@@ -45,7 +45,114 @@ public sealed class FieldGun : MonoBehaviour
 
 	private float recoil;
 
+	private readonly List<CombatBrain> crew = new List<CombatBrain>();
+
+	private float nextCrewCheck;
+
+	private float nextMannedCheck;
+
+	private bool manned;
+
+	public int CrewNeeded => (Kind == GunKind.Mortar) ? 1 : 2;
+
+	public bool Manned
+	{
+		get
+		{
+			if (Time.time >= nextMannedCheck)
+			{
+				nextMannedCheck = Time.time + 0.5f;
+				manned = false;
+				Vector3 position = base.transform.position;
+				float num = ((Kind == GunKind.Mortar) ? 2.6f : 3.4f);
+				foreach (CombatBrain item in CombatBrain.All)
+				{
+					if ((bool)item && item.Team == Team && CaptureMode.Standing(item) && !item.Body.Vehicle && Flat(item.Here - position) < num)
+					{
+						manned = true;
+						break;
+					}
+				}
+			}
+			return manned && !Destroyed;
+		}
+	}
+
+	private static float Flat(Vector3 v)
+	{
+		v.y = 0f;
+		return v.magnitude;
+	}
+
+	public Vector3 CrewSpot(CombatBrain who)
+	{
+		int num = Mathf.Max(0, crew.IndexOf(who));
+		Vector3 position = ((Kind == GunKind.Mortar) ? new Vector3(0.9f, 0f, -0.6f) : new Vector3((num % 2 == 0) ? (-0.75f) : 0.75f, 0f, -1.1f));
+		return base.transform.TransformPoint(position);
+	}
+
+	private bool Fit(CombatBrain b)
+	{
+		if ((bool)b && b.Team == Team && CaptureMode.Standing(b) && !b.PlayerControlled && !b.Body.Vehicle && !b.Lift && !b.ClaimedVehicle && !b.CrewOf && b.Captive == CombatBrain.Captivity.None)
+		{
+			return b.GunPost == this;
+		}
+		return false;
+	}
+
+	private void Crew()
+	{
+		for (int num = crew.Count - 1; num >= 0; num--)
+		{
+			CombatBrain combatBrain = crew[num];
+			if (Destroyed || !Fit(combatBrain))
+			{
+				if ((bool)combatBrain && combatBrain.GunPost == this)
+				{
+					combatBrain.GunPost = null;
+				}
+				crew.RemoveAt(num);
+			}
+		}
+		if (Destroyed || crew.Count >= CrewNeeded)
+		{
+			return;
+		}
+		Vector3 position = base.transform.position;
+		CombatBrain combatBrain2 = null;
+		float num2 = 180f;
+		foreach (CombatBrain item in CombatBrain.All)
+		{
+			if ((bool)item && item.Team == Team && CaptureMode.Standing(item) && !item.PlayerControlled && !item.GunPost && !item.Body.Vehicle && !item.Lift && !item.ClaimedVehicle && !item.CrewOf && item.Captive == CombatBrain.Captivity.None && item.Duty != CombatBrain.Role.Commander && item.Duty != CombatBrain.Role.Operator && item.Duty != CombatBrain.Role.Medic)
+			{
+				float num3 = Flat(item.Here - position);
+				if (num3 < num2)
+				{
+					num2 = num3;
+					combatBrain2 = item;
+				}
+			}
+		}
+		if ((bool)combatBrain2)
+		{
+			combatBrain2.GunPost = this;
+			crew.Add(combatBrain2);
+		}
+	}
+
 	public static bool Battery(int team)
+	{
+		foreach (FieldGun item in All)
+		{
+			if ((bool)item && item.Kind == GunKind.Howitzer && item.Team == team && !item.Destroyed && item.Manned)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool Intact(int team)
 	{
 		foreach (FieldGun item in All)
 		{
@@ -223,7 +330,12 @@ public sealed class FieldGun : MonoBehaviour
 			recoil = Mathf.MoveTowards(recoil, 0f, Time.deltaTime * 2f);
 			barrel.localPosition = ((Kind == GunKind.Mortar) ? new Vector3(0f, 0.08f, 0f) : new Vector3(0f, 1.1f, 0f)) - barrel.localRotation * Vector3.forward * recoil * ((Kind == GunKind.Mortar) ? 0.05f : 0.6f);
 		}
-		if (Kind != GunKind.Mortar || Destroyed || Time.time < nextShot || (CaptureMode.Active && !CaptureMode.Instance.Started))
+		if (Time.time >= nextCrewCheck)
+		{
+			nextCrewCheck = Time.time + 2f;
+			Crew();
+		}
+		if (Kind != GunKind.Mortar || Destroyed || Time.time < nextShot || !Manned || (CaptureMode.Active && !CaptureMode.Instance.Started))
 		{
 			return;
 		}

@@ -1080,5 +1080,6 @@ internal static class LocRu
 		yield return ("Side one storms the enemy base with many tanks and armour.", "Первая сторона штурмует вражескую базу: много танков и бронетехники.");
 		yield return ("Defence", "Оборона");
 		yield return ("Side one holds its base with howitzers and mortars against heavy armour.", "Первая сторона держит базу: гаубицы и миномёты против тяжёлой брони.");
+		yield return ("No crew at the guns - gunners are on their way", "У орудий нет расчёта — артиллеристы идут к орудиям");
 	}
 }

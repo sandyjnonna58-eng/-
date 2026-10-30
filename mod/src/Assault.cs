@@ -21,16 +21,33 @@ public static class Assault
 
 	public static void Begin(BattleDirector director)
 	{
-		int attacker = Attacker;
-		if (attacker < 0 || !director)
+		if (!director)
 		{
+			return;
+		}
+		int attacker = Attacker;
+		if (attacker < 0)
+		{
+			if (GameSettings.Artillery && BattleSetup.Mode != GameMode.Capture)
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					Guns(director, i, 2);
+				}
+			}
 			return;
 		}
 		int num = 1 - attacker;
 		director.Teams[attacker].Attack = true;
 		director.Teams[num].Attack = false;
-		Transform @base = director.Teams[num].Base;
-		Transform base2 = director.Teams[attacker].Base;
+		Guns(director, num, 3);
+		director.Notice?.Invoke(director.Teams[attacker].Name + " attacks, " + director.Teams[num].Name + " defends");
+	}
+
+	private static void Guns(BattleDirector director, int team, int mortars)
+	{
+		Transform @base = director.Teams[team].Base;
+		Transform base2 = director.Teams[1 - team].Base;
 		if (!@base)
 		{
 			return;
@@ -43,22 +60,21 @@ public static class Assault
 		}
 		Vector3 vector2 = Vector3.Cross(Vector3.up, vector);
 		int[] array = new int[2] { -1, 1 };
-		foreach (int num2 in array)
+		foreach (int num in array)
 		{
-			if (Ground(position - vector * 14f + vector2 * num2 * 7f, out var at))
+			if (Ground(position - vector * 14f + vector2 * num * 7f, out var at))
 			{
-				FieldGun.Create(FieldGun.GunKind.Howitzer, num, at, vector);
+				FieldGun.Create(FieldGun.GunKind.Howitzer, team, at, vector);
 			}
 		}
-		float[] array2 = new float[3] { -18f, 0f, 18f };
-		foreach (float num3 in array2)
+		for (int j = 0; j < mortars; j++)
 		{
-			if (Ground(position + vector * 40f + vector2 * num3, out var at2))
+			float num2 = ((float)j - (float)(mortars - 1) * 0.5f) * 18f;
+			if (Ground(position + vector * 40f + vector2 * num2, out var at2))
 			{
-				FieldGun.Create(FieldGun.GunKind.Mortar, num, at2, vector);
+				FieldGun.Create(FieldGun.GunKind.Mortar, team, at2, vector);
 			}
 		}
-		director.Notice?.Invoke(director.Teams[attacker].Name + " attacks, " + director.Teams[num].Name + " defends");
 	}
 
 	private static bool Ground(Vector3 near, out Vector3 at)

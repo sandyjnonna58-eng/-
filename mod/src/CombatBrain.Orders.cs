@@ -19,7 +19,7 @@ public sealed partial class CombatBrain
 
 	private Mode Obeyed(Mode mode)
 	{
-		if (Time.time >= ObeyUntil || PlayerControlled || !Fighter)
+		if (Time.time >= ObeyUntil || PlayerControlled || !Fighter || (bool)GunPost || liftWaiting)
 		{
 			return mode;
 		}
