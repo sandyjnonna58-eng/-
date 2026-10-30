@@ -55,12 +55,29 @@ public sealed class Artillery : MonoBehaviour
 	public bool Call(int team, Vector3 at)
 	{
 		team = Mathf.Clamp(team, 0, 1);
-		if (!GameSettings.Artillery || firing[team] || Time.time < nextCall[team])
+		if (!Allowed(team) || firing[team] || Time.time < nextCall[team])
 		{
 			return false;
 		}
 		nextCall[team] = Time.time + 40f;
 		StartCoroutine(Fire(team, at));
+		return true;
+	}
+
+	public static bool Allowed(int team)
+	{
+		if (!GameSettings.Artillery)
+		{
+			return false;
+		}
+		if (Assault.Active && team == Assault.Attacker)
+		{
+			return false;
+		}
+		if (FieldGun.AnyHowitzers(team))
+		{
+			return FieldGun.Battery(team);
+		}
 		return true;
 	}
 
@@ -72,9 +89,9 @@ public sealed class Artillery : MonoBehaviour
 		}
 		for (int i = 0; i < 2; i++)
 		{
-			if (!(Time.time < nextAuto[i]) && !firing[i])
+			if (!(Time.time < nextAuto[i]) && !firing[i] && Allowed(i))
 			{
-				nextAuto[i] = Time.time + Random.Range(70f, 110f);
+				nextAuto[i] = Time.time + (Assault.Active ? Random.Range(35f, 55f) : Random.Range(70f, 110f));
 				if (Target(i, out var at))
 				{
 					StartCoroutine(Fire(i, at));
@@ -118,7 +135,34 @@ public sealed class Artillery : MonoBehaviour
 				at = here;
 			}
 		}
-		return num >= 2;
+		if (num >= 2)
+		{
+			return true;
+		}
+		float num3 = float.MaxValue;
+		foreach (Vehicle item3 in Vehicle.All)
+		{
+			if (!((bool)item3) || item3.Wrecked || item3.Team < 0 || item3.Team == team || !item3.Armoured || item3 is Helicopter)
+			{
+				continue;
+			}
+			bool flag2 = false;
+			foreach (CombatBrain item4 in CombatBrain.All)
+			{
+				if (CaptureMode.Standing(item4) && item4.Team == team && (item4.Here - item3.transform.position).magnitude < 40f)
+				{
+					flag2 = true;
+					break;
+				}
+			}
+			float magnitude2 = item3.Body ? item3.Body.velocity.magnitude : 0f;
+			if (!flag2 && magnitude2 < num3)
+			{
+				num3 = magnitude2;
+				at = item3.transform.position;
+			}
+		}
+		return num3 < float.MaxValue;
 	}
 
 	private IEnumerator Fire(int team, Vector3 at)
@@ -144,6 +188,13 @@ public sealed class Artillery : MonoBehaviour
 		}
 		for (int i = 0; i < 6; i++)
 		{
+			foreach (FieldGun item2 in FieldGun.All)
+			{
+				if ((bool)item2 && item2.Kind == FieldGun.GunKind.Howitzer && item2.Team == team && i % 2 == FieldGun.All.IndexOf(item2) % 2)
+				{
+					item2.Flash();
+				}
+			}
 			Vector2 vector2 = Random.insideUnitCircle * 14f;
 			Vector3 vector3 = at + new Vector3(vector2.x, 0f, vector2.y);
 			Vector3 vector4 = new Vector3(Random.Range(-25f, 25f), -300f, Random.Range(-25f, 25f));

@@ -1,5 +1,5 @@
 diff --git a/CombatSandbox.Demo/ArenaTarget.cs b/CombatSandbox.Demo/ArenaTarget.cs
-index ab8d31b..5a3a75a 100644
+index ab8d31b..0bed9bc 100644
 --- a/CombatSandbox.Demo/ArenaTarget.cs
 +++ b/CombatSandbox.Demo/ArenaTarget.cs
 @@ -4,7 +4,7 @@ using UnityEngine;
@@ -11,7 +11,15 @@ index ab8d31b..5a3a75a 100644
  {
  	public enum GripLoss
  	{
-@@ -1547,6 +1547,8 @@ public sealed class ArenaTarget : MonoBehaviour
+@@ -999,6 +999,7 @@ public sealed class ArenaTarget : MonoBehaviour
+ 		reflexAge = 10f;
+ 		Response.Reset();
+ 		Vitals.Reset();
++		PlateFront = (PlateBack = (SoftArmour = (Helmet = 100f)));
+ 		HoldingWound = false;
+ 		GripBlend = 0f;
+ 		EvadeVelocity = Vector3.zero;
+@@ -1547,6 +1548,8 @@ public sealed class ArenaTarget : MonoBehaviour
  			stepCount++;
  			if (Body.Dead)
  			{
@@ -20,7 +28,7 @@ index ab8d31b..5a3a75a 100644
  				if (Armed)
  				{
  					Rifle.Drop(default(Vector3), Range(0f, 1f) < 0.5f);
-@@ -1629,6 +1631,10 @@ public sealed class ArenaTarget : MonoBehaviour
+@@ -1629,6 +1632,10 @@ public sealed class ArenaTarget : MonoBehaviour
  			Breathe(fixedDeltaTime);
  			UpdateGround();
  			SupportStrength = Mathf.Clamp01((LegStrength(0) + LegStrength(1)) * 0.5f) * Vitality;
@@ -32,18 +40,19 @@ index ab8d31b..5a3a75a 100644
  			{
  			case ActiveRagdollPhase.Riding:
 diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDirector.cs
-index 36fa06c..c1c99ca 100644
+index 36fa06c..2830e95 100644
 --- a/CombatSandbox.Demo/BattleDirector.cs
 +++ b/CombatSandbox.Demo/BattleDirector.cs
-@@ -469,6 +469,7 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -469,6 +469,8 @@ public sealed class BattleDirector : MonoBehaviour
  		}
  		ApplyRosters();
  		WarStart();
++		Assault.Begin(this);
 +		Artillery.Begin();
  		if (Vehicle.MapHasVehicles)
  		{
  			VehicleNav.Build();
-@@ -507,6 +508,10 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -507,6 +509,10 @@ public sealed class BattleDirector : MonoBehaviour
  		{
  			base.gameObject.AddComponent<CommandWheel>();
  		}
@@ -54,7 +63,7 @@ index 36fa06c..c1c99ca 100644
  		if ((bool)Acoustics.Instance)
  		{
  			Acoustics.Instance.Ambience = AmbientBattle && GameSettings.Ambience;
-@@ -593,6 +598,20 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -593,6 +599,20 @@ public sealed class BattleDirector : MonoBehaviour
  		brain.SightRange = 120f * Mathf.Min(num, 1.8f);
  		brain.SpotDistance = 28f * Mathf.Pow(num, 0.55f);
  		brain.EngageRange = 65f * Mathf.Lerp(1f, num, 0.45f);
@@ -75,7 +84,7 @@ index 36fa06c..c1c99ca 100644
  	}
  
  	public Vector3 BasePoint(int team)
-@@ -915,7 +934,7 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -915,7 +935,7 @@ public sealed class BattleDirector : MonoBehaviour
  			return;
  		}
  		bool overUI = (bool)EventSystem.current && EventSystem.current.IsPointerOverGameObject();
@@ -84,7 +93,7 @@ index 36fa06c..c1c99ca 100644
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1322,15 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1303,6 +1323,15 @@ public sealed class BattleDirector : MonoBehaviour
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
@@ -100,7 +109,7 @@ index 36fa06c..c1c99ca 100644
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1624,29 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1596,6 +1625,29 @@ public sealed class BattleDirector : MonoBehaviour
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -124,7 +133,7 @@ index 36fa06c..c1c99ca 100644
 +			}
 +			else
 +			{
-+				Notice?.Invoke(GameSettings.Artillery ? ("Artillery not ready: " + Mathf.CeilToInt(Mathf.Max(1f, Artillery.Instance.Ready(possessed.Team))) + " s") : "Artillery is off in the settings");
++				Notice?.Invoke((!GameSettings.Artillery) ? "Artillery is off in the settings" : ((!Artillery.Allowed(possessed.Team)) ? "No artillery for this side" : ("Artillery not ready: " + Mathf.CeilToInt(Mathf.Max(1f, Artillery.Instance.Ready(possessed.Team))) + " s")));
 +			}
 +		}
  		if (flag6)
@@ -630,15 +639,15 @@ index b75fd2c..89ad27a 100644
  		})));
  	}
 diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
-index 9fd3d6c..bf7ce5b 100644
+index 9fd3d6c..749d05d 100644
 --- a/CombatSandbox.Demo/GameMenu.cs
 +++ b/CombatSandbox.Demo/GameMenu.cs
-@@ -38,14 +38,15 @@ public sealed class GameMenu : MonoBehaviour
+@@ -38,14 +38,16 @@ public sealed class GameMenu : MonoBehaviour
  
  	private Text pauseStats;
  
 -	private static readonly (string Name, string Icon, string Blurb)[] SettingsTabs = new(string, string, string)[6]
-+	private static readonly (string Name, string Icon, string Blurb)[] SettingsTabs = new(string, string, string)[7]
++	private static readonly (string Name, string Icon, string Blurb)[] SettingsTabs = new(string, string, string)[8]
  	{
  		("Sound", "volume", "How loud everything is, and which sounds you hear."),
  		("Controls", "mouse", "The mouse and the keys."),
@@ -647,11 +656,12 @@ index 9fd3d6c..bf7ce5b 100644
  		("Game", "flag", "How the battle plays: the enemy, the time, the numbers."),
 -		("Performance", "gear", "Keeping the frame rate up in a big battle.")
 +		("Performance", "gear", "Keeping the frame rate up in a big battle."),
-+		("Extra", "drop", "Language, blood, tanks, helicopters and artillery.")
++		("Extra", "drop", "Language, blood, tanks, helicopters and artillery."),
++		("Combat", "skull", "The kind of battle, wounds and body armour.")
  	};
  
  	private readonly List<RectTransform> settingsPages = new List<RectTransform>();
-@@ -68,6 +69,7 @@ public sealed class GameMenu : MonoBehaviour
+@@ -68,6 +70,7 @@ public sealed class GameMenu : MonoBehaviour
  	private void Awake()
  	{
  		GameSettings.Load();
@@ -659,7 +669,7 @@ index 9fd3d6c..bf7ce5b 100644
  	}
  
  	private void Start()
-@@ -432,7 +434,7 @@ public sealed class GameMenu : MonoBehaviour
+@@ -432,7 +435,7 @@ public sealed class GameMenu : MonoBehaviour
  		UIKit.Renew(parent, "Controls", "Layout rest");
  		Image guide = UIKit.Box(parent, "Controls", UIKit.Panel);
  		UIKit.Mark(guide.transform, "Layout rest");
@@ -668,7 +678,7 @@ index 9fd3d6c..bf7ce5b 100644
  		UIKit.Place(UIKit.IconImage(guide.transform, "keyboard", UIKit.Accent, 34f).rectTransform, new Vector2(0f, 1f), new Vector2(34f, -34f), new Vector2(34f, 34f));
  		UIKit.Place(UIKit.Label(guide.transform, "CONTROLS", 30, UIKit.Text, TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(84f, -32f), new Vector2(500f, 40f));
  		float gy = -96f;
-@@ -458,7 +460,10 @@ public sealed class GameMenu : MonoBehaviour
+@@ -458,7 +461,10 @@ public sealed class GameMenu : MonoBehaviour
  		Row(new string[1] { "Wheel" }, "scope magnification (aiming through a scope)");
  		Row(new string[1] { "H" }, "drag a wounded comrade (again — let go)");
  		Row(new string[2] { "V", "F" }, "first-person view / leave the soldier");
@@ -680,7 +690,7 @@ index 9fd3d6c..bf7ce5b 100644
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +700,31 @@ public sealed class GameMenu : MonoBehaviour
+@@ -695,6 +701,44 @@ public sealed class GameMenu : MonoBehaviour
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -709,14 +719,27 @@ index 9fd3d6c..bf7ce5b 100644
 +		{
 +			GameSettings.Artillery = b;
 +		});
++		Page(7);
++		SelectRow("Battle type", "Attack and defence: the attackers get many tanks and armour, the defenders a howitzer battery at the base and mortars (from the next battle, not in the capture mode).", GameSettings.BattleTypeNames, GameSettings.BattleType, delegate(int i)
++		{
++			GameSettings.BattleType = i;
++		});
++		SwitchRow("Slow death from head wounds", "A man shot through the brain falls unconscious and dies over half a minute or more; a light head wound may pass.", GameSettings.SlowBrainDeath, delegate(bool b)
++		{
++			GameSettings.SlowBrainDeath = b;
++		});
++		SwitchRow("Body armour", "Plates front and back stop rifle rounds until they wear out, soft armour stops pistol rounds and splinters, the helmet saves from splinters and glancing hits.", GameSettings.BodyArmour, delegate(bool b)
++		{
++			GameSettings.BodyArmour = b;
++		});
  		UIKit.Place((RectTransform)UIKit.MakeButton(panel.transform, "Reset all", "restart", UIKit.Muted, delegate
  		{
  			GameSettings.Reset();
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
-index d817002..329d71f 100644
+index d817002..2d376e9 100644
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,26 @@ public static class GameSettings
+@@ -9,6 +9,34 @@ public static class GameSettings
  {
  	public static float Volume = 0.9f;
  
@@ -727,6 +750,14 @@ index d817002..329d71f 100644
 +	public static bool SmartAI = true;
 +
 +	public static bool Helicopters = true;
++
++	public static bool SlowBrainDeath = true;
++
++	public static bool BodyArmour = true;
++
++	public static int BattleType = 0;
++
++	public static readonly string[] BattleTypeNames = new string[3] { "Normal", "Side one attacks", "Side two attacks" };
 +
 +	public static int Blood = 1;
 +
@@ -743,7 +774,7 @@ index d817002..329d71f 100644
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +206,12 @@ public static class GameSettings
+@@ -186,6 +214,15 @@ public static class GameSettings
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
@@ -751,12 +782,15 @@ index d817002..329d71f 100644
 +			Artillery = B("artillery", Artillery);
 +			SmartAI = B("smartai", SmartAI);
 +			Helicopters = B("helicopters", Helicopters);
++			SlowBrainDeath = B("slowbrain", SlowBrainDeath);
++			BodyArmour = B("armour", BodyArmour);
++			BattleType = Mathf.Clamp(I("battletype", BattleType), 0, 2);
 +			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
 +			Language = Mathf.Clamp(I("language", Language), 0, 1);
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +284,12 @@ public static class GameSettings
+@@ -258,6 +295,15 @@ public static class GameSettings
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
@@ -764,12 +798,15 @@ index d817002..329d71f 100644
 +		B("artillery", Artillery);
 +		B("smartai", SmartAI);
 +		B("helicopters", Helicopters);
++		B("slowbrain", SlowBrainDeath);
++		B("armour", BodyArmour);
++		I("battletype", BattleType);
 +		I("blood", Blood);
 +		I("language", Language);
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +336,11 @@ public static class GameSettings
+@@ -304,6 +350,14 @@ public static class GameSettings
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
@@ -777,6 +814,9 @@ index d817002..329d71f 100644
 +		Artillery = true;
 +		SmartAI = true;
 +		Helicopters = true;
++		SlowBrainDeath = true;
++		BodyArmour = true;
++		BattleType = 0;
 +		Blood = 1;
  		Apply();
  	}
@@ -1245,10 +1285,22 @@ index 1642108..6f5a058 100644
  			where c.team == t.Team && c.p != t.Point
  			orderby Flat(c.p.transform.position - v.transform.position).magnitude
 diff --git a/CombatSandbox.Demo/ReconstructionDemo.cs b/CombatSandbox.Demo/ReconstructionDemo.cs
-index d0e18db..c3096be 100644
+index d0e18db..e38c37b 100644
 --- a/CombatSandbox.Demo/ReconstructionDemo.cs
 +++ b/CombatSandbox.Demo/ReconstructionDemo.cs
-@@ -1450,13 +1450,20 @@ public sealed class ReconstructionDemo : MonoBehaviour
+@@ -1355,6 +1355,11 @@ public sealed class ReconstructionDemo : MonoBehaviour
+ 				component.LastAttacker = attacker;
+ 				component.LastAttackTime = Time.time;
+ 			}
++			if (BodyArmour.Stop(component, zone, point, normal, direction, ref energy))
++			{
++				hitMarker = Time.time + 0.2f;
++				return;
++			}
+ 			component.Hit(zone, point, direction, normal, energy);
+ 			bool arterial = (component.LastOrgans & Organ.Artery) != 0;
+ 			bool venous = (component.LastOrgans & Organ.Vein) != 0;
+@@ -1450,13 +1455,20 @@ public sealed class ReconstructionDemo : MonoBehaviour
  			component.Rifle.Spatter(traces, position, direction, 0.025f);
  		}
  		BloodRng.Eject();
@@ -1305,7 +1357,7 @@ index be2ff84..b0ac6a0 100644
  		Image image = Box(parent, "Key " + key, new Color(0.85f, 0.87f, 0.86f, 0.95f));
  		Place(image.rectTransform, anchor, position, new Vector2(num, 28f));
 diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
-index 3a35c45..50635b9 100644
+index 3a35c45..af3163a 100644
 --- a/CombatSandbox.Demo/Vehicle.cs
 +++ b/CombatSandbox.Demo/Vehicle.cs
 @@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
@@ -1317,28 +1369,41 @@ index 3a35c45..50635b9 100644
  {
  	public struct Wheel
  	{
-@@ -486,6 +486,20 @@ public abstract class Vehicle : MonoBehaviour
+@@ -486,6 +486,24 @@ public abstract class Vehicle : MonoBehaviour
  					typeof(QuadBike),
  					typeof(QuadBike)
  				});
-+				if (GameSettings.Helicopters)
++				List<Type> list = new List<Type>(array);
++				int attacker = Assault.Attacker;
++				bool flag = attacker >= 0 && attacker != i;
++				Type item = ((i == 0) ? typeof(T72) : typeof(Abrams));
++				Type item2 = ((i == 0) ? typeof(M113) : typeof(Btr));
++				if (GameSettings.Helicopters && !flag)
 +				{
-+					Type[] array3 = new Type[array.Length + 1];
-+					array3[0] = typeof(Helicopter);
-+					Array.Copy(array, 0, array3, 1, array.Length);
-+					array = array3;
++					list.Insert(0, typeof(Helicopter));
 +				}
-+				if (GameSettings.Tanks)
++				if (GameSettings.Tanks && !flag)
 +				{
-+					Type[] array2 = new Type[array.Length + 1];
-+					array2[0] = ((i == 0) ? typeof(T72) : typeof(Abrams));
-+					Array.Copy(array, 0, array2, 1, array.Length);
-+					array = array2;
++					list.Insert(0, item);
 +				}
++				if (attacker == i)
++				{
++					list.InsertRange(0, new Type[4] { item, item, item2, item2 });
++				}
++				array = list.ToArray();
  				for (int j = 0; j < array.Length; j++)
  				{
  					Place(array[j], i, @base.position, toward);
-@@ -518,6 +532,18 @@ public abstract class Vehicle : MonoBehaviour
+@@ -497,7 +515,7 @@ public abstract class Vehicle : MonoBehaviour
+ 	private static bool Place(Type kind, int team, Vector3 centre, Vector3 toward)
+ 	{
+ 		Vector3 vector = HalfSize(kind);
+-		for (float num = 7f; num < 50f; num += 2.5f)
++		for (float num = 7f; num < 95f; num += 2.5f)
+ 		{
+ 			for (int i = 0; i < 11; i++)
+ 			{
+@@ -518,6 +536,18 @@ public abstract class Vehicle : MonoBehaviour
  
  	private static Vector3 HalfSize(Type kind)
  	{
@@ -1357,7 +1422,7 @@ index 3a35c45..50635b9 100644
  		if (!(kind == typeof(Btr)))
  		{
  			if (!(kind == typeof(M113)))
-@@ -1002,12 +1028,49 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1002,12 +1032,49 @@ public abstract class Vehicle : MonoBehaviour
  		}
  	}
  
@@ -1407,7 +1472,7 @@ index 3a35c45..50635b9 100644
  		if (spec.Armoured)
  		{
  			if (energy < spec.ArmourEnergy)
-@@ -1015,11 +1078,16 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1015,11 +1082,16 @@ public abstract class Vehicle : MonoBehaviour
  				return;
  			}
  			energy = (energy - spec.ArmourEnergy) * 0.6f;
@@ -1424,7 +1489,15 @@ index 3a35c45..50635b9 100644
  		Vector3 vector = Local(point + direction.normalized * 0.05f) - spec.EngineCentre;
  		Vector3 vector2 = spec.EngineSize * 0.5f + Vector3.one * 0.06f;
  		bool flag = Mathf.Abs(vector.x) < vector2.x && Mathf.Abs(vector.y) < vector2.y && Mathf.Abs(vector.z) < vector2.z;
-@@ -1092,12 +1160,13 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1063,6 +1135,7 @@ public abstract class Vehicle : MonoBehaviour
+ 
+ 	public static void Blast(Vector3 centre, float power)
+ 	{
++		FieldGun.Blast(centre, power);
+ 		Vehicle[] array = All.ToArray();
+ 		foreach (Vehicle vehicle in array)
+ 		{
+@@ -1092,12 +1165,13 @@ public abstract class Vehicle : MonoBehaviour
  				continue;
  			}
  			float num4 = Mathf.Clamp01(1f - num3 / num2);
@@ -1439,7 +1512,7 @@ index 3a35c45..50635b9 100644
  				if (flag)
  				{
  					vehicle.Spall(vector);
-@@ -1311,6 +1380,7 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1311,6 +1385,7 @@ public abstract class Vehicle : MonoBehaviour
  				Passing();
  			}
  			ClearDead(fixedDeltaTime);
@@ -1447,7 +1520,7 @@ index 3a35c45..50635b9 100644
  			if (Time.time < unstickUntil && !Wrecked)
  			{
  				unstickHelp = Mathf.MoveTowards(unstickHelp, 1f, fixedDeltaTime / 3f);
-@@ -1446,8 +1516,10 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1446,8 +1521,10 @@ public abstract class Vehicle : MonoBehaviour
  				{
  					num11 *= 1f - Steer / spec.MaxSteer * 0.6f * Mathf.Sign(wheel.At.x);
  				}
@@ -1485,6 +1558,88 @@ index 32950e7..69cfe9c 100644
  		main.simulationSpace = ParticleSystemSimulationSpace.World;
  		main.startSpeed = 0f;
  		main.startLifetime = 1000f;
+diff --git a/CombatSandbox/Physiology.cs b/CombatSandbox/Physiology.cs
+index c126827..5dcf3fa 100644
+--- a/CombatSandbox/Physiology.cs
++++ b/CombatSandbox/Physiology.cs
+@@ -51,6 +51,10 @@ public sealed class Physiology
+ 
+ 	public DeathCause Cause { get; private set; }
+ 
++	public float BrainDamage { get; private set; }
++
++	private float brainRate;
++
+ 	public float HeartPhase { get; private set; }
+ 
+ 	public float Stun { get; private set; }
+@@ -85,6 +89,8 @@ public sealed class Physiology
+ 		bool legsParalyzed = (ArmsParalyzed = flag2);
+ 		LegsParalyzed = legsParalyzed;
+ 		Cause = DeathCause.None;
++		BrainDamage = 0f;
++		brainRate = 0f;
+ 		Stun = 0f;
+ 		InShock = false;
+ 	}
+@@ -95,7 +101,18 @@ public sealed class Physiology
+ 		Stress(Mathf.Clamp01(0.35f + severity * 0.4f));
+ 		if ((organs & Organ.Brain) != 0)
+ 		{
+-			Cause = DeathCause.Brain;
++			if (CombatSandbox.Demo.GameSettings.SlowBrainDeath)
++			{
++				float num = Mathf.Clamp01(0.45f + severity * 0.2f) * UnityEngine.Random.Range(0.85f, 1.05f);
++				BrainDamage = Mathf.Clamp(BrainDamage + num * 0.7f, 0f, 0.97f);
++				brainRate = Mathf.Max(brainRate, (num - 0.42f) * 0.06f * UnityEngine.Random.Range(0.7f, 1.4f));
++				Stun = 1f;
++				Consciousness = Mathf.Min(Consciousness, 1f - BrainDamage * 1.8f);
++			}
++			else
++			{
++				Cause = DeathCause.Brain;
++			}
+ 		}
+ 		if ((organs & Organ.CervicalSpine) != 0)
+ 		{
+@@ -180,7 +197,17 @@ public sealed class Physiology
+ 		float num2 = (BreathingParalyzed ? 0f : Mathf.Clamp01(1f - LungDamage * 0.42f));
+ 		Oxygen = Mathf.MoveTowards(Oxygen, num2, dt * ((!(num2 < Oxygen)) ? 0.02f : (BreathingParalyzed ? 0.018f : 0.012f)));
+ 		Stun = Mathf.MoveTowards(Stun, 0f, dt / 14f);
+-		float num3 = Mathf.Min(Mathf.Min(Perfusion, Mathf.Clamp01((Oxygen - 0.5f) / 0.32f)), 1f - Stun * 0.65f);
++		if (BrainDamage > 0f)
++		{
++			float num5 = brainRate + ((Oxygen < 0.5f || Perfusion < 0.3f) ? 0.01f : 0f);
++			BrainDamage = Mathf.Max(0f, BrainDamage + ((num5 > 0f) ? num5 : (-0.004f)) * dt);
++			Stun = Mathf.Max(Stun, Mathf.Clamp01(BrainDamage * 1.5f));
++			if (BrainDamage >= 1f && Cause == DeathCause.None)
++			{
++				Cause = DeathCause.Brain;
++			}
++		}
++		float num3 = Mathf.Min(Mathf.Min(Mathf.Min(Perfusion, Mathf.Clamp01((Oxygen - 0.5f) / 0.32f)), 1f - Stun * 0.65f), 1f - BrainDamage * 1.8f);
+ 		Consciousness = Mathf.MoveTowards(Consciousness, num3, dt * ((num3 < Consciousness) ? 0.35f : 0.12f));
+ 		Adrenaline = Mathf.MoveTowards(Adrenaline, 0f, dt / 45f);
+ 		float num4 = 72f + Adrenaline * 55f + (1f - num) * 190f + LungDamage * 20f;
+@@ -198,6 +225,10 @@ public sealed class Physiology
+ 		{
+ 			b = Mathf.Lerp(5f, b, Consciousness * 4f);
+ 		}
++		if (BrainDamage > 0.6f)
++		{
++			b *= Mathf.Lerp(1f, 0.25f, (BrainDamage - 0.6f) / 0.4f) * (0.6f + 0.8f * Mathf.PerlinNoise(BreathPhase, 0.3f));
++		}
+ 		BreathRate = Mathf.Lerp(BreathRate, b, dt * 0.6f);
+ 		HeartPhase += dt * HeartRate / 60f;
+ 		BreathPhase += dt * BreathRate / 60f;
+@@ -230,6 +261,7 @@ public sealed class Physiology
+ 			}
+ 			organRate *= 0.6f;
+ 			gutRate *= 0.6f;
++			brainRate *= 0.7f;
+ 		}
+ 	}
+ 
 diff --git a/CombatSandbox/WoundBleeding.cs b/CombatSandbox/WoundBleeding.cs
 index 503ec9f..804992e 100644
 --- a/CombatSandbox/WoundBleeding.cs

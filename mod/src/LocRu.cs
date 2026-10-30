@@ -1010,5 +1010,25 @@ internal static class LocRu
 		yield return ("Buggy", "Багги");
 		yield return ("ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand", "регдолл: обмякнуть / встать   ПКМ — руки вперёд, Shift / Alt — хвататься, Пробел — подтянуться");
 		yield return ("fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)", "режим огня: автоматический / одиночный (в танке: ОФС / БОПС, Пробел — спаренный пулемёт)");
+		yield return ("Combat", "Бой");
+		yield return ("The kind of battle, wounds and body armour.", "Тип боя, ранения и бронезащита.");
+		yield return ("Battle type", "Тип боя");
+		yield return ("Side one attacks", "Атакует первая сторона");
+		yield return ("Side two attacks", "Атакует вторая сторона");
+		yield return ("Attack and defence: the attackers get many tanks and armour, the defenders a howitzer battery at the base and mortars (from the next battle, not in the capture mode).", "Атака и оборона: у атакующих много танков и бронетехники, у обороняющихся батарея гаубиц на базе и миномёты (со следующего боя, не в режиме захвата).");
+		yield return ("Slow death from head wounds", "Медленная смерть при ранении в голову");
+		yield return ("A man shot through the brain falls unconscious and dies over half a minute or more; a light head wound may pass.", "Боец с ранением мозга теряет сознание и умирает за полминуты и дольше; лёгкое ранение головы может пройти.");
+		yield return ("Body armour", "Бронезащита");
+		yield return ("Plates front and back stop rifle rounds until they wear out, soft armour stops pistol rounds and splinters, the helmet saves from splinters and glancing hits.", "Плиты спереди и сзади держат винтовочные пули, пока не износятся; мягкая броня — пистолетные пули и осколки; шлем — осколки и попадания вскользь.");
+		yield return ("ARMOUR", "БРОНЯ");
+		yield return ("Front plate", "Плита спереди");
+		yield return ("Back plate", "Плита сзади");
+		yield return ("Soft armour", "Мягкая броня");
+		yield return ("attacks,", "атакует,");
+		yield return ("defends", "обороняется");
+		yield return ("mortar destroyed", "миномёт уничтожен");
+		yield return ("howitzer destroyed", "гаубица уничтожена");
+		yield return ("No artillery for this side", "У этой стороны нет артиллерии");
+		yield return ("82 mm mortar", "82-мм миномёт");
 	}
 }
