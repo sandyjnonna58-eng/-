@@ -8,9 +8,9 @@ public static class Crews
 
 	private static bool Crewed(Vehicle v)
 	{
-		if (!(v is Tank) && !(v is Helicopter) && !(v is Btr))
+		if (!(v is Tank))
 		{
-			return v is M113;
+			return v is Gunship;
 		}
 		return true;
 	}

@@ -47,6 +47,12 @@ public abstract class Tank : Vehicle
 
 	private bool detonated;
 
+	private int trackFrame;
+
+	private float laidLeft = float.MaxValue;
+
+	private float laidRight = float.MaxValue;
+
 	private float jetUntil;
 
 	private Light jetLight;
@@ -155,8 +161,17 @@ public abstract class Tank : Vehicle
 			sprocketRight.localRotation = Quaternion.Euler(base.RolledRight * num, 0f, 0f);
 			idlerL.localRotation = Quaternion.Euler(base.RolledLeft * num2, 0f, 0f);
 			idlerRight.localRotation = Quaternion.Euler(base.RolledRight * num2, 0f, 0f);
-			LayTrack(shoesL, -1, base.RolledLeft);
-			LayTrack(shoesR, 1, base.RolledRight);
+			trackFrame++;
+			bool flag = Mathf.Abs(base.RolledLeft - laidLeft) > 0.003f || Mathf.Abs(base.RolledRight - laidRight) > 0.003f;
+			Camera main = Camera.main;
+			bool flag2 = (bool)main && (main.transform.position - base.transform.position).sqrMagnitude > 40000f;
+			if ((flag && (!flag2 || trackFrame % 6 == 0)) || trackFrame % 30 == 0)
+			{
+				laidLeft = base.RolledLeft;
+				laidRight = base.RolledRight;
+				LayTrack(shoesL, -1, base.RolledLeft);
+				LayTrack(shoesR, 1, base.RolledRight);
+			}
 		}
 		if (GameSettings.SmartAI && !base.Wrecked && Time.time >= nextScare)
 		{

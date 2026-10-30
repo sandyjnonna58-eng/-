@@ -80,7 +80,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  			Motorpool.Begin();
  		}
  		for (int j = 0; j < 2; j++)
-@@ -507,6 +520,14 @@
+@@ -507,6 +520,10 @@
  		{
  			base.gameObject.AddComponent<CommandWheel>();
  		}
@@ -88,14 +88,10 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
 +		{
 +			base.gameObject.AddComponent<ModuleHud>();
 +		}
-+		if (!GetComponent<VitalMonitor>())
-+		{
-+			base.gameObject.AddComponent<VitalMonitor>();
-+		}
  		if ((bool)Acoustics.Instance)
  		{
  			Acoustics.Instance.Ambience = AmbientBattle && GameSettings.Ambience;
-@@ -532,6 +553,15 @@
+@@ -532,6 +549,15 @@
  
  	private void ApplyRosters()
  	{
@@ -111,7 +107,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		int t;
  		for (t = 0; t < 2; t++)
  		{
-@@ -554,9 +584,10 @@
+@@ -554,9 +580,10 @@
  				}
  			}
  			List<CombatBrain> list = Soldiers.Where((CombatBrain b) => b.Team == t).OrderBy((CombatBrain b) => b.name, StringComparer.Ordinal).ToList();
@@ -124,7 +120,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  				{
  					CombatBrain combatBrain = list[i];
  					CombatBrain.All.Remove(combatBrain);
-@@ -564,15 +595,17 @@
+@@ -564,15 +591,17 @@
  					UnityEngine.Object.Destroy(combatBrain.gameObject);
  					continue;
  				}
@@ -146,7 +142,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  				combatBrain2.Equip(unitLoadout.Primary, unitLoadout.Pistol, unitLoadout.Grenades);
  			}
  		}
-@@ -593,6 +626,20 @@
+@@ -593,6 +622,20 @@
  		brain.SightRange = 120f * Mathf.Min(num, 1.8f);
  		brain.SpotDistance = 28f * Mathf.Pow(num, 0.55f);
  		brain.EngageRange = 65f * Mathf.Lerp(1f, num, 0.45f);
@@ -167,7 +163,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  	}
  
  	public Vector3 BasePoint(int team)
-@@ -688,6 +735,16 @@
+@@ -688,6 +731,16 @@
  		return (TeamRoster)obj;
  	}
  
@@ -184,7 +180,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  	public CombatBrain SpawnUnit(int team, int index, Vector3 at)
  	{
  		TeamRoster teamRoster = RosterOf(team);
-@@ -695,9 +752,9 @@
+@@ -695,9 +748,9 @@
  		{
  			return Spawn(team, at);
  		}
@@ -196,7 +192,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		{
  			role = CombatBrain.Role.Rifleman;
  		}
-@@ -915,7 +972,7 @@
+@@ -915,7 +968,7 @@
  			return;
  		}
  		bool overUI = (bool)EventSystem.current && EventSystem.current.IsPointerOverGameObject();
@@ -205,7 +201,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1360,33 @@
+@@ -1303,6 +1356,33 @@
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
@@ -239,7 +235,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1680,40 @@
+@@ -1596,6 +1676,40 @@
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -295,7 +291,55 @@ diff --git a/CombatSandbox.Demo/BattleSetup.cs b/CombatSandbox.Demo/BattleSetup.
 diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
 --- a/CombatSandbox.Demo/BattleUI.cs
 +++ b/CombatSandbox.Demo/BattleUI.cs
-@@ -1003,8 +1003,9 @@
+@@ -253,6 +253,10 @@
+ 
+ 	private Text pulseText;
+ 
++	private BreathTrace breath;
++
++	private Text breathText;
++
+ 	private Text bloodText;
+ 
+ 	private Text mindText;
+@@ -636,7 +640,7 @@
+ 			transform.gameObject.SetActive(value: false);
+ 		}
+ 		Image image3 = UIKit.Box(hud, "Vitals monitor", UIKit.Panel);
+-		UIKit.Place(image3.rectTransform, new Vector2(0f, 0f), new Vector2(24f, 58f), new Vector2(430f, 200f));
++		UIKit.Place(image3.rectTransform, new Vector2(0f, 0f), new Vector2(24f, 58f), new Vector2(430f, 232f));
+ 		UIKit.Place(UIKit.IconImage(image3.transform, "user", UIKit.Text, 20f).rectTransform, new Vector2(0f, 1f), new Vector2(16f, -14f), new Vector2(20f, 20f));
+ 		status = UIKit.Label(image3.transform, "", 19, UIKit.Text, TextAnchor.MiddleLeft, bold: true);
+ 		UIKit.Place(status.rectTransform, new Vector2(0f, 1f), new Vector2(44f, -10f), new Vector2(370f, 28f));
+@@ -676,10 +680,26 @@
+ 		UIKit.Place(mindText.rectTransform, new Vector2(0f, 1f), new Vector2(46f, -144f), new Vector2(110f, 24f));
+ 		mindFill = UIKit.Bar(image3.transform, new Color(0.5f, 0.7f, 1f), out var back3);
+ 		UIKit.Place(back3.rectTransform, new Vector2(0f, 1f), new Vector2(160f, -152f), new Vector2(254f, 9f));
++		Image breathBox = UIKit.Box(image3.transform, "Breath monitor", new Color(0f, 0f, 0f, 0.45f), UIKit.Rounded);
++		UIKit.Place(breathBox.rectTransform, new Vector2(0f, 1f), new Vector2(46f, -172f), new Vector2(262f, 28f));
++		GameObject breathObject = (breathBox.transform.Find("Trace") ? breathBox.transform.Find("Trace").gameObject : new GameObject("Trace", typeof(RectTransform), typeof(CanvasRenderer)));
++		breathObject.transform.SetParent(breathBox.transform, worldPositionStays: false);
++		breathObject.layer = breathBox.gameObject.layer;
++		breath = UIKit.Ensure<BreathTrace>(breathObject);
++		breath.raycastTarget = false;
++		breath.color = new Color(0.45f, 0.82f, 1f);
++		RectTransform breathRect = breath.rectTransform;
++		breathRect.anchorMin = Vector2.zero;
++		breathRect.anchorMax = Vector2.one;
++		breathRect.offsetMin = new Vector2(6f, 3f);
++		breathRect.offsetMax = new Vector2(-6f, -3f);
++		UIKit.Place(UIKit.Label(image3.transform, "RESP", 11, new Color(0.45f, 0.82f, 1f), TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(12f, -178f), new Vector2(34f, 16f));
++		breathText = UIKit.Label(image3.transform, "", 15, new Color(0.45f, 0.82f, 1f), TextAnchor.MiddleRight, bold: true);
++		UIKit.Place(breathText.rectTransform, new Vector2(0f, 1f), new Vector2(314f, -174f), new Vector2(100f, 24f));
+ 		injuries = UIKit.Label(image3.transform, "", 14, UIKit.Bad, TextAnchor.MiddleLeft, bold: true);
+ 		UIKit.Place(injuries.rectTransform, new Vector2(0f, 0f), new Vector2(16f, 10f), new Vector2(398f, 24f));
+ 		conditions = UIKit.Node(hud, "Conditions");
+-		UIKit.Place(conditions, new Vector2(0f, 0f), new Vector2(24f, 266f), new Vector2(700f, 26f));
++		UIKit.Place(conditions, new Vector2(0f, 0f), new Vector2(24f, 298f), new Vector2(700f, 26f));
+ 		hitMarker = UIKit.Node(hud, "Hit marker");
+ 		UIKit.Place(hitMarker, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(40f, 40f));
+ 		for (int l = 0; l < 4; l++)
+@@ -1003,8 +1023,9 @@
  				UnityEngine.Object.Destroy(item5.gameObject);
  			}
  		}
@@ -306,7 +350,7 @@ diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
  			("WASD", "move"),
  			("Shift", "run"),
  			("Ctrl", "crouch"),
-@@ -1078,7 +1079,7 @@
+@@ -1078,7 +1099,7 @@
  		}
  		bool flag = director.Mode == BattleDirector.ViewMode.Possessed && (bool)director.Possessed;
  		bool active = CaptureMode.Active;
@@ -315,7 +359,7 @@ diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
  		if (!canvas.enabled)
  		{
  			return;
-@@ -1732,9 +1733,9 @@
+@@ -1732,9 +1753,9 @@
  		{
  			text2 = K("E") + "pick up the weapon";
  		}
@@ -327,6 +371,18 @@ diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
  		}
  		prompt.text = text2;
  		float num11 = body.Health / 100f;
+@@ -1755,6 +1776,11 @@
+ 		ecg.Strength = Mathf.Lerp(0.3f, 1f, vitals.Pressure) * Mathf.Lerp(0.5f, 1f, vitals.HeartFunction);
+ 		ecg.Ragged = Mathf.Clamp01(1f - vitals.HeartFunction) * 0.8f + (vitals.InShock ? 0.15f : 0f);
+ 		bpmText.text = (flag5 ? "0" : heartRate.ToString("0"));
++		bool flag6 = body.Body.Dead || vitals.BreathRate < 0.5f;
++		breath.Phase = vitals.BreathPhase;
++		breath.Stopped = flag6;
++		breath.Depth = Mathf.Clamp01(vitals.BreathRate / 10f) * Mathf.Lerp(0.45f, 1f, 1f - vitals.LungDamage * 0.6f);
++		breathText.text = (flag6 ? "0" : vitals.BreathRate.ToString("0")) + Loc.T("/min");
+ 		bpmText.color = color;
+ 		float num12 = (flag5 ? 0f : Mathf.Pow(Mathf.Max(0f, 1f - Mathf.Repeat(vitals.HeartPhase, 1f) * 5f), 2f));
+ 		heartIcon.rectTransform.localScale = Vector3.one * (1f + num12 * 0.25f);
 diff --git a/CombatSandbox.Demo/BootSequence.cs b/CombatSandbox.Demo/BootSequence.cs
 --- a/CombatSandbox.Demo/BootSequence.cs
 +++ b/CombatSandbox.Demo/BootSequence.cs
@@ -889,7 +945,7 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +703,52 @@
+@@ -695,6 +703,56 @@
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -931,7 +987,11 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
 +		{
 +			GameSettings.BodyArmour = b;
 +		});
-+		SwitchRow("Ready crews", "Every tank, IFV, APC and helicopter starts the battle with its own crew (the Crew class): the infantry stays infantry. Crew soldiers take over any free vehicle or gun (from the next battle).", GameSettings.ReadyCrews, delegate(bool b)
++		SelectRow("Vehicles", "How much armour and how many helicopters each side gets. Few: a tank and an IFV. Normal: a tank, an IFV and a gunship. Many: two tanks, an IFV, a gunship and a transport helicopter (heavy on the computer). From the next battle.", GameSettings.VehicleAmountNames, GameSettings.VehicleAmount, delegate(int i)
++		{
++			GameSettings.VehicleAmount = i;
++		});
++		SwitchRow("Ready crews", "Every tank, IFV and gunship starts the battle with its own crew (the Crew class), so the infantry stays infantry. Crew soldiers take over any free vehicle or gun (from the next battle).", GameSettings.ReadyCrews, delegate(bool b)
 +		{
 +			GameSettings.ReadyCrews = b;
 +		});
@@ -945,7 +1005,7 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,38 @@
+@@ -9,6 +9,42 @@
  {
  	public static float Volume = 0.9f;
  
@@ -964,6 +1024,10 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +	public static bool EqualForces = true;
 +
 +	public static bool ReadyCrews = true;
++
++	public static int VehicleAmount = 1;
++
++	public static readonly string[] VehicleAmountNames = new string[3] { "Few", "Normal", "Many" };
 +
 +	public static int BattleType = 0;
 +
@@ -984,7 +1048,7 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +218,17 @@
+@@ -186,6 +222,18 @@
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
@@ -996,13 +1060,14 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +			BodyArmour = B("armour", BodyArmour);
 +			EqualForces = B("equal", EqualForces);
 +			ReadyCrews = B("crews", ReadyCrews);
++			VehicleAmount = Mathf.Clamp(I("vehicles", VehicleAmount), 0, 2);
 +			BattleType = Mathf.Clamp(I("battletype", BattleType), 0, 2);
 +			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
 +			Language = Mathf.Clamp(I("language", Language), 0, 1);
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +301,17 @@
+@@ -258,6 +306,18 @@
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
@@ -1014,13 +1079,14 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		B("armour", BodyArmour);
 +		B("equal", EqualForces);
 +		B("crews", ReadyCrews);
++		I("vehicles", VehicleAmount);
 +		I("battletype", BattleType);
 +		I("blood", Blood);
 +		I("language", Language);
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +358,16 @@
+@@ -304,6 +364,17 @@
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
@@ -1032,6 +1098,7 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		BodyArmour = true;
 +		EqualForces = true;
 +		ReadyCrews = true;
++		VehicleAmount = 1;
 +		BattleType = 0;
 +		Blood = 1;
  		Apply();
@@ -1858,7 +1925,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  				{
  					(i == 0) ? typeof(M113) : typeof(Btr),
  					typeof(Buggy),
-@@ -486,6 +486,35 @@
+@@ -486,6 +486,36 @@
  					typeof(QuadBike),
  					typeof(QuadBike)
  				});
@@ -1870,31 +1937,32 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
 +				Type item3 = ((i == 0) ? typeof(T90) : typeof(Leopard2));
 +				Type item4 = ((i == 0) ? typeof(Bmp2) : typeof(Bradley));
 +				Type item5 = ((i == 0) ? typeof(Mi24) : typeof(Apache));
-+				if (GameSettings.Helicopters && !flag)
++				int vehicleAmount = GameSettings.VehicleAmount;
++				if (GameSettings.Helicopters && !flag && vehicleAmount >= 1)
 +				{
-+					list.InsertRange(0, new Type[2] { item5, typeof(Helicopter) });
++					list.Insert(0, item5);
++					if (vehicleAmount >= 2 || BigMap.Active)
++					{
++						list.Insert(1, typeof(Helicopter));
++					}
 +				}
 +				if (GameSettings.Tanks && !flag)
 +				{
-+					list.InsertRange(0, new Type[3] { item, item3, item4 });
++					list.InsertRange(0, (vehicleAmount >= 2) ? new Type[3] { item, item3, item4 } : new Type[2] { (vehicleAmount == 0) ? item : item3, item4 });
 +				}
 +				if (attacker == i)
 +				{
-+					list.InsertRange(0, new Type[4] { item, item3, item4, item2 });
++					list.InsertRange(0, (vehicleAmount >= 2) ? new Type[4] { item, item3, item4, item2 } : new Type[2] { item, item4 });
 +				}
-+				if (BigMap.Active)
++				if (BigMap.Active && vehicleAmount >= 1)
 +				{
-+					list.InsertRange(0, new Type[3] { item2, item4, typeof(Buggy) });
-+					if (GameSettings.Helicopters)
-+					{
-+						list.Insert(0, typeof(Helicopter));
-+					}
++					list.InsertRange(0, (vehicleAmount >= 2) ? new Type[3] { item2, item4, typeof(Buggy) } : new Type[1] { item2 });
 +				}
 +				array = list.ToArray();
  				for (int j = 0; j < array.Length; j++)
  				{
  					Place(array[j], i, @base.position, toward);
-@@ -497,7 +526,7 @@
+@@ -497,7 +527,7 @@
  	private static bool Place(Type kind, int team, Vector3 centre, Vector3 toward)
  	{
  		Vector3 vector = HalfSize(kind);
@@ -1903,7 +1971,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  		{
  			for (int i = 0; i < 11; i++)
  			{
-@@ -518,6 +547,42 @@
+@@ -518,6 +548,42 @@
  
  	private static Vector3 HalfSize(Type kind)
  	{
@@ -1946,7 +2014,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  		if (!(kind == typeof(Btr)))
  		{
  			if (!(kind == typeof(M113)))
-@@ -1002,12 +1067,49 @@
+@@ -1002,12 +1068,49 @@
  		}
  	}
  
@@ -1996,7 +2064,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  		if (spec.Armoured)
  		{
  			if (energy < spec.ArmourEnergy)
-@@ -1015,11 +1117,16 @@
+@@ -1015,11 +1118,16 @@
  				return;
  			}
  			energy = (energy - spec.ArmourEnergy) * 0.6f;
@@ -2013,7 +2081,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  		Vector3 vector = Local(point + direction.normalized * 0.05f) - spec.EngineCentre;
  		Vector3 vector2 = spec.EngineSize * 0.5f + Vector3.one * 0.06f;
  		bool flag = Mathf.Abs(vector.x) < vector2.x && Mathf.Abs(vector.y) < vector2.y && Mathf.Abs(vector.z) < vector2.z;
-@@ -1063,6 +1170,7 @@
+@@ -1063,6 +1171,7 @@
  
  	public static void Blast(Vector3 centre, float power)
  	{
@@ -2021,7 +2089,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  		Vehicle[] array = All.ToArray();
  		foreach (Vehicle vehicle in array)
  		{
-@@ -1092,12 +1200,13 @@
+@@ -1092,12 +1201,13 @@
  				continue;
  			}
  			float num4 = Mathf.Clamp01(1f - num3 / num2);
@@ -2036,7 +2104,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  				if (flag)
  				{
  					vehicle.Spall(vector);
-@@ -1311,6 +1420,7 @@
+@@ -1311,6 +1421,7 @@
  				Passing();
  			}
  			ClearDead(fixedDeltaTime);
@@ -2044,7 +2112,7 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  			if (Time.time < unstickUntil && !Wrecked)
  			{
  				unstickHelp = Mathf.MoveTowards(unstickHelp, 1f, fixedDeltaTime / 3f);
-@@ -1446,8 +1556,10 @@
+@@ -1446,8 +1557,10 @@
  				{
  					num11 *= 1f - Steer / spec.MaxSteer * 0.6f * Mathf.Sign(wheel.At.x);
  				}
@@ -2057,30 +2125,6 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  				wheels[j].steerAngle = Steer * wheel.Steer;
  			}
  			if (spec.Tracked && flag)
-diff --git a/CombatSandbox/BloodDroplets.cs b/CombatSandbox/BloodDroplets.cs
---- a/CombatSandbox/BloodDroplets.cs
-+++ b/CombatSandbox/BloodDroplets.cs
-@@ -7,9 +7,9 @@
- 
- public sealed class BloodDroplets : IDisposable
- {
--	private readonly BloodDrop[] drops = new BloodDrop[2400];
-+	private readonly BloodDrop[] drops = new BloodDrop[4000];
- 
--	private readonly ParticleSystem.Particle[] particles = new ParticleSystem.Particle[2400];
-+	private readonly ParticleSystem.Particle[] particles = new ParticleSystem.Particle[4000];
- 
- 	private readonly ParticleSystem system;
- 
-@@ -70,7 +70,7 @@
- 		ParticleSystem.MainModule main = system.main;
- 		main.loop = true;
- 		main.playOnAwake = false;
--		main.maxParticles = 2400;
-+		main.maxParticles = 4000;
- 		main.simulationSpace = ParticleSystemSimulationSpace.World;
- 		main.startSpeed = 0f;
- 		main.startLifetime = 1000f;
 diff --git a/CombatSandbox/Physiology.cs b/CombatSandbox/Physiology.cs
 --- a/CombatSandbox/Physiology.cs
 +++ b/CombatSandbox/Physiology.cs

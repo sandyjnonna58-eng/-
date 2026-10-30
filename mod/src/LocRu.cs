@@ -1081,9 +1081,7 @@ internal static class LocRu
 		yield return ("Defence", "Оборона");
 		yield return ("Side one holds its base with howitzers and mortars against heavy armour.", "Первая сторона держит базу: гаубицы и миномёты против тяжёлой брони.");
 		yield return ("No crew at the guns - gunners are on their way", "У орудий нет расчёта — артиллеристы идут к орудиям");
-		yield return ("ECG", "ЭКГ");
-		yield return ("HR", "ЧСС · АД");
-		yield return ("RESP", "ДЫХАНИЕ");
+		yield return ("RESP", "ДЫХ");
 		yield return ("The guns are destroyed", "Орудия уничтожены");
 		yield return ("The battery is out of shells", "У батареи кончились снаряды");
 		yield return ("shells left:", "осталось снарядов:");
@@ -1092,5 +1090,10 @@ internal static class LocRu
 		yield return ("Crew", "Экипаж");
 		yield return ("Big City", "Большой город");
 		yield return ("A big city made anew for every battle: blocks of five- and nine-storey panel houses, private houses, ruins and parks, 14 m streets with burnt-out cars and barricades. The bases are on the outskirts about 800 m apart. For the Battle, Attack and Defence modes; loading takes a little longer.", "Большой город, новый в каждом бою: кварталы панельных пятиэтажек и девятиэтажек, частный сектор, руины и парки, улицы шириной 14 м со сгоревшими машинами и баррикадами. Базы на окраинах примерно в 800 м друг от друга. Для режимов «Сражение», «Атака» и «Оборона»; загрузка чуть дольше.");
+		yield return ("Vehicles", "Техника");
+		yield return ("Few", "Мало");
+		yield return ("Many", "Много");
+		yield return ("How much armour and how many helicopters each side gets. Few: a tank and an IFV. Normal: a tank, an IFV and a gunship. Many: two tanks, an IFV, a gunship and a transport helicopter (heavy on the computer). From the next battle.", "Сколько бронетехники и вертолётов у каждой стороны. Мало: танк и БМП. Обычно: танк, БМП и ударный вертолёт. Много: два танка, БМП, ударный и транспортный вертолёты (тяжело для компьютера). Со следующего боя.");
+		yield return ("Every tank, IFV and gunship starts the battle with its own crew (the Crew class), so the infantry stays infantry. Crew soldiers take over any free vehicle or gun (from the next battle).", "Каждый танк, БМП и ударный вертолёт начинает бой со своим экипажем (класс «Экипаж»), пехота остаётся пехотой. Экипажи садятся в любую свободную технику или встают к орудиям (со следующего боя).");
 	}
 }
