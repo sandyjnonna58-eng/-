@@ -162,6 +162,7 @@ public sealed class Abrams : Tank
 			Muzzle = new Vector3(0f, 0f, 5.3f),
 			Port = new Vector3(0f, 0f, 0.1f),
 			Casings = false,
+			Sight = new Vector3(-0.55f, 0.75f, -1f),
 			GripsElevate = false,
 			GripL = new Vector3(0.3f, -0.3f, 0.45f),
 			GripR = new Vector3(0.6f, -0.3f, 0.45f),

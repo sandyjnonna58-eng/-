@@ -221,6 +221,7 @@ public sealed class T72 : Tank
 			Muzzle = new Vector3(0f, 0f, 4.8f),
 			Port = new Vector3(0f, 0f, 0.1f),
 			Casings = false,
+			Sight = new Vector3(-0.55f, 0.58f, -0.5f),
 			GripsElevate = false,
 			GripL = new Vector3(-0.6f, -0.25f, 0.35f),
 			GripR = new Vector3(-0.3f, -0.25f, 0.35f),

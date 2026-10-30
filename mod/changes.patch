@@ -114,7 +114,7 @@ index 36fa06c..551e555 100644
  		{
  			Vector3 vector12 = aimPoint - (shoulder + Vector3.up * rifle.BoreHeight);
 diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
-index 2a9fd65..cb25203 100644
+index 2a9fd65..d661120 100644
 --- a/CombatSandbox.Demo/BattleUI.cs
 +++ b/CombatSandbox.Demo/BattleUI.cs
 @@ -1003,8 +1003,9 @@ public sealed class BattleUI : MonoBehaviour
@@ -128,6 +128,15 @@ index 2a9fd65..cb25203 100644
  			("WASD", "move"),
  			("Shift", "run"),
  			("Ctrl", "crouch"),
+@@ -1078,7 +1079,7 @@ public sealed class BattleUI : MonoBehaviour
+ 		}
+ 		bool flag = director.Mode == BattleDirector.ViewMode.Possessed && (bool)director.Possessed;
+ 		bool active = CaptureMode.Active;
+-		canvas.enabled = visible && (!active || flag) && !DroneView.Busy && !TreatmentScreen.Active && !director.InPeriscope;
++		canvas.enabled = visible && (!active || flag) && !DroneView.Busy && !TreatmentScreen.Active && !director.InPeriscope && !director.InGunSight;
+ 		if (!canvas.enabled)
+ 		{
+ 			return;
 @@ -1732,9 +1733,9 @@ public sealed class BattleUI : MonoBehaviour
  		{
  			text2 = K("E") + "pick up the weapon";
@@ -175,7 +184,7 @@ index 7233289..6a42e5b 100644
  			CombatBrain key = item12.Key;
  			(CapturePoint, bool) value = item12.Value;
 diff --git a/CombatSandbox.Demo/CombatBrain.cs b/CombatSandbox.Demo/CombatBrain.cs
-index f9b15b7..8606492 100644
+index f9b15b7..ac8fe72 100644
 --- a/CombatSandbox.Demo/CombatBrain.cs
 +++ b/CombatSandbox.Demo/CombatBrain.cs
 @@ -7,7 +7,7 @@ namespace CombatSandbox.Demo;
@@ -187,7 +196,41 @@ index f9b15b7..8606492 100644
  {
  	public enum Mode
  	{
-@@ -7743,18 +7743,28 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -2386,6 +2386,10 @@ public sealed class CombatBrain : MonoBehaviour
+ 			return;
+ 		}
+ 		Vector3 vector = ((!CaptureGoal) ? (EnemyKnown ? enemyLastSeen : ((Time.time - heardTime < 15f) ? heardAt : (ThreatKnown ? Threat : Objective))) : ((!Storming && EnemyKnown && EnemyRange < 25f) ? enemyLastSeen : Objective));
++		if (Time.time < ObeyUntil && HasObjective && (!EnemyVisible || EnemyRange > 25f))
++		{
++			vector = Objective;
++		}
+ 		orders.Face = true;
+ 		orders.FaceTo = vector;
+ 		float magnitude = Flat(vector - Here).magnitude;
+@@ -2761,6 +2765,7 @@ public sealed class CombatBrain : MonoBehaviour
+ 			}
+ 			bool flag3 = EnemyVisible && Flat(enemyLastSeen - Here).magnitude < 45f;
+ 			Mode mode = ((!flag && (!target.IsRecovering || Current != Mode.Down || target.PickingUp || target.KneelingHeld)) ? (ExecuteTarget ? Mode.Execute : (EscortOf ? Mode.Escort : ((!flag && ((Current == Mode.Aid && (aid != 0 || MedicComing)) || MedicComing || WantsSelfAid())) ? Mode.Aid : (((!(Severity >= PanicSeverity) || (!flag2 && !(Severity > 0.7f))) && !(Time.time < panicUntil)) ? (((Current == Mode.Retrieve && target.PickingUp) || CanRetrieve(flag2)) ? Mode.Retrieve : ((Duty == Role.Operator && ((bool)Drone || launchAt > 0f || ReadyToLaunch())) ? Mode.Pilot : ((Duty == Role.Medic && ((Current == Mode.Treat && (bool)Patient) || TryTreat())) ? Mode.Treat : ((Duty != Role.Medic && ((Current == Mode.Rescue && (bool)casualty) || TryRescue())) ? Mode.Rescue : (WantsSupplies() ? Mode.Resupply : ((EnemyKnown && target.Armed && (Duty != Role.Medic || flag3) && (EnemyRange < MyEngageRange || UnderFire || (Current == Mode.Fight && EnemyRange < MyEngageRange * 1.2f)) && (!Storming || EnemyVisible || UnderFire || !(EnemyRange > 12f))) ? Mode.Fight : ((EnemyKnown && !UnderFire && Defending && !Route) ? Mode.Defend : ((EnemyKnown && !UnderFire && Attacking && HasObjective && target.Armed) ? Mode.Advance : ((flag2 && (!Attacking || !HasObjective || !target.Armed || !(Suppression < 0.5f))) ? ((Duty != Role.Medic) ? Mode.Alert : Mode.Standby) : (((Duty == Role.Commander || Duty == Role.Operator) && HasHome) ? Mode.Guard : ((Duty == Role.Medic) ? Mode.Standby : ((Attacking && HasObjective) ? Mode.Advance : ((Defending && !Route) ? Mode.Defend : Mode.Patrol))))))))))))) : Mode.Panic)))) : Mode.Down);
++			mode = Obeyed(mode);
+ 			if (mode != Current)
+ 			{
+ 				Enter(mode);
+@@ -6417,6 +6422,14 @@ public sealed class CombatBrain : MonoBehaviour
+ 				coverSince = Time.time;
+ 			}
+ 		}
++		if (Time.time < ObeyUntil && HasHome && (!cover || Flat(cover.Position - HomeBase).magnitude > HoldRadius + 4f) && Flat(HomeBase - Here).magnitude > Mathf.Max(3f, HoldRadius * 0.6f))
++		{
++			orders.Speed = target.RunSpeed * 0.85f;
++			orders.Hunch = 0.3f;
++			orders.Face = false;
++			Steer(HomeBase, ref orders);
++			return;
++		}
+ 		if ((bool)cover && !AtCover)
+ 		{
+ 			orders.Speed = target.RunSpeed * 0.75f;
+@@ -7743,18 +7756,28 @@ public sealed class CombatBrain : MonoBehaviour
  		Vector3 point = (((bool)enemy && EnemyVisible) ? enemy.target.Body.Chest.Body.position : default(Vector3));
  		GunMount gun = v.Gun;
  		bool flag3 = EnemyVisible && EnemyRange < ((role == SeatRole.Gunner && gun != null) ? Mathf.Clamp(gun.Def.EffectiveRange * 0.4f, 300f, 700f) : (MyEngageRange * 1.2f));
@@ -220,7 +263,7 @@ index f9b15b7..8606492 100644
  						gunBurst = UnityEngine.Random.Range(4, 9);
  						lastRounds = gun.Rounds;
 diff --git a/CombatSandbox.Demo/CommandOrders.cs b/CombatSandbox.Demo/CommandOrders.cs
-index 55a2514..35589b1 100644
+index 55a2514..43e0322 100644
 --- a/CombatSandbox.Demo/CommandOrders.cs
 +++ b/CombatSandbox.Demo/CommandOrders.cs
 @@ -14,7 +14,36 @@ public static class CommandOrders
@@ -294,6 +337,15 @@ index 55a2514..35589b1 100644
  			Kind.HoldThere => "pin", 
  			Kind.FollowMe => "follow", 
  			Kind.Defend => "shield", 
+@@ -85,7 +124,7 @@ public static class CommandOrders
+ 	public static CapturePoint PointNear(Vector3 at)
+ 	{
+ 		return (from p in CapturePoint.All
+-			where p
++			where (bool)p && Vector3.ProjectOnPlane(p.transform.position - at, Vector3.up).magnitude < p.Radius + 30f
+ 			orderby (p.transform.position - at).sqrMagnitude
+ 			select p).FirstOrDefault();
+ 	}
 @@ -97,6 +136,9 @@ public static class CommandOrders
  		default:
  			return "";
@@ -316,10 +368,19 @@ index 55a2514..35589b1 100644
  		if (kind == Kind.None)
  		{
  			if (current[team] != null)
-@@ -152,6 +199,37 @@ public static class CommandOrders
+@@ -150,6 +197,44 @@ public static class CommandOrders
+ 		};
+ 		BattleDirector.Report(by.name.Trim() + " (you): " + text + "!", team);
  		Apply(team);
- 	}
- 
++		foreach (CombatBrain item in CombatBrain.All)
++		{
++			if ((bool)item && item.Team == team && item != by && !item.PlayerControlled && item.Fighter && !item.CrewOf && CaptureMode.Standing(item))
++			{
++				item.Obey((kind == Kind.Resupply) ? 0f : 35f);
++			}
++		}
++	}
++
 +	private static void GiveOnce(CombatBrain by, Kind kind, Vector3 aim)
 +	{
 +		int team = by.Team;
@@ -349,11 +410,20 @@ index 55a2514..35589b1 100644
 +			break;
 +		}
 +		BattleDirector.Report(text, team);
-+	}
-+
+ 	}
+ 
  	public static void Apply(int team)
- 	{
- 		Order o = Of(team);
+@@ -207,6 +292,10 @@ public static class CommandOrders
+ 				item.Storming = false;
+ 				item.Objective = vector + normalized * 40f;
+ 				item.HasObjective = true;
++				if (Vector3.ProjectOnPlane(vector2 - homeBase, Vector3.up).magnitude > 9f && Time.time >= item.ObeyUntil - 1f)
++				{
++					item.ObeyUntil = Time.time + 3f;
++				}
+ 				break;
+ 			}
+ 			case Kind.Resupply:
 diff --git a/CombatSandbox.Demo/CommandWheel.cs b/CombatSandbox.Demo/CommandWheel.cs
 index b75fd2c..89ad27a 100644
 --- a/CombatSandbox.Demo/CommandWheel.cs
@@ -601,7 +671,7 @@ index d817002..55f9ed6 100644
  	}
  
 diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
-index 25a7bcd..fa4e50c 100644
+index 25a7bcd..eca9be0 100644
 --- a/CombatSandbox.Demo/GunMount.cs
 +++ b/CombatSandbox.Demo/GunMount.cs
 @@ -107,6 +107,23 @@ public sealed class GunMount
@@ -628,7 +698,18 @@ index 25a7bcd..fa4e50c 100644
  	public Transform Turret;
  
  	public Transform Cradle;
-@@ -261,6 +278,13 @@ public sealed class GunMount
+@@ -149,7 +166,9 @@ public sealed class GunMount
+ 
+ 	public Quaternion BoreRotation => Bore;
+ 
+-	public Vector3 SightAt => At(new Vector3(0f, 0.14f, Muzzle.z - 0.3f));
++	public Vector3 Sight;
++
++	public Vector3 SightAt => At((Sight != Vector3.zero) ? Sight : new Vector3(0f, 0.14f, Muzzle.z - 0.3f));
+ 
+ 	public float Kick => kick;
+ 
+@@ -261,6 +280,13 @@ public sealed class GunMount
  		}
  		pitch = Mathf.MoveTowards(pitch, Mathf.Max(wantPitch, Lowest(yaw)), dt * (flag ? (90f * num) : 20f));
  		kick = Mathf.MoveTowards(kick, 0f, dt * 0.9f);
@@ -642,7 +723,7 @@ index 25a7bcd..fa4e50c 100644
  		if (Rounds <= 0 && flag)
  		{
  			if (reloadUntil <= 0f)
-@@ -292,6 +316,11 @@ public sealed class GunMount
+@@ -292,6 +318,11 @@ public sealed class GunMount
  			Vector2 vector4 = UnityEngine.Random.insideUnitCircle * num;
  			Vector3 normalized2 = (vector2 + normalized * vector4.x + vector3 * vector4.y).normalized;
  			Vector3 inherit = vehicle.PointVelocity(vector);
@@ -654,7 +735,7 @@ index 25a7bcd..fa4e50c 100644
  			instance.Report(vector, Def, gunner);
  			if ((bool)Ballistics.Instance)
  			{
-@@ -314,6 +343,38 @@ public sealed class GunMount
+@@ -314,6 +345,34 @@ public sealed class GunMount
  		}
  	}
  
@@ -674,10 +755,6 @@ index 25a7bcd..fa4e50c 100644
 +			ShotEffects.Instance.Flash(muzzle, direction, Def.Flash);
 +			ShotEffects.Instance.Flare(muzzle + direction * 0.5f, 1.4f);
 +			ShotEffects.Instance.Sparks(muzzle, direction, 24, 18f);
-+		}
-+		if ((bool)RoomDust.Instance)
-+		{
-+			RoomDust.Instance.Blast(muzzle);
 +		}
 +		if ((bool)BattleDirector.Instance)
 +		{

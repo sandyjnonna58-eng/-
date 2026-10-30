@@ -31,7 +31,7 @@
 
 ## Установка готового патча
 
-1. Скачайте `patch/DummyWar_patch_RU_v3.zip`.
+1. Скачайте `patch/DummyWar_patch_RU_v4.zip`.
 2. Сохраните копию `DummyWar Alpha 0.0.3\DummyWar_Data\Managed\Assembly-CSharp.dll`.
 3. Распакуйте архив рядом с папкой `DummyWar Alpha 0.0.3` с заменой файла.
 
@@ -48,6 +48,7 @@
 | `mod/src/Artillery.cs` | артиллерия |
 | `mod/src/ArenaTarget.Limp.cs` | регдолл и хватание руками |
 | `mod/src/CombatBrain.Tank.cs` | ИИ наводчика: поиск техники и выбор снаряда |
+| `mod/src/CombatBrain.Orders.cs` | выполнение приказов бойцами |
 | `mod/src/Loc.cs` | переводчик интерфейса (заменяет английский текст на лету) |
 | `mod/src/LocRu.cs` | словарь, сгенерирован из `mod/loc_ru.txt` |
 | `mod/loc_ru.txt` | словарь `English\|Русский`: здесь удобно править перевод |
