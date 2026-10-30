@@ -39,6 +39,8 @@ public sealed class FieldGun : MonoBehaviour
 
 	public bool Destroyed;
 
+	public int Ammo;
+
 	private Transform barrel;
 
 	private float nextShot;
@@ -125,7 +127,7 @@ public sealed class FieldGun : MonoBehaviour
 		{
 			if ((bool)item && item.Team == Team && CaptureMode.Standing(item) && !item.PlayerControlled && !item.GunPost && !item.Body.Vehicle && !item.Lift && !item.ClaimedVehicle && !item.CrewOf && item.Captive == CombatBrain.Captivity.None && item.Duty != CombatBrain.Role.Commander && item.Duty != CombatBrain.Role.Operator && item.Duty != CombatBrain.Role.Medic)
 			{
-				float num3 = Flat(item.Here - position);
+				float num3 = Flat(item.Here - position) - ((item.Duty == CombatBrain.Role.Crewman) ? 60f : 0f);
 				if (num3 < num2)
 				{
 					num2 = num3;
@@ -150,6 +152,38 @@ public sealed class FieldGun : MonoBehaviour
 			}
 		}
 		return false;
+	}
+
+	public static int Shells(int team)
+	{
+		int num = 0;
+		foreach (FieldGun item in All)
+		{
+			if ((bool)item && item.Kind == GunKind.Howitzer && item.Team == team && !item.Destroyed)
+			{
+				num += item.Ammo;
+			}
+		}
+		return num;
+	}
+
+	public static bool TakeShell(int team)
+	{
+		FieldGun fieldGun = null;
+		foreach (FieldGun item in All)
+		{
+			if ((bool)item && item.Kind == GunKind.Howitzer && item.Team == team && !item.Destroyed && item.Ammo > 0 && item.Manned && (!fieldGun || item.Ammo > fieldGun.Ammo))
+			{
+				fieldGun = item;
+			}
+		}
+		if (!fieldGun)
+		{
+			return false;
+		}
+		fieldGun.Ammo--;
+		fieldGun.Flash();
+		return true;
 	}
 
 	public static bool Intact(int team)
@@ -184,6 +218,7 @@ public sealed class FieldGun : MonoBehaviour
 		fieldGun.Kind = kind;
 		fieldGun.Team = team;
 		fieldGun.nextShot = Time.time + Random.Range(15f, 30f);
+		fieldGun.Ammo = ((kind == GunKind.Mortar) ? 30 : 24);
 		fieldGun.Build();
 		return fieldGun;
 	}
@@ -335,7 +370,7 @@ public sealed class FieldGun : MonoBehaviour
 			nextCrewCheck = Time.time + 2f;
 			Crew();
 		}
-		if (Kind != GunKind.Mortar || Destroyed || Time.time < nextShot || !Manned || (CaptureMode.Active && !CaptureMode.Instance.Started))
+		if (Kind != GunKind.Mortar || Destroyed || Ammo <= 0 || Time.time < nextShot || !Manned || (CaptureMode.Active && !CaptureMode.Instance.Started))
 		{
 			return;
 		}
@@ -350,6 +385,7 @@ public sealed class FieldGun : MonoBehaviour
 			Vector3 vector3 = vector2 / num + Vector3.up * (vector.y / num + 4.905f * num);
 			barrel.rotation = Quaternion.LookRotation(vector3);
 			TankShell.Fire(null, null, muzzle, vector3, 0, 1.6f, tracer: false, num + 4f, smoke: true);
+			Ammo--;
 			Flash();
 		}
 	}

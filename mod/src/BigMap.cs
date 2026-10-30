@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 namespace CombatSandbox.Demo;
 
-public static class BigMap
+public static partial class BigMap
 {
 	public const float Play = 1000f;
 
@@ -45,6 +45,8 @@ public static class BigMap
 	private static Texture2D preview;
 
 	public static bool Active { get; private set; }
+
+	public static bool City { get; private set; }
 
 	public static Texture2D Preview()
 	{
@@ -129,17 +131,26 @@ public static class BigMap
 			return false;
 		}
 		Active = true;
+		City = BattleSetup.City;
 		seedX = Random.Range(0f, 500f);
 		seedZ = Random.Range(0f, 500f);
 		baseHeight = 0f;
 		baseHeight = (Raw(0f, -410f) + Raw(0f, 410f)) * 0.5f;
 		Paints();
-		root = new GameObject("Big map").transform;
+		CityPaints();
+		root = new GameObject(City ? "Big city" : "Big map").transform;
 		BuildGround();
 		System.Random random = new System.Random((int)(seedX * 1000f));
-		BuildTreeBelts(random);
-		BuildVillages(random);
-		BuildRocks(random);
+		if (City)
+		{
+			BuildCity(random);
+		}
+		else
+		{
+			BuildTreeBelts(random);
+			BuildVillages(random);
+			BuildRocks(random);
+		}
 		for (int i = 0; i < 2; i++)
 		{
 			BuildBase(i, random);
@@ -166,6 +177,10 @@ public static class BigMap
 
 	private static float Raw(float x, float z)
 	{
+		if (City)
+		{
+			return 0.9f * Mathf.PerlinNoise(seedX + x / 220f, seedZ + z / 220f);
+		}
 		return 9f * Mathf.PerlinNoise(seedX + x / 280f, seedZ + z / 280f) + 4f * Mathf.PerlinNoise(seedX * 1.7f + 13f + x / 95f, seedZ * 1.3f + 7f + z / 95f) + 1.2f * Mathf.PerlinNoise(seedX + 51f + x / 30f, seedZ + 23f + z / 30f);
 	}
 
@@ -255,7 +270,7 @@ public static class BigMap
 				gameObject.transform.SetParent(root, worldPositionStays: false);
 				gameObject.transform.position = Centre;
 				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
-				gameObject.AddComponent<MeshRenderer>().sharedMaterial = groundPaint;
+				gameObject.AddComponent<MeshRenderer>().sharedMaterial = (City ? cityGround : groundPaint);
 				gameObject.AddComponent<MeshCollider>().sharedMesh = mesh;
 			}
 		}

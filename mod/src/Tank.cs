@@ -47,6 +47,12 @@ public abstract class Tank : Vehicle
 
 	private bool detonated;
 
+	private float jetUntil;
+
+	private Light jetLight;
+
+	private AudioSource jetRoar;
+
 	private float nextScare;
 
 	protected abstract Vector3 TurretPivot { get; }
@@ -157,6 +163,7 @@ public abstract class Tank : Vehicle
 			nextScare = Time.time + UnityEngine.Random.Range(1.2f, 2f);
 			Scare();
 		}
+		CookOff();
 		if (base.Wrecked && !tossed)
 		{
 			if (wreckedAt < 0f)
@@ -195,13 +202,66 @@ public abstract class Tank : Vehicle
 	protected override void Detonated()
 	{
 		detonated = true;
-		wreckedAt = Time.time + 0.4f;
+		wreckedAt = Time.time + 1.4f;
+		jetUntil = Time.time + 6f;
+		jetLight = new GameObject("Cook-off light").AddComponent<Light>();
+		jetLight.transform.SetParent(base.transform, worldPositionStays: false);
+		jetLight.transform.localPosition = TurretPivot + Vector3.up * 2.5f;
+		jetLight.type = LightType.Point;
+		jetLight.color = new Color(1f, 0.6f, 0.25f);
+		jetLight.range = 30f;
+		jetLight.shadows = LightShadows.None;
+		jetRoar = base.gameObject.AddComponent<AudioSource>();
+		jetRoar.clip = RocketEffects.Roar();
+		jetRoar.loop = true;
+		jetRoar.spatialBlend = 1f;
+		jetRoar.rolloffMode = AudioRolloffMode.Logarithmic;
+		jetRoar.minDistance = 10f;
+		jetRoar.maxDistance = 600f;
+		jetRoar.pitch = 0.6f;
+		jetRoar.volume = GameSettings.EffectsVolume;
+		jetRoar.Play();
+	}
+
+	private void CookOff()
+	{
+		if (jetUntil <= 0f)
+		{
+			return;
+		}
+		if (Time.time >= jetUntil)
+		{
+			jetUntil = 0f;
+			if ((bool)jetLight)
+			{
+				UnityEngine.Object.Destroy(jetLight.gameObject);
+			}
+			if ((bool)jetRoar)
+			{
+				UnityEngine.Object.Destroy(jetRoar);
+			}
+			return;
+		}
+		float num = Mathf.Clamp01((jetUntil - Time.time) / 2f);
+		Vector3 at = World(TurretPivot + Vector3.up * ((gun != null && (bool)gun.Turret) ? 0.85f : 0.1f));
+		if ((bool)RocketEffects.Instance)
+		{
+			RocketEffects.Instance.Jet(at, Vector3.up, 0.6f + 0.6f * num);
+		}
+		if ((bool)jetLight)
+		{
+			jetLight.intensity = UnityEngine.Random.Range(4f, 7f) * (0.3f + 0.7f * num);
+		}
+		if ((bool)jetRoar)
+		{
+			jetRoar.volume = GameSettings.EffectsVolume * (0.3f + 0.7f * num);
+		}
 	}
 
 	private void TossTurret()
 	{
 		tossed = true;
-		if (gun == null || !gun.Turret || (!detonated && UnityEngine.Random.value > 0.65f))
+		if (gun == null || !gun.Turret || !detonated)
 		{
 			return;
 		}

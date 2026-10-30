@@ -19,6 +19,10 @@ public sealed class Artillery : MonoBehaviour
 
 	private readonly bool[] firing = new bool[2];
 
+	private static readonly int[] stock = new int[2];
+
+	public const int OffMapShells = 36;
+
 	public static Artillery Instance { get; private set; }
 
 	public static Artillery Begin()
@@ -33,6 +37,7 @@ public sealed class Artillery : MonoBehaviour
 	private void Awake()
 	{
 		Instance = this;
+		stock[0] = (stock[1] = 36);
 		for (int i = 0; i < 2; i++)
 		{
 			nextAuto[i] = Time.time + Random.Range(60f, 100f);
@@ -76,9 +81,56 @@ public sealed class Artillery : MonoBehaviour
 		}
 		if (FieldGun.AnyHowitzers(team))
 		{
-			return FieldGun.Battery(team);
+			if (FieldGun.Battery(team))
+			{
+				return FieldGun.Shells(team) > 0;
+			}
+			return false;
 		}
-		return true;
+		return stock[team] > 0;
+	}
+
+	public static int ShellsLeft(int team)
+	{
+		team = Mathf.Clamp(team, 0, 1);
+		if (!FieldGun.AnyHowitzers(team))
+		{
+			return stock[team];
+		}
+		return FieldGun.Shells(team);
+	}
+
+	public static string Refusal(int team)
+	{
+		team = Mathf.Clamp(team, 0, 1);
+		if (!GameSettings.Artillery)
+		{
+			return "Artillery is off in the settings";
+		}
+		if (Assault.Active && team == Assault.Attacker)
+		{
+			return "No artillery for this side";
+		}
+		if (FieldGun.AnyHowitzers(team))
+		{
+			if (!FieldGun.Intact(team))
+			{
+				return "The guns are destroyed";
+			}
+			if (FieldGun.Shells(team) <= 0)
+			{
+				return "The battery is out of shells";
+			}
+			if (!FieldGun.Battery(team))
+			{
+				return "No crew at the guns - gunners are on their way";
+			}
+		}
+		else if (stock[team] <= 0)
+		{
+			return "The battery is out of shells";
+		}
+		return null;
 	}
 
 	private void Update()
@@ -186,14 +238,23 @@ public sealed class Artillery : MonoBehaviour
 				item.Body.SenseShot(at + Vector3.up * 30f, at);
 			}
 		}
+		bool flag = FieldGun.AnyHowitzers(team);
 		for (int i = 0; i < 6; i++)
 		{
-			foreach (FieldGun item2 in FieldGun.All)
+			if (flag)
 			{
-				if ((bool)item2 && item2.Kind == FieldGun.GunKind.Howitzer && item2.Team == team && i % 2 == FieldGun.All.IndexOf(item2) % 2)
+				if (!FieldGun.TakeShell(team))
 				{
-					item2.Flash();
+					break;
 				}
+			}
+			else
+			{
+				if (stock[team] <= 0)
+				{
+					break;
+				}
+				stock[team]--;
 			}
 			Vector2 vector2 = Random.insideUnitCircle * 14f;
 			Vector3 vector3 = at + new Vector3(vector2.x, 0f, vector2.y);

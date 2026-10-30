@@ -1081,5 +1081,16 @@ internal static class LocRu
 		yield return ("Defence", "Оборона");
 		yield return ("Side one holds its base with howitzers and mortars against heavy armour.", "Первая сторона держит базу: гаубицы и миномёты против тяжёлой брони.");
 		yield return ("No crew at the guns - gunners are on their way", "У орудий нет расчёта — артиллеристы идут к орудиям");
+		yield return ("ECG", "ЭКГ");
+		yield return ("HR", "ЧСС · АД");
+		yield return ("RESP", "ДЫХАНИЕ");
+		yield return ("The guns are destroyed", "Орудия уничтожены");
+		yield return ("The battery is out of shells", "У батареи кончились снаряды");
+		yield return ("shells left:", "осталось снарядов:");
+		yield return ("Ready crews", "Готовые экипажи");
+		yield return ("Every tank, IFV, APC and helicopter starts the battle with its own crew (the Crew class): the infantry stays infantry. Crew soldiers take over any free vehicle or gun (from the next battle).", "Каждый танк, БМП, БТР и вертолёт начинает бой со своим экипажем (класс «Экипаж»), пехота остаётся пехотой. Экипажи садятся в любую свободную технику или встают к орудиям (со следующего боя).");
+		yield return ("Crew", "Экипаж");
+		yield return ("Big City", "Большой город");
+		yield return ("A big city made anew for every battle: blocks of five- and nine-storey panel houses, private houses, ruins and parks, 14 m streets with burnt-out cars and barricades. The bases are on the outskirts about 800 m apart. For the Battle, Attack and Defence modes; loading takes a little longer.", "Большой город, новый в каждом бою: кварталы панельных пятиэтажек и девятиэтажек, частный сектор, руины и парки, улицы шириной 14 м со сгоревшими машинами и баррикадами. Базы на окраинах примерно в 800 м друг от друга. Для режимов «Сражение», «Атака» и «Оборона»; загрузка чуть дольше.");
 	}
 }
