@@ -271,6 +271,16 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		if (flag6)
  		{
  			Vector3 vector12 = aimPoint - (shoulder + Vector3.up * rifle.BoreHeight);
+diff --git a/CombatSandbox.Demo/BattleSetup.cs b/CombatSandbox.Demo/BattleSetup.cs
+--- a/CombatSandbox.Demo/BattleSetup.cs
++++ b/CombatSandbox.Demo/BattleSetup.cs
+@@ -7,4 +7,6 @@
+ 	public static readonly TeamRoster[] Teams = new TeamRoster[2];
+ 
+ 	public static GameMode Mode = GameMode.Battle;
++
++	public static bool BigMap;
+ }
 diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
 --- a/CombatSandbox.Demo/BattleUI.cs
 +++ b/CombatSandbox.Demo/BattleUI.cs
@@ -839,7 +849,7 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +703,52 @@
+@@ -695,6 +703,48 @@
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -885,17 +895,13 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
 +		{
 +			GameSettings.EqualForces = b;
 +		});
-+		SwitchRow("Big map", "A large generated battlefield, a kilometre across: hills, tree belts, ruined villages, rocks and sandbag lines, the bases about 800 m apart (from the next battle, not in the capture mode; loading takes longer).", GameSettings.BigMap, delegate(bool b)
-+		{
-+			GameSettings.BigMap = b;
-+		});
  		UIKit.Place((RectTransform)UIKit.MakeButton(panel.transform, "Reset all", "restart", UIKit.Muted, delegate
  		{
  			GameSettings.Reset();
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,38 @@
+@@ -9,6 +9,36 @@
  {
  	public static float Volume = 0.9f;
  
@@ -912,8 +918,6 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +	public static bool BodyArmour = true;
 +
 +	public static bool EqualForces = true;
-+
-+	public static bool BigMap = false;
 +
 +	public static int BattleType = 0;
 +
@@ -934,7 +938,7 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +218,17 @@
+@@ -186,6 +216,16 @@
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
@@ -945,14 +949,13 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +			SlowBrainDeath = B("slowbrain", SlowBrainDeath);
 +			BodyArmour = B("armour", BodyArmour);
 +			EqualForces = B("equal", EqualForces);
-+			BigMap = B("bigmap", BigMap);
 +			BattleType = Mathf.Clamp(I("battletype", BattleType), 0, 2);
 +			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
 +			Language = Mathf.Clamp(I("language", Language), 0, 1);
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +301,17 @@
+@@ -258,6 +298,16 @@
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
@@ -963,14 +966,13 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		B("slowbrain", SlowBrainDeath);
 +		B("armour", BodyArmour);
 +		B("equal", EqualForces);
-+		B("bigmap", BigMap);
 +		I("battletype", BattleType);
 +		I("blood", Blood);
 +		I("language", Language);
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +358,16 @@
+@@ -304,6 +354,15 @@
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
@@ -981,7 +983,6 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		SlowBrainDeath = true;
 +		BodyArmour = true;
 +		EqualForces = true;
-+		BigMap = false;
 +		BattleType = 0;
 +		Blood = 1;
  		Apply();
@@ -1530,6 +1531,112 @@ diff --git a/CombatSandbox.Demo/ReconstructionDemo.cs b/CombatSandbox.Demo/Recon
  			{
  				zone.Owner.GetComponent<ArenaTarget>()?.ApplyBloodLoss(num2);
  			}
+diff --git a/CombatSandbox.Demo/SceneFlow.cs b/CombatSandbox.Demo/SceneFlow.cs
+--- a/CombatSandbox.Demo/SceneFlow.cs
++++ b/CombatSandbox.Demo/SceneFlow.cs
+@@ -16,11 +16,14 @@
+ 
+ 	public const string DeadGroundScene = "DeadGround";
+ 
+-	public static readonly (string Scene, string Name, string Blurb)[] Maps = new(string, string, string)[3]
++	public const int BigMapIndex = 3;
++
++	public static readonly (string Scene, string Name, string Blurb)[] Maps = new(string, string, string)[4]
+ 	{
+ 		("CombatZone", "Ruined Town", "Two bases at either end of a shelled town: rubble, burnt-out wrecks and sandbagged positions along the streets, ruins to hold and to clear."),
+ 		("EasternBattle", "Eastern Battle", "A fight for a microdistrict on the edge of a big post-Soviet city: panel blocks and five-storey walk-ups to hold floor by floor, basements, courtyards with garages and playgrounds, a school, a supermarket and the tram avenue between them."),
+-		("DeadGround", "Dead Ground", "Open steppe on a trench front: two trench lines facing each other along burnt tree belts, a cratered no man's land between them, a forward trench, burnt-out vehicles on the roads and a ruined village in the east.")
++		("DeadGround", "Dead Ground", "Open steppe on a trench front: two trench lines facing each other along burnt tree belts, a cratered no man's land between them, a forward trench, burnt-out vehicles on the roads and a ruined village in the east."),
++		("DeadGround", "Big Steppe", "A big battlefield a kilometre across, made anew for every battle: hills, tree belts with gaps, three ruined villages, rocks, sandbag lines and tents at the bases about 800 m apart. Room for tanks, helicopters and air strikes. For the Battle, Attack and Defence modes; loading takes a little longer.")
+ 	};
+ 
+ 	public static string VersionLine => "ALPHA PROTOTYPE  ·  VERSION 0.0.3";
+diff --git a/CombatSandbox.Demo/TeamMenus.cs b/CombatSandbox.Demo/TeamMenus.cs
+--- a/CombatSandbox.Demo/TeamMenus.cs
++++ b/CombatSandbox.Demo/TeamMenus.cs
+@@ -56,14 +56,16 @@
+ 
+ 	private RawImage mapPreview;
+ 
+-	private readonly Image[] modeCards = new Image[2];
++	private readonly Image[] modeCards = new Image[4];
+ 
+-	private readonly Image[] modeStripes = new Image[2];
++	private readonly Image[] modeStripes = new Image[4];
+ 
+-	private static readonly (GameMode Mode, string Icon, string Name, string Blurb)[] Modes = new(GameMode, string, string, string)[2]
++	private static readonly (GameMode Mode, string Icon, string Name, string Blurb, int Type)[] Modes = new(GameMode, string, string, string, int)[4]
+ 	{
+-		(GameMode.Battle, "attack", "Battle", "Two sides, two bases. Watch the fight from above, send in your soldiers, take over any of them."),
+-		(GameMode.Capture, "flag", "Capture the points", "You are one soldier of your side. Take the points on the map, come back at the ones you hold - take them all to win.")
++		(GameMode.Battle, "team", "Battle", "Two sides, two bases, equal forces. Watch from above, take over any soldier.", 0),
++		(GameMode.Capture, "flag", "Capture the points", "You are one soldier. Take the points on the map - all of them to win.", 0),
++		(GameMode.Battle, "attack", "Attack", "Side one storms the enemy base with many tanks and armour.", 1),
++		(GameMode.Battle, "shield", "Defence", "Side one holds its base with howitzers and mortars against heavy armour.", 2)
+ 	};
+ 
+ 	private readonly Text[] sideValue = new Text[2];
+@@ -223,9 +225,9 @@
+ 		for (int m = 0; m < Modes.Length; m++)
+ 		{
+ 			int k = m;
+-			(GameMode, string, string, string) tuple = Modes[m];
++			(GameMode, string, string, string, int) tuple = Modes[m];
+ 			Image image3 = (modeCards[m] = UIKit.Box(rectTransform, "Mode " + tuple.Item3, UIKit.PanelLight));
+-			UIKit.Place(image3.rectTransform, new Vector2(0f, 1f), new Vector2(40 + m * 556, -410f), new Vector2(544f, 108f));
++			UIKit.Place(image3.rectTransform, new Vector2(0f, 1f), new Vector2(40 + m * 278, -410f), new Vector2(268f, 108f));
+ 			bool num = UIKit.IsNew(image3.transform);
+ 			Button button = UIKit.Ensure<Button>(image3.gameObject);
+ 			if (num)
+@@ -246,15 +248,20 @@
+ 			{
+ 				UISound.Click();
+ 				BattleSetup.Mode = Modes[k].Mode;
++				if (Modes[k].Mode == GameMode.Battle)
++				{
++					GameSettings.BattleType = Modes[k].Type;
++					GameSettings.Save();
++				}
+ 				RefreshSetup();
+ 			});
+ 			modeStripes[m] = UIKit.Box(image3.transform, "Stripe", UIKit.Accent, UIKit.Soft);
+ 			UIKit.Place(modeStripes[m].rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(5f, 80f));
+-			UIKit.Place(UIKit.IconImage(image3.transform, tuple.Item2, UIKit.Text, 40f).rectTransform, new Vector2(0f, 0.5f), new Vector2(26f, 0f), new Vector2(40f, 40f));
+-			UIKit.Place(UIKit.Label(image3.transform, tuple.Item3.ToUpper(), 20, UIKit.Text, TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(86f, -12f), new Vector2(440f, 28f));
+-			Text text = UIKit.Label(image3.transform, tuple.Item4, 14, UIKit.Muted, TextAnchor.UpperLeft);
++			UIKit.Place(UIKit.IconImage(image3.transform, tuple.Item2, UIKit.Text, 30f).rectTransform, new Vector2(0f, 1f), new Vector2(18f, -14f), new Vector2(30f, 30f));
++			UIKit.Place(UIKit.Label(image3.transform, tuple.Item3.ToUpper(), 16, UIKit.Text, TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(58f, -14f), new Vector2(200f, 28f));
++			Text text = UIKit.Label(image3.transform, tuple.Item4, 13, UIKit.Muted, TextAnchor.UpperLeft);
+ 			text.horizontalOverflow = HorizontalWrapMode.Wrap;
+-			UIKit.Place(text.rectTransform, new Vector2(0f, 1f), new Vector2(86f, -44f), new Vector2(440f, 56f));
++			UIKit.Place(text.rectTransform, new Vector2(0f, 1f), new Vector2(18f, -48f), new Vector2(240f, 56f));
+ 		}
+ 		Caption(rectTransform, "TEAMS", new Vector2(40f, -540f));
+ 		for (int n = 0; n < 2; n++)
+@@ -614,6 +621,7 @@
+ 		{
+ 			UISound.Confirm();
+ 			BattleSetup.Map = SceneFlow.Maps[map].Scene;
++			BattleSetup.BigMap = map == SceneFlow.BigMapIndex;
+ 			for (int i = 0; i < 2; i++)
+ 			{
+ 				BattleSetup.Teams[i] = Rosters.Teams[side[i]].Copy();
+@@ -813,13 +821,13 @@
+ 	private void RefreshSetup()
+ 	{
+ 		mapBlurb.text = SceneFlow.Maps[map].Blurb;
+-		Texture2D texture2D = Resources.Load<Texture2D>("CombatSandbox/UI/Maps/" + SceneFlow.Maps[map].Scene);
++		Texture2D texture2D = ((map == SceneFlow.BigMapIndex) ? BigMap.Preview() : Resources.Load<Texture2D>("CombatSandbox/UI/Maps/" + SceneFlow.Maps[map].Scene));
+ 		mapPreview.texture = texture2D;
+ 		mapPreview.enabled = texture2D;
+ 		mapMissing.text = (texture2D ? "" : SceneFlow.Maps[map].Name);
+ 		for (int k = 0; k < Modes.Length; k++)
+ 		{
+-			bool flag = BattleSetup.Mode == Modes[k].Mode;
++			bool flag = BattleSetup.Mode == Modes[k].Mode && (BattleSetup.Mode == GameMode.Capture || GameSettings.BattleType == Modes[k].Type);
+ 			modeCards[k].color = (flag ? new Color(0.2f, 0.23f, 0.25f, 0.97f) : UIKit.PanelLight);
+ 			modeStripes[k].enabled = flag;
+ 		}
 diff --git a/CombatSandbox.Demo/UIKit.cs b/CombatSandbox.Demo/UIKit.cs
 --- a/CombatSandbox.Demo/UIKit.cs
 +++ b/CombatSandbox.Demo/UIKit.cs

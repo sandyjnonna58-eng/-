@@ -1066,5 +1066,19 @@ internal static class LocRu
 		yield return ("Both sides get the same number of soldiers (the smaller team is filled up), and each tank, IFV and helicopter has an equal counterpart on the other side (from the next battle).", "У обеих сторон одинаковое число бойцов (меньший отряд дополняется), а у каждого танка, БМП и вертолёта есть равный по силе противник на другой стороне (со следующего боя).");
 		yield return ("Big map", "Большая карта");
 		yield return ("A large generated battlefield, a kilometre across: hills, tree belts, ruined villages, rocks and sandbag lines, the bases about 800 m apart (from the next battle, not in the capture mode; loading takes longer).", "Большое поле боя километр на километр: холмы, лесополосы, разрушенные деревни, камни и позиции из мешков, базы примерно в 800 м друг от друга (со следующего боя, не в режиме захвата; загрузка дольше).");
+		yield return ("Ruined Town", "Разрушенный город");
+		yield return ("Eastern Battle", "Бой на востоке");
+		yield return ("Dead Ground", "Мёртвая земля");
+		yield return ("Big Steppe", "Большая степь");
+		yield return ("Two bases at either end of a shelled town: rubble, burnt-out wrecks and sandbagged positions along the streets, ruins to hold and to clear.", "Две базы на краях обстрелянного города: завалы, сгоревшие машины и позиции из мешков вдоль улиц, руины, которые надо удерживать и зачищать.");
+		yield return ("A fight for a microdistrict on the edge of a big post-Soviet city: panel blocks and five-storey walk-ups to hold floor by floor, basements, courtyards with garages and playgrounds, a school, a supermarket and the tram avenue between them.", "Бой за микрорайон на окраине большого постсоветского города: панельки и пятиэтажки, которые держат этаж за этажом, подвалы, дворы с гаражами и детскими площадками, школа, супермаркет и трамвайный проспект между ними.");
+		yield return ("Open steppe on a trench front: two trench lines facing each other along burnt tree belts, a cratered no man's land between them, a forward trench, burnt-out vehicles on the roads and a ruined village in the east.", "Открытая степь на позиционном фронте: две линии окопов друг напротив друга вдоль сгоревших лесополос, изрытая воронками нейтральная полоса, передовой окоп, сгоревшая техника на дорогах и разрушенное село на востоке.");
+		yield return ("A big battlefield a kilometre across, made anew for every battle: hills, tree belts with gaps, three ruined villages, rocks, sandbag lines and tents at the bases about 800 m apart. Room for tanks, helicopters and air strikes. For the Battle, Attack and Defence modes; loading takes a little longer.", "Большое поле боя километр на километр, новое в каждом бою: холмы, лесополосы с проходами, три разрушенные деревни, камни, позиции из мешков и палатки у баз в ~800 м друг от друга. Простор для танков, вертолётов и авиаударов. Для режимов «Бой», «Атака» и «Оборона»; загрузка чуть дольше.");
+		yield return ("Two sides, two bases, equal forces. Watch from above, take over any soldier.", "Две стороны, две базы, равные силы. Смотрите сверху, берите управление любым бойцом.");
+		yield return ("You are one soldier. Take the points on the map - all of them to win.", "Вы — один боец. Захватывайте точки на карте — возьмите все, чтобы победить.");
+		yield return ("Attack", "Атака");
+		yield return ("Side one storms the enemy base with many tanks and armour.", "Первая сторона штурмует вражескую базу: много танков и бронетехники.");
+		yield return ("Defence", "Оборона");
+		yield return ("Side one holds its base with howitzers and mortars against heavy armour.", "Первая сторона держит базу: гаубицы и миномёты против тяжёлой брони.");
 	}
 }

@@ -42,13 +42,71 @@ public static class BigMap
 
 	private static Transform root;
 
+	private static Texture2D preview;
+
 	public static bool Active { get; private set; }
+
+	public static Texture2D Preview()
+	{
+		if ((bool)preview)
+		{
+			return preview;
+		}
+		float num = seedX;
+		float num2 = seedZ;
+		float num3 = baseHeight;
+		seedX = 17f;
+		seedZ = 211f;
+		baseHeight = (Raw(0f, -410f) + Raw(0f, 410f)) * 0.5f;
+		preview = new Texture2D(336, 186, TextureFormat.RGB24, mipChain: false)
+		{
+			name = "Big Steppe preview",
+			wrapMode = TextureWrapMode.Clamp
+		};
+		Color a = new Color(0.25f, 0.3f, 0.16f);
+		Color b = new Color(0.55f, 0.5f, 0.34f);
+		for (int i = 0; i < 186; i++)
+		{
+			for (int j = 0; j < 336; j++)
+			{
+				float num4 = ((float)i / 185f - 0.5f) * 1000f;
+				float num5 = ((float)j / 335f - 0.5f) * 1000f * 336f / 186f;
+				float x = num4;
+				float z = num5;
+				float num6 = Height(x, z);
+				float num7 = Height(x + 4f, z) - Height(x - 4f, z) + (Height(x, z + 4f) - Height(x, z - 4f));
+				Color color = Color.Lerp(a, b, Mathf.InverseLerp(0f, 14f, num6)) * (1f + num7 * 0.12f);
+				float num8 = Mathf.Repeat(num5 + 37f, 140f);
+				float[] array = new float[6] { -300f, -190f, -70f, 60f, 180f, 300f };
+				foreach (float num9 in array)
+				{
+					if (Mathf.Abs(num5 - num9) < 5f && num8 > 14f && Mathf.Abs(num4) < 470f)
+					{
+						color = new Color(0.12f, 0.18f, 0.08f);
+					}
+				}
+				for (int l = -1; l <= 1; l += 2)
+				{
+					if (new Vector2(num4, num5 - (float)l * 410f).magnitude < 14f)
+					{
+						color = ((l < 0) ? new Color(0.25f, 0.55f, 1f) : new Color(1f, 0.35f, 0.25f));
+					}
+				}
+				preview.SetPixel(j, i, color);
+			}
+		}
+		preview.Apply();
+		seedX = num;
+		seedZ = num2;
+		baseHeight = num3;
+		return preview;
+	}
 
 	public static bool Wanted
 	{
 		get
 		{
-			if (GameSettings.BigMap)
+			if (BattleSetup.BigMap)
 			{
 				return BattleSetup.Mode != GameMode.Capture;
 			}
