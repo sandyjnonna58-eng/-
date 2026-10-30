@@ -1040,3 +1040,24 @@ mortar destroyed|миномёт уничтожен
 howitzer destroyed|гаубица уничтожена
 No artillery for this side|У этой стороны нет артиллерии
 82 mm mortar|82-мм миномёт
+# ===== v7: new tanks, IFVs, gunships
+T-90M|Т-90М
+2A46M-5 125 mm|2А46М-5 125 мм
+Leopard 2A6|«Леопард» 2A6
+Rh-120 L55 120 mm|Rh-120 L55 120 мм
+BMP-2|БМП-2
+2A42 30 mm|2А42 30 мм
+M2A2 Bradley|M2A2 «Брэдли»
+M242 Bushmaster 25 mm|M242 «Бушмастер» 25 мм
+Mi-24V|Ми-24В
+YakB-12.7|ЯкБ-12,7
+AH-64D Apache|AH-64D «Апач»
+M230 30 mm|M230 30 мм
+HEI-T|ОФЗТ
+AP-T|БТ
+Loading HEI-T|Заряжается ОФЗТ
+Loading AP-T|Заряжается БТ
+Gunship: W / S - forward / back, A / D - turn, Space - up, Ctrl - down, LMB - rockets|Ударный вертолёт: W / S — вперёд / назад, A / D — поворот, Пробел — вверх, Ctrl — вниз, ЛКМ — НУРы
+Out of rockets - land to rearm|НУРы кончились — сядьте, чтобы пополнить
+Tanks and infantry fighting vehicles: T-72, T-90M and BMP-2 for one side, M1 Abrams, Leopard 2A6 and M2 Bradley for the other (from the next battle).|Танки и БМП: Т-72, Т-90М и БМП-2 у одной стороны, M1 «Абрамс», «Леопард» 2A6 и M2 «Брэдли» у другой (со следующего боя).
+Mi-8 and Mi-24 for one side, UH-60 Black Hawk and AH-64 Apache for the other: transports carry troops, gunships strike with rockets and cannon (from the next battle).|Ми-8 и Ми-24 у одной стороны, UH-60 «Блэк Хок» и AH-64 «Апач» у другой: транспортные возят десант, ударные бьют НУРами и из пушки (со следующего боя).

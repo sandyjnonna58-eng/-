@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CombatSandbox.Demo;
 
-public sealed class Helicopter : Vehicle
+public class Helicopter : Vehicle
 {
 	public const int Gunner = 1;
 
@@ -41,9 +41,9 @@ public sealed class Helicopter : Vehicle
 
 	private static Material bladePaint;
 
-	private Transform rotor;
+	protected Transform rotor;
 
-	private Transform tailRotor;
+	protected Transform tailRotor;
 
 	private float rotorSpeed;
 
@@ -54,6 +54,14 @@ public sealed class Helicopter : Vehicle
 	private Vector3 orbitDir = Vector3.forward;
 
 	private bool Bravo => base.Team == 1;
+
+	protected virtual string PilotHelp => "Helicopter: W / S - forward / back, A / D - turn, Space - up, Ctrl - down";
+
+	protected virtual float CruiseSpeed => 22f;
+
+	protected virtual void PilotWeapons(ArenaTarget pilot, PlayerInput input)
+	{
+	}
 
 	protected override Vector3 FlagMount => new Vector3(0f, 2.15f, -7.6f);
 
@@ -247,7 +255,7 @@ public sealed class Helicopter : Vehicle
 		ArenaTarget arenaTarget = base.Riders[0];
 		if ((bool)arenaTarget && arenaTarget.Seated && arenaTarget != lastPilot && (bool)arenaTarget.Brain && arenaTarget.Brain.PlayerControlled && (bool)BattleDirector.Instance && BattleDirector.Instance.Notice != null)
 		{
-			BattleDirector.Instance.Notice("Helicopter: W / S - forward / back, A / D - turn, Space - up, Ctrl - down");
+			BattleDirector.Instance.Notice(PilotHelp);
 		}
 		lastPilot = (((bool)arenaTarget && arenaTarget.Seated) ? arenaTarget : null);
 	}
@@ -289,6 +297,7 @@ public sealed class Helicopter : Vehicle
 			num3 = Mathf.Clamp(SteerInput, -1f, 1f) * 55f;
 			num4 = (Brake ? 6f : (input.Crouch ? (-5f) : 0f));
 			flag3 = !Brake && input.Crouch && num2 < 1.2f;
+			PilotWeapons(arenaTarget, input);
 		}
 		else
 		{
@@ -317,7 +326,7 @@ public sealed class Helicopter : Vehicle
 		}
 	}
 
-	private void Autopilot(Vector3 here, Vector3 velocity, float ground, float height, out Vector3 accel, out float yawRate, out float climb, out bool land)
+	protected virtual void Autopilot(Vector3 here, Vector3 velocity, float ground, float height, out Vector3 accel, out float yawRate, out float climb, out bool land)
 	{
 		accel = Vector3.zero;
 		yawRate = 0f;
@@ -368,7 +377,7 @@ public sealed class Helicopter : Vehicle
 			float num2 = num + 35f;
 			climb = Mathf.Clamp((num2 - here.y) * 0.4f, -5f, 6f);
 		}
-		float num3 = ((height < 8f && flag && (flag2 || magnitude > 25f)) ? 0f : Mathf.Clamp(magnitude * 0.25f, 0f, flag2 ? 8f : 22f));
+		float num3 = ((height < 8f && flag && (flag2 || magnitude > 25f)) ? 0f : Mathf.Clamp(magnitude * 0.25f, 0f, flag2 ? 8f : CruiseSpeed));
 		Vector3 vector4 = ((magnitude > 0.5f) ? (vector3 / magnitude * num3) : Vector3.zero);
 		accel = (vector4 - Flat(velocity)) * 0.8f;
 		Vector3 vector5 = (flag2 ? Flat(((task.Target != Vector3.zero) ? task.Target : task.Goal) - here) : ((Flat(velocity).magnitude > 4f) ? Flat(velocity) : vector3));
@@ -379,13 +388,13 @@ public sealed class Helicopter : Vehicle
 		}
 	}
 
-	private static Vector3 Flat(Vector3 v)
+	protected static Vector3 Flat(Vector3 v)
 	{
 		v.y = 0f;
 		return v;
 	}
 
-	private static float Ground(Vector3 at)
+	protected static float Ground(Vector3 at)
 	{
 		if (Physics.Raycast(new Vector3(at.x, at.y + 0.35f, at.z), Vector3.down, out var hitInfo, 400f, -261, QueryTriggerInteraction.Ignore))
 		{

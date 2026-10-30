@@ -33,7 +33,13 @@ public sealed class TankShell : MonoBehaviour
 
 	public static TankShell Fire(ArenaTarget shooter, Vehicle own, Vector3 at, Vector3 velocity, int kind, float power = 2.4f, bool tracer = true, float life = 6f)
 	{
-		GameObject gameObject = new GameObject((kind == 1) ? "APFSDS dart" : "HE-FRAG shell");
+		GameObject gameObject = new GameObject(kind switch
+		{
+			1 => "APFSDS dart", 
+			2 => "AP-T round", 
+			3 => "HEI-T round", 
+			_ => "HE-FRAG shell", 
+		});
 		gameObject.layer = 2;
 		gameObject.transform.SetPositionAndRotation(at, Quaternion.LookRotation(velocity));
 		TankShell tankShell = gameObject.AddComponent<TankShell>();
@@ -61,20 +67,30 @@ public sealed class TankShell : MonoBehaviour
 		Object.Destroy(obj.GetComponent<Collider>());
 		obj.layer = 2;
 		obj.transform.SetParent(base.transform, worldPositionStays: false);
-		obj.transform.localScale = ((kind == 1) ? new Vector3(0.035f, 0.35f, 0.035f) : new Vector3(0.125f, 0.3f, 0.125f));
+		obj.transform.localScale = kind switch
+		{
+			1 => new Vector3(0.035f, 0.35f, 0.035f), 
+			2 => new Vector3(0.025f, 0.08f, 0.025f), 
+			3 => new Vector3(0.03f, 0.09f, 0.03f), 
+			_ => new Vector3(0.125f, 0.3f, 0.125f), 
+		};
 		obj.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
 		obj.GetComponent<Renderer>().sharedMaterial = shellPaint;
 		if (tracer)
 		{
 			TrailRenderer trailRenderer = base.gameObject.AddComponent<TrailRenderer>();
 			trailRenderer.sharedMaterial = tracerPaint;
-			trailRenderer.time = ((kind == 1) ? 0.05f : 0.09f);
-			trailRenderer.startWidth = ((kind == 1) ? 0.09f : 0.14f);
+			trailRenderer.time = ((kind == 1) ? 0.05f : ((kind >= 2) ? 0.04f : 0.09f));
+			trailRenderer.startWidth = ((kind == 1) ? 0.09f : ((kind >= 2) ? 0.06f : 0.14f));
 			trailRenderer.endWidth = 0.02f;
 			trailRenderer.minVertexDistance = 0.5f;
-			trailRenderer.startColor = ((kind == 1) ? new Color(1f, 0.9f, 0.6f, 1f) : new Color(1f, 0.75f, 0.35f, 0.9f));
+			trailRenderer.startColor = ((kind == 1) ? new Color(1f, 0.9f, 0.6f, 1f) : ((kind >= 2) ? new Color(1f, 0.35f, 0.15f, 1f) : new Color(1f, 0.75f, 0.35f, 0.9f)));
 			trailRenderer.endColor = new Color(1f, 0.5f, 0.2f, 0f);
 			trailRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+			if (kind >= 2)
+			{
+				return;
+			}
 			Light light = new GameObject("Tracer light").AddComponent<Light>();
 			light.transform.SetParent(base.transform, worldPositionStays: false);
 			light.type = LightType.Point;
@@ -125,7 +141,7 @@ public sealed class TankShell : MonoBehaviour
 			base.transform.position = vector;
 			if (age >= life)
 			{
-				if (kind == 1)
+				if (kind == 1 || kind == 2)
 				{
 					done = true;
 					Object.Destroy(base.gameObject);
@@ -180,7 +196,12 @@ public sealed class TankShell : MonoBehaviour
 			Dart(hit, normalized);
 			return;
 		}
-		Vehicle.Struck(hit.collider, hit.point, normalized, 40f);
+		if (kind == 2)
+		{
+			Bolt(hit, normalized);
+			return;
+		}
+		Vehicle.Struck(hit.collider, hit.point, normalized, (kind == 3) ? 10f : 40f);
 		Burst(hit.point + hit.normal * 0.1f);
 	}
 
@@ -213,6 +234,34 @@ public sealed class TankShell : MonoBehaviour
 		Object.Destroy(base.gameObject);
 	}
 
+	private void Bolt(RaycastHit hit, Vector3 direction)
+	{
+		HitZone hitZone = ShotQuery.ZoneOf(hit.collider);
+		if ((bool)hitZone)
+		{
+			pierced.Add(hit.collider);
+			if ((bool)ReconstructionDemo.Instance)
+			{
+				ReconstructionDemo.Instance.Strike(shooter, hitZone, hit.point, hit.normal, direction, 9f, exits: true);
+			}
+			velocity *= 0.8f;
+			return;
+		}
+		done = true;
+		if (!Vehicle.Pierce(hit.collider, hit.point, direction, power))
+		{
+			if ((bool)ReconstructionDemo.Instance)
+			{
+				ReconstructionDemo.Instance.SurfaceHit(hit, direction);
+			}
+			if ((bool)ShotEffects.Instance)
+			{
+				ShotEffects.Instance.Sparks(hit.point, hit.normal, 8, 7f);
+			}
+		}
+		Object.Destroy(base.gameObject);
+	}
+
 	private void Burst(Vector3 centre)
 	{
 		done = true;
@@ -222,7 +271,7 @@ public sealed class TankShell : MonoBehaviour
 		}
 		if ((bool)Ballistics.Instance)
 		{
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < ((kind == 3) ? 8 : 30); i++)
 			{
 				Vector3 onUnitSphere = Random.onUnitSphere;
 				if (onUnitSphere.y < -0.2f)

@@ -1030,5 +1030,25 @@ internal static class LocRu
 		yield return ("howitzer destroyed", "гаубица уничтожена");
 		yield return ("No artillery for this side", "У этой стороны нет артиллерии");
 		yield return ("82 mm mortar", "82-мм миномёт");
+		yield return ("T-90M", "Т-90М");
+		yield return ("2A46M-5 125 mm", "2А46М-5 125 мм");
+		yield return ("Leopard 2A6", "«Леопард» 2A6");
+		yield return ("Rh-120 L55 120 mm", "Rh-120 L55 120 мм");
+		yield return ("BMP-2", "БМП-2");
+		yield return ("2A42 30 mm", "2А42 30 мм");
+		yield return ("M2A2 Bradley", "M2A2 «Брэдли»");
+		yield return ("M242 Bushmaster 25 mm", "M242 «Бушмастер» 25 мм");
+		yield return ("Mi-24V", "Ми-24В");
+		yield return ("YakB-12.7", "ЯкБ-12,7");
+		yield return ("AH-64D Apache", "AH-64D «Апач»");
+		yield return ("M230 30 mm", "M230 30 мм");
+		yield return ("HEI-T", "ОФЗТ");
+		yield return ("AP-T", "БТ");
+		yield return ("Loading HEI-T", "Заряжается ОФЗТ");
+		yield return ("Loading AP-T", "Заряжается БТ");
+		yield return ("Gunship: W / S - forward / back, A / D - turn, Space - up, Ctrl - down, LMB - rockets", "Ударный вертолёт: W / S — вперёд / назад, A / D — поворот, Пробел — вверх, Ctrl — вниз, ЛКМ — НУРы");
+		yield return ("Out of rockets - land to rearm", "НУРы кончились — сядьте, чтобы пополнить");
+		yield return ("Tanks and infantry fighting vehicles: T-72, T-90M and BMP-2 for one side, M1 Abrams, Leopard 2A6 and M2 Bradley for the other (from the next battle).", "Танки и БМП: Т-72, Т-90М и БМП-2 у одной стороны, M1 «Абрамс», «Леопард» 2A6 и M2 «Брэдли» у другой (со следующего боя).");
+		yield return ("Mi-8 and Mi-24 for one side, UH-60 Black Hawk and AH-64 Apache for the other: transports carry troops, gunships strike with rockets and cannon (from the next battle).", "Ми-8 и Ми-24 у одной стороны, UH-60 «Блэк Хок» и AH-64 «Апач» у другой: транспортные возят десант, ударные бьют НУРами и из пушки (со следующего боя).");
 	}
 }

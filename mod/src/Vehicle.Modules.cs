@@ -522,4 +522,55 @@ public abstract partial class Vehicle
 			}
 		}
 	}
+
+	public float ArmourRating => spec.ArmourEnergy;
+
+	public static bool Pierce(Collider c, Vector3 point, Vector3 direction, float energy)
+	{
+		if (!c || !byCollider.TryGetValue(c, out var value) || !value)
+		{
+			return false;
+		}
+		if (value.Wrecked)
+		{
+			return true;
+		}
+		Vector3 normalized = direction.normalized;
+		value.Body.AddForceAtPosition(normalized * 60f, point, ForceMode.Impulse);
+		if (value.spec.Armoured && energy < value.spec.ArmourEnergy)
+		{
+			value.ModulesAlongPath(point, normalized, energy * 0.7f, 0f, 0.5f);
+			if ((bool)ShotEffects.Instance)
+			{
+				ShotEffects.Instance.Sparks(point, -normalized, 12, 9f);
+			}
+			if ((bool)Acoustics.Instance)
+			{
+				Acoustics.Instance.Impact(point, ImpactSound.Metal, 1.2f);
+			}
+			return false;
+		}
+		Vector3 vector = value.Local(point + normalized * 0.3f) - value.spec.EngineCentre;
+		Vector3 vector2 = value.spec.EngineSize * 0.5f + Vector3.one * 0.15f;
+		bool flag = Mathf.Abs(vector.x) < vector2.x && Mathf.Abs(vector.y) < vector2.y && Mathf.Abs(vector.z) < vector2.z;
+		if ((bool)ShotEffects.Instance)
+		{
+			ShotEffects.Instance.Sparks(point, -normalized, 18, 12f);
+			ShotEffects.Instance.Flare(point, 0.5f);
+		}
+		if ((bool)Acoustics.Instance)
+		{
+			Acoustics.Instance.Impact(point, ImpactSound.Metal, 1.6f);
+		}
+		value.ModulesAlongPath(point, normalized, 18f, 14f, 2.5f);
+		if ((bool)Ballistics.Instance)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				Ballistics.Instance.Fragment(null, point + normalized * 0.15f, (normalized + Random.insideUnitSphere * 0.35f).normalized, Random.Range(300, 500), Random.Range(0.002f, 0.005f));
+			}
+		}
+		value.Damage(value.spec.EngineHealth * (flag ? 0.25f : 0.07f));
+		return true;
+	}
 }

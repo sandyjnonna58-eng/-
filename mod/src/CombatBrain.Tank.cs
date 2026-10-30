@@ -80,6 +80,10 @@ public sealed partial class CombatBrain
 				continue;
 			}
 			float num2 = magnitude - ((item.Gun != null && item.Gun.Cannon) ? 600f : 0f) - (item.Armoured ? 200f : 0f);
+			if (gun.Autocannon && item.ArmourRating >= gun.ApEnergy)
+			{
+				num2 += 900f;
+			}
 			if (num2 < num)
 			{
 				num = num2;

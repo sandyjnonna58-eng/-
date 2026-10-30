@@ -312,6 +312,46 @@ public abstract class Tank : Vehicle
 		return wheelModelsCache[i];
 	}
 
+	protected static Wheel[] TrackWheels(float[] at, float x, float y, float radius, float width)
+	{
+		Wheel[] array = new Wheel[at.Length * 2];
+		for (int i = 0; i < at.Length; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				array[i * 2 + j] = new Wheel
+				{
+					At = new Vector3((j == 0) ? (0f - x) : x, y, at[i]),
+					Radius = radius,
+					Width = width,
+					Steer = at[i] / at[0],
+					Driven = true
+				};
+			}
+		}
+		return array;
+	}
+
+	protected static Place Inside(SeatRole role, Vector3 pelvis, Vector3 door, Vector3 way, float lean = 5f, float yaw = 0f)
+	{
+		Vector3 vector = Quaternion.Euler(0f, yaw, 0f) * new Vector3(0.13f, 0f, 0f);
+		Vector3 vector2 = Quaternion.Euler(0f, yaw, 0f) * new Vector3(0f, 0f, 0.42f);
+		return new Place
+		{
+			Role = role,
+			Pelvis = pelvis,
+			FootL = pelvis + vector2 - vector + Vector3.down * Mathf.Max(0.3f, pelvis.y - 0.6f),
+			FootR = pelvis + vector2 + vector + Vector3.down * Mathf.Max(0.3f, pelvis.y - 0.6f),
+			HoldL = pelvis + vector2 * 0.6f - vector * 2f + Vector3.down * 0.1f,
+			HoldR = pelvis + vector2 * 0.6f + vector * 2f + Vector3.down * 0.1f,
+			Door = door,
+			Out = way,
+			Stand = 2.3f,
+			Lean = lean,
+			Yaw = yaw
+		};
+	}
+
 	protected Place[] CrewAndRiders(Place driver, Place gunner, float riderX, float riderY, float footX, float footY, float[] riderZ)
 	{
 		List<Place> list = new List<Place> { driver, gunner };
@@ -320,7 +360,7 @@ public abstract class Tank : Vehicle
 		{
 			foreach (float num2 in riderZ)
 			{
-				float num3 = ((num < 0) ? 1 : (-1));
+				float num3 = num;
 				list.Add(new Place
 				{
 					Role = SeatRole.Holder,

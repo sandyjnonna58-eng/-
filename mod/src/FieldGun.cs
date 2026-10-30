@@ -31,6 +31,8 @@ public sealed class FieldGun : MonoBehaviour
 
 	private static Material sandbag;
 
+	private static Material rubber;
+
 	public GunKind Kind;
 
 	public int Team;
@@ -104,52 +106,75 @@ public sealed class FieldGun : MonoBehaviour
 			};
 			sandbag.SetFloat("_Glossiness", 0.05f);
 		}
+		if (!rubber)
+		{
+			rubber = new Material(Shader.Find("Standard"))
+			{
+				color = new Color(0.04f, 0.04f, 0.04f)
+			};
+			rubber.SetFloat("_Glossiness", 0.1f);
+		}
+		if (!FieldGunMeshes.Ready)
+		{
+			FieldGunMeshes.Build();
+		}
 		if (Kind == GunKind.Mortar)
 		{
-			for (int i = 0; i < 10; i++)
+			Draw(base.transform, FieldGunMeshes.Sandbags, sandbag);
+			Draw(base.transform, FieldGunMeshes.Baseplate, steel);
+			(Vector3, float)[] array = FieldGunMeshes.Bags();
+			for (int i = 0; i < 12; i++)
 			{
-				float f = (float)i * 36f * (Mathf.PI / 180f);
-				Part(PrimitiveType.Cube, new Vector3(Mathf.Sin(f) * 1.6f, 0.25f, Mathf.Cos(f) * 1.6f), new Vector3(0.9f, 0.5f, 0.45f), sandbag, new Vector3(0f, (float)i * 36f, 0f), collide: true);
+				Solid(array[i].Item1, new Vector3(0.86f, 0.24f, 0.42f), new Vector3(0f, array[i].Item2, 0f));
 			}
-			Part(PrimitiveType.Cylinder, new Vector3(0f, 0.04f, 0f), new Vector3(0.5f, 0.03f, 0.5f), steel, Vector3.zero, collide: false);
 			barrel = new GameObject("Tube").transform;
 			barrel.SetParent(base.transform, worldPositionStays: false);
-			barrel.localPosition = new Vector3(0f, 0.08f, 0f);
+			barrel.localPosition = FieldGunMeshes.MortarPivot;
 			barrel.localEulerAngles = new Vector3(-50f, 0f, 0f);
-			Part(PrimitiveType.Cylinder, new Vector3(0f, 0f, 0.6f), new Vector3(0.09f, 0.6f, 0.09f), steel, new Vector3(90f, 0f, 0f), collide: false, barrel);
-			Part(PrimitiveType.Cube, new Vector3(0f, 0.45f, 0.5f), new Vector3(0.04f, 0.9f, 0.04f), steel, new Vector3(-30f, 0f, 0f), collide: false);
+			Draw(barrel, FieldGunMeshes.MortarTube, steel);
 		}
 		else
 		{
-			Part(PrimitiveType.Cube, new Vector3(0f, 1.05f, 0.2f), new Vector3(2f, 1.1f, 0.06f), steel, new Vector3(-8f, 0f, 0f), collide: true);
-			Part(PrimitiveType.Cube, new Vector3(0f, 0.75f, -0.3f), new Vector3(0.6f, 0.5f, 1.2f), steel, Vector3.zero, collide: true);
-			int[] array = new int[2] { -1, 1 };
-			foreach (int num in array)
+			Draw(base.transform, FieldGunMeshes.Carriage, steel);
+			Draw(base.transform, FieldGunMeshes.Shield, steel);
+			Vector3[] wheels = FieldGunMeshes.Wheels;
+			foreach (Vector3 vector in wheels)
 			{
-				Part(PrimitiveType.Cylinder, new Vector3((float)num * 0.85f, 0.45f, -0.2f), new Vector3(0.9f, 0.12f, 0.9f), sandbag, new Vector3(0f, 0f, 90f), collide: false);
-				Part(PrimitiveType.Cube, new Vector3((float)num * 0.6f, 0.2f, -1.8f), new Vector3(0.14f, 0.14f, 2.6f), steel, new Vector3(0f, (float)num * 20f, 0f), collide: false);
+				Transform transform = new GameObject("Wheel").transform;
+				transform.SetParent(base.transform, worldPositionStays: false);
+				transform.localPosition = vector;
+				if (vector.x < 0f)
+				{
+					transform.localScale = new Vector3(-1f, 1f, 1f);
+				}
+				Draw(transform, FieldGunMeshes.Tyre, rubber);
+				Draw(transform, FieldGunMeshes.Hub, steel);
 			}
+			Solid(new Vector3(0f, 1.05f, 0.3f), new Vector3(2f, 1.1f, 0.08f), new Vector3(-8f, 0f, 0f));
+			Solid(new Vector3(0f, 0.7f, -0.25f), new Vector3(0.62f, 0.5f, 1.2f), Vector3.zero);
 			barrel = new GameObject("Barrel").transform;
 			barrel.SetParent(base.transform, worldPositionStays: false);
-			barrel.localPosition = new Vector3(0f, 1.1f, 0f);
+			barrel.localPosition = FieldGunMeshes.HowitzerPivot;
 			barrel.localEulerAngles = new Vector3(-25f, 0f, 0f);
-			Part(PrimitiveType.Cylinder, new Vector3(0f, 0f, 2.2f), new Vector3(0.16f, 2.4f, 0.16f), steel, new Vector3(90f, 0f, 0f), collide: false, barrel);
-			Part(PrimitiveType.Cube, new Vector3(0f, 0f, 4.55f), new Vector3(0.3f, 0.2f, 0.4f), steel, Vector3.zero, collide: false, barrel);
+			Draw(barrel, FieldGunMeshes.Barrel, steel);
 		}
 	}
 
-	private void Part(PrimitiveType type, Vector3 at, Vector3 size, Material m, Vector3 euler, bool collide, Transform parent = null)
+	private static void Draw(Transform parent, Mesh mesh, Material m)
 	{
-		GameObject gameObject = GameObject.CreatePrimitive(type);
-		if (!collide)
-		{
-			Object.Destroy(gameObject.GetComponent<Collider>());
-		}
-		gameObject.transform.SetParent(parent ? parent : base.transform, worldPositionStays: false);
+		GameObject gameObject = new GameObject(mesh.name);
+		gameObject.transform.SetParent(parent, worldPositionStays: false);
+		gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+		gameObject.AddComponent<MeshRenderer>().sharedMaterial = m;
+	}
+
+	private void Solid(Vector3 at, Vector3 size, Vector3 euler)
+	{
+		GameObject gameObject = new GameObject("Collider");
+		gameObject.transform.SetParent(base.transform, worldPositionStays: false);
 		gameObject.transform.localPosition = at;
 		gameObject.transform.localEulerAngles = euler;
-		gameObject.transform.localScale = size;
-		gameObject.GetComponent<Renderer>().sharedMaterial = m;
+		gameObject.AddComponent<BoxCollider>().size = size;
 	}
 
 	public Vector3 Muzzle

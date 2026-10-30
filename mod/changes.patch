@@ -1,8 +1,7 @@
 diff --git a/CombatSandbox.Demo/ArenaTarget.cs b/CombatSandbox.Demo/ArenaTarget.cs
-index ab8d31b..0bed9bc 100644
 --- a/CombatSandbox.Demo/ArenaTarget.cs
 +++ b/CombatSandbox.Demo/ArenaTarget.cs
-@@ -4,7 +4,7 @@ using UnityEngine;
+@@ -4,7 +4,7 @@
  
  namespace CombatSandbox.Demo;
  
@@ -11,7 +10,7 @@ index ab8d31b..0bed9bc 100644
  {
  	public enum GripLoss
  	{
-@@ -999,6 +999,7 @@ public sealed class ArenaTarget : MonoBehaviour
+@@ -999,6 +999,7 @@
  		reflexAge = 10f;
  		Response.Reset();
  		Vitals.Reset();
@@ -19,7 +18,7 @@ index ab8d31b..0bed9bc 100644
  		HoldingWound = false;
  		GripBlend = 0f;
  		EvadeVelocity = Vector3.zero;
-@@ -1547,6 +1548,8 @@ public sealed class ArenaTarget : MonoBehaviour
+@@ -1547,6 +1548,8 @@
  			stepCount++;
  			if (Body.Dead)
  			{
@@ -28,7 +27,7 @@ index ab8d31b..0bed9bc 100644
  				if (Armed)
  				{
  					Rifle.Drop(default(Vector3), Range(0f, 1f) < 0.5f);
-@@ -1629,6 +1632,10 @@ public sealed class ArenaTarget : MonoBehaviour
+@@ -1629,6 +1632,10 @@
  			Breathe(fixedDeltaTime);
  			UpdateGround();
  			SupportStrength = Mathf.Clamp01((LegStrength(0) + LegStrength(1)) * 0.5f) * Vitality;
@@ -40,10 +39,9 @@ index ab8d31b..0bed9bc 100644
  			{
  			case ActiveRagdollPhase.Riding:
 diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDirector.cs
-index 36fa06c..2830e95 100644
 --- a/CombatSandbox.Demo/BattleDirector.cs
 +++ b/CombatSandbox.Demo/BattleDirector.cs
-@@ -469,6 +469,8 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -469,6 +469,8 @@
  		}
  		ApplyRosters();
  		WarStart();
@@ -52,7 +50,7 @@ index 36fa06c..2830e95 100644
  		if (Vehicle.MapHasVehicles)
  		{
  			VehicleNav.Build();
-@@ -507,6 +509,10 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -507,6 +509,10 @@
  		{
  			base.gameObject.AddComponent<CommandWheel>();
  		}
@@ -63,7 +61,7 @@ index 36fa06c..2830e95 100644
  		if ((bool)Acoustics.Instance)
  		{
  			Acoustics.Instance.Ambience = AmbientBattle && GameSettings.Ambience;
-@@ -593,6 +599,20 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -593,6 +599,20 @@
  		brain.SightRange = 120f * Mathf.Min(num, 1.8f);
  		brain.SpotDistance = 28f * Mathf.Pow(num, 0.55f);
  		brain.EngageRange = 65f * Mathf.Lerp(1f, num, 0.45f);
@@ -84,7 +82,7 @@ index 36fa06c..2830e95 100644
  	}
  
  	public Vector3 BasePoint(int team)
-@@ -915,7 +935,7 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -915,7 +935,7 @@
  			return;
  		}
  		bool overUI = (bool)EventSystem.current && EventSystem.current.IsPointerOverGameObject();
@@ -93,7 +91,7 @@ index 36fa06c..2830e95 100644
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1323,15 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1303,6 +1323,15 @@
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
@@ -104,12 +102,12 @@ index 36fa06c..2830e95 100644
 +		if (flag2 && vehicle.Gun.Cannon && Input.GetKeyDown(KeyCode.B))
 +		{
 +			vehicle.Gun.PendingShell = 1 - vehicle.Gun.Shell;
-+			Notice?.Invoke("Loading " + GunMount.ShellNames[1 - vehicle.Gun.Shell]);
++			Notice?.Invoke("Loading " + (vehicle.Gun.Autocannon ? GunMount.AutoNames : GunMount.ShellNames)[1 - vehicle.Gun.Shell]);
 +		}
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1625,29 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1596,6 +1625,29 @@
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -140,10 +138,9 @@ index 36fa06c..2830e95 100644
  		{
  			Vector3 vector12 = aimPoint - (shoulder + Vector3.up * rifle.BoreHeight);
 diff --git a/CombatSandbox.Demo/BattleUI.cs b/CombatSandbox.Demo/BattleUI.cs
-index 2a9fd65..d661120 100644
 --- a/CombatSandbox.Demo/BattleUI.cs
 +++ b/CombatSandbox.Demo/BattleUI.cs
-@@ -1003,8 +1003,9 @@ public sealed class BattleUI : MonoBehaviour
+@@ -1003,8 +1003,9 @@
  				UnityEngine.Object.Destroy(item5.gameObject);
  			}
  		}
@@ -154,7 +151,7 @@ index 2a9fd65..d661120 100644
  			("WASD", "move"),
  			("Shift", "run"),
  			("Ctrl", "crouch"),
-@@ -1078,7 +1079,7 @@ public sealed class BattleUI : MonoBehaviour
+@@ -1078,7 +1079,7 @@
  		}
  		bool flag = director.Mode == BattleDirector.ViewMode.Possessed && (bool)director.Possessed;
  		bool active = CaptureMode.Active;
@@ -163,7 +160,7 @@ index 2a9fd65..d661120 100644
  		if (!canvas.enabled)
  		{
  			return;
-@@ -1732,9 +1733,9 @@ public sealed class BattleUI : MonoBehaviour
+@@ -1732,9 +1733,9 @@
  		{
  			text2 = K("E") + "pick up the weapon";
  		}
@@ -176,10 +173,9 @@ index 2a9fd65..d661120 100644
  		prompt.text = text2;
  		float num11 = body.Health / 100f;
 diff --git a/CombatSandbox.Demo/BootSequence.cs b/CombatSandbox.Demo/BootSequence.cs
-index 3fbed81..6986e8b 100644
 --- a/CombatSandbox.Demo/BootSequence.cs
 +++ b/CombatSandbox.Demo/BootSequence.cs
-@@ -45,6 +45,7 @@ public sealed class BootSequence : MonoBehaviour
+@@ -45,6 +45,7 @@
  
  	private void Awake()
  	{
@@ -188,10 +184,9 @@ index 3fbed81..6986e8b 100644
  		Cursor.visible = false;
  		Camera main = Camera.main;
 diff --git a/CombatSandbox.Demo/Buggy.cs b/CombatSandbox.Demo/Buggy.cs
-index 989fd35..4901ed4 100644
 --- a/CombatSandbox.Demo/Buggy.cs
 +++ b/CombatSandbox.Demo/Buggy.cs
-@@ -57,28 +57,44 @@ public sealed class Buggy : Vehicle
+@@ -57,28 +57,44 @@
  
  	protected override float FlagLength => 1.5f;
  
@@ -249,7 +244,7 @@ index 989fd35..4901ed4 100644
  			SteerPivot = SteerPivot,
  			SteerAxis = new Vector3(0f, 0.5f, -0.866f),
  			GripL = SteerPivot + new Vector3(-0.18f, 0f, 0f),
-@@ -88,7 +104,7 @@ public sealed class Buggy : Vehicle
+@@ -88,7 +104,7 @@
  			SteerArms = 600f,
  			EngineCentre = new Vector3(0f, 0.85f, -1.38f),
  			EngineSize = new Vector3(1.1f, 0.55f, 0.7f),
@@ -259,10 +254,9 @@ index 989fd35..4901ed4 100644
  			EngineLoudness = 1.25f,
  			CameraOffset = new Vector3(0f, 1.7f, -6.5f)
 diff --git a/CombatSandbox.Demo/CaptureMode.cs b/CombatSandbox.Demo/CaptureMode.cs
-index 7233289..6a42e5b 100644
 --- a/CombatSandbox.Demo/CaptureMode.cs
 +++ b/CombatSandbox.Demo/CaptureMode.cs
-@@ -763,7 +763,7 @@ public sealed class CaptureMode : MonoBehaviour
+@@ -763,7 +763,7 @@
  		bool flag = list3.Count > 1 && posture != Posture.Defensive && (float)num3 >= Mathf.Max(6f, (float)num4 * 1.35f);
  		CapturePoint secondary = (flag ? list3[1].Item1 : null);
  		List<CombatBrain> list4 = new List<CombatBrain>(list2);
@@ -271,7 +265,7 @@ index 7233289..6a42e5b 100644
  		foreach (var item5 in threatened)
  		{
  			CapturePoint item2 = item5.p;
-@@ -829,7 +829,7 @@ public sealed class CaptureMode : MonoBehaviour
+@@ -829,7 +829,7 @@
  		{
  			list5 = list5.OrderBy((CombatBrain b) => Vector3.Dot(Flat(Position(b) - primary.transform.position), Vector3.Cross(Vector3.up, Flat(primary.transform.position - ourCentre).normalized))).ToList();
  		}
@@ -281,10 +275,9 @@ index 7233289..6a42e5b 100644
  			CombatBrain key = item12.Key;
  			(CapturePoint, bool) value = item12.Value;
 diff --git a/CombatSandbox.Demo/CombatBrain.cs b/CombatSandbox.Demo/CombatBrain.cs
-index f9b15b7..6c87f7f 100644
 --- a/CombatSandbox.Demo/CombatBrain.cs
 +++ b/CombatSandbox.Demo/CombatBrain.cs
-@@ -7,7 +7,7 @@ namespace CombatSandbox.Demo;
+@@ -7,7 +7,7 @@
  
  [DefaultExecutionOrder(-50)]
  [DisallowMultipleComponent]
@@ -293,7 +286,7 @@ index f9b15b7..6c87f7f 100644
  {
  	public enum Mode
  	{
-@@ -2386,6 +2386,10 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -2386,6 +2386,10 @@
  			return;
  		}
  		Vector3 vector = ((!CaptureGoal) ? (EnemyKnown ? enemyLastSeen : ((Time.time - heardTime < 15f) ? heardAt : (ThreatKnown ? Threat : Objective))) : ((!Storming && EnemyKnown && EnemyRange < 25f) ? enemyLastSeen : Objective));
@@ -304,7 +297,7 @@ index f9b15b7..6c87f7f 100644
  		orders.Face = true;
  		orders.FaceTo = vector;
  		float magnitude = Flat(vector - Here).magnitude;
-@@ -2761,6 +2765,7 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -2761,6 +2765,7 @@
  			}
  			bool flag3 = EnemyVisible && Flat(enemyLastSeen - Here).magnitude < 45f;
  			Mode mode = ((!flag && (!target.IsRecovering || Current != Mode.Down || target.PickingUp || target.KneelingHeld)) ? (ExecuteTarget ? Mode.Execute : (EscortOf ? Mode.Escort : ((!flag && ((Current == Mode.Aid && (aid != 0 || MedicComing)) || MedicComing || WantsSelfAid())) ? Mode.Aid : (((!(Severity >= PanicSeverity) || (!flag2 && !(Severity > 0.7f))) && !(Time.time < panicUntil)) ? (((Current == Mode.Retrieve && target.PickingUp) || CanRetrieve(flag2)) ? Mode.Retrieve : ((Duty == Role.Operator && ((bool)Drone || launchAt > 0f || ReadyToLaunch())) ? Mode.Pilot : ((Duty == Role.Medic && ((Current == Mode.Treat && (bool)Patient) || TryTreat())) ? Mode.Treat : ((Duty != Role.Medic && ((Current == Mode.Rescue && (bool)casualty) || TryRescue())) ? Mode.Rescue : (WantsSupplies() ? Mode.Resupply : ((EnemyKnown && target.Armed && (Duty != Role.Medic || flag3) && (EnemyRange < MyEngageRange || UnderFire || (Current == Mode.Fight && EnemyRange < MyEngageRange * 1.2f)) && (!Storming || EnemyVisible || UnderFire || !(EnemyRange > 12f))) ? Mode.Fight : ((EnemyKnown && !UnderFire && Defending && !Route) ? Mode.Defend : ((EnemyKnown && !UnderFire && Attacking && HasObjective && target.Armed) ? Mode.Advance : ((flag2 && (!Attacking || !HasObjective || !target.Armed || !(Suppression < 0.5f))) ? ((Duty != Role.Medic) ? Mode.Alert : Mode.Standby) : (((Duty == Role.Commander || Duty == Role.Operator) && HasHome) ? Mode.Guard : ((Duty == Role.Medic) ? Mode.Standby : ((Attacking && HasObjective) ? Mode.Advance : ((Defending && !Route) ? Mode.Defend : Mode.Patrol))))))))))))) : Mode.Panic)))) : Mode.Down);
@@ -312,7 +305,7 @@ index f9b15b7..6c87f7f 100644
  			if (mode != Current)
  			{
  				Enter(mode);
-@@ -6417,6 +6422,14 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -6417,6 +6422,14 @@
  				coverSince = Time.time;
  			}
  		}
@@ -327,7 +320,7 @@ index f9b15b7..6c87f7f 100644
  		if ((bool)cover && !AtCover)
  		{
  			orders.Speed = target.RunSpeed * 0.75f;
-@@ -7230,6 +7243,13 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -7230,6 +7243,13 @@
  
  	private void DriveVehicle(Vehicle v)
  	{
@@ -341,7 +334,7 @@ index f9b15b7..6c87f7f 100644
  		float fixedDeltaTime = Time.fixedDeltaTime;
  		float speed = v.Speed;
  		if (!target.Seated)
-@@ -7743,18 +7763,28 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -7743,18 +7763,28 @@
  		Vector3 point = (((bool)enemy && EnemyVisible) ? enemy.target.Body.Chest.Body.position : default(Vector3));
  		GunMount gun = v.Gun;
  		bool flag3 = EnemyVisible && EnemyRange < ((role == SeatRole.Gunner && gun != null) ? Mathf.Clamp(gun.Def.EffectiveRange * 0.4f, 300f, 700f) : (MyEngageRange * 1.2f));
@@ -374,10 +367,9 @@ index f9b15b7..6c87f7f 100644
  						gunBurst = UnityEngine.Random.Range(4, 9);
  						lastRounds = gun.Rounds;
 diff --git a/CombatSandbox.Demo/CommandOrders.cs b/CombatSandbox.Demo/CommandOrders.cs
-index 55a2514..43e0322 100644
 --- a/CombatSandbox.Demo/CommandOrders.cs
 +++ b/CombatSandbox.Demo/CommandOrders.cs
-@@ -14,7 +14,36 @@ public static class CommandOrders
+@@ -14,7 +14,36 @@
  		Defend,
  		FollowMe,
  		HoldThere,
@@ -415,7 +407,7 @@ index 55a2514..43e0322 100644
  	}
  
  	public sealed class Order
-@@ -48,7 +77,7 @@ public static class CommandOrders
+@@ -48,7 +77,7 @@
  		{
  			return false;
  		}
@@ -424,7 +416,7 @@ index 55a2514..43e0322 100644
  		{
  			current[team] = null;
  			return false;
-@@ -61,6 +90,11 @@ public static class CommandOrders
+@@ -61,6 +90,11 @@
  		return k switch
  		{
  			Kind.Resupply => "RESUPPLY", 
@@ -436,7 +428,7 @@ index 55a2514..43e0322 100644
  			Kind.HoldThere => "HOLD THERE", 
  			Kind.FollowMe => "FOLLOW ME", 
  			Kind.Defend => "DEFEND", 
-@@ -74,6 +108,11 @@ public static class CommandOrders
+@@ -74,6 +108,11 @@
  		return k switch
  		{
  			Kind.Resupply => "ammo", 
@@ -448,7 +440,7 @@ index 55a2514..43e0322 100644
  			Kind.HoldThere => "pin", 
  			Kind.FollowMe => "follow", 
  			Kind.Defend => "shield", 
-@@ -85,7 +124,7 @@ public static class CommandOrders
+@@ -85,7 +124,7 @@
  	public static CapturePoint PointNear(Vector3 at)
  	{
  		return (from p in CapturePoint.All
@@ -457,7 +449,7 @@ index 55a2514..43e0322 100644
  			orderby (p.transform.position - at).sqrMagnitude
  			select p).FirstOrDefault();
  	}
-@@ -97,6 +136,9 @@ public static class CommandOrders
+@@ -97,6 +136,9 @@
  		default:
  			return "";
  		case Kind.HoldThere:
@@ -467,7 +459,7 @@ index 55a2514..43e0322 100644
  			return "THERE";
  		case Kind.Attack:
  		case Kind.Defend:
-@@ -115,6 +157,11 @@ public static class CommandOrders
+@@ -115,6 +157,11 @@
  			return;
  		}
  		int team = by.Team;
@@ -479,7 +471,7 @@ index 55a2514..43e0322 100644
  		if (kind == Kind.None)
  		{
  			if (current[team] != null)
-@@ -150,6 +197,44 @@ public static class CommandOrders
+@@ -150,6 +197,44 @@
  		};
  		BattleDirector.Report(by.name.Trim() + " (you): " + text + "!", team);
  		Apply(team);
@@ -524,7 +516,7 @@ index 55a2514..43e0322 100644
  	}
  
  	public static void Apply(int team)
-@@ -207,6 +292,10 @@ public static class CommandOrders
+@@ -207,6 +292,10 @@
  				item.Storming = false;
  				item.Objective = vector + normalized * 40f;
  				item.HasObjective = true;
@@ -536,10 +528,9 @@ index 55a2514..43e0322 100644
  			}
  			case Kind.Resupply:
 diff --git a/CombatSandbox.Demo/CommandWheel.cs b/CombatSandbox.Demo/CommandWheel.cs
-index b75fd2c..89ad27a 100644
 --- a/CombatSandbox.Demo/CommandWheel.cs
 +++ b/CombatSandbox.Demo/CommandWheel.cs
-@@ -7,16 +7,23 @@ namespace CombatSandbox.Demo;
+@@ -7,16 +7,23 @@
  
  public sealed class CommandWheel : MonoBehaviour
  {
@@ -565,7 +556,7 @@ index b75fd2c..89ad27a 100644
  	private BattleDirector director;
  
  	private Canvas canvas;
-@@ -85,7 +92,7 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -85,7 +92,7 @@
  		UIKit.Place(wheel, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 10f));
  		dim = UIKit.Box(wheel, "Shade", new Color(0f, 0f, 0f, 0.45f), UIKit.Soft);
  		dim.type = Image.Type.Simple;
@@ -574,7 +565,7 @@ index b75fd2c..89ad27a 100644
  		hubRing = UIKit.Box(wheel, "Hub", new Color(0.06f, 0.07f, 0.08f, 0.92f), UIKit.Pill);
  		UIKit.Place(hubRing.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(200f, 200f));
  		centreTitle = UIKit.Label(wheel, "ORDERS", 22, UIKit.Accent, TextAnchor.MiddleCenter, bold: true);
-@@ -96,10 +103,10 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -96,10 +103,10 @@
  		UIKit.Place(cancelIcon.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 50f), new Vector2(30f, 30f));
  		for (int i = 0; i < Wheel.Length; i++)
  		{
@@ -588,7 +579,7 @@ index b75fd2c..89ad27a 100644
  			Image image2 = UIKit.IconImage(image.transform, CommandOrders.Icon(Wheel[i]), UIKit.Text, 34f);
  			UIKit.Place(image2.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(34f, 34f));
  			Text text = UIKit.Label(image.transform, CommandOrders.Name(Wheel[i]), 15, UIKit.Text, TextAnchor.MiddleCenter, bold: true);
-@@ -107,8 +114,8 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -107,8 +114,8 @@
  			image.gameObject.AddComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0f);
  			slots.Add((image, image2, text, image.rectTransform));
  		}
@@ -599,7 +590,7 @@ index b75fd2c..89ad27a 100644
  		wheel.gameObject.SetActive(value: false);
  		Image image3 = UIKit.Box(root, "Order in force", new Color(0.06f, 0.07f, 0.08f, 0.9f), UIKit.Rounded);
  		banner = image3.rectTransform;
-@@ -138,9 +145,9 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -138,9 +145,9 @@
  			return;
  		}
  		CombatBrain possessed = director.Possessed;
@@ -611,7 +602,7 @@ index b75fd2c..89ad27a 100644
  		if (flag2 && !Open)
  		{
  			Open = true;
-@@ -179,7 +186,7 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -179,7 +186,7 @@
  			cancelled = true;
  			UISound.Back();
  		}
@@ -620,7 +611,7 @@ index b75fd2c..89ad27a 100644
  		{
  			cancelled = false;
  		}
-@@ -238,7 +245,7 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -238,7 +245,7 @@
  		if (pointer.magnitude > 40f)
  		{
  			float t = Mathf.Atan2(pointer.x, pointer.y) * 57.29578f;
@@ -629,7 +620,7 @@ index b75fd2c..89ad27a 100644
  		}
  		else
  		{
-@@ -267,6 +274,8 @@ public sealed class CommandWheel : MonoBehaviour
+@@ -267,6 +274,8 @@
  		{
  			CommandOrders.Kind.Resupply => "fill up, then on", 
  			CommandOrders.Kind.FollowMe => "keep round me", 
@@ -639,10 +630,9 @@ index b75fd2c..89ad27a 100644
  		})));
  	}
 diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
-index 9fd3d6c..749d05d 100644
 --- a/CombatSandbox.Demo/GameMenu.cs
 +++ b/CombatSandbox.Demo/GameMenu.cs
-@@ -38,14 +38,16 @@ public sealed class GameMenu : MonoBehaviour
+@@ -38,14 +38,16 @@
  
  	private Text pauseStats;
  
@@ -661,7 +651,7 @@ index 9fd3d6c..749d05d 100644
  	};
  
  	private readonly List<RectTransform> settingsPages = new List<RectTransform>();
-@@ -68,6 +70,7 @@ public sealed class GameMenu : MonoBehaviour
+@@ -68,6 +70,7 @@
  	private void Awake()
  	{
  		GameSettings.Load();
@@ -669,7 +659,7 @@ index 9fd3d6c..749d05d 100644
  	}
  
  	private void Start()
-@@ -432,7 +435,7 @@ public sealed class GameMenu : MonoBehaviour
+@@ -432,7 +435,7 @@
  		UIKit.Renew(parent, "Controls", "Layout rest");
  		Image guide = UIKit.Box(parent, "Controls", UIKit.Panel);
  		UIKit.Mark(guide.transform, "Layout rest");
@@ -678,7 +668,7 @@ index 9fd3d6c..749d05d 100644
  		UIKit.Place(UIKit.IconImage(guide.transform, "keyboard", UIKit.Accent, 34f).rectTransform, new Vector2(0f, 1f), new Vector2(34f, -34f), new Vector2(34f, 34f));
  		UIKit.Place(UIKit.Label(guide.transform, "CONTROLS", 30, UIKit.Text, TextAnchor.MiddleLeft, bold: true).rectTransform, new Vector2(0f, 1f), new Vector2(84f, -32f), new Vector2(500f, 40f));
  		float gy = -96f;
-@@ -458,7 +461,10 @@ public sealed class GameMenu : MonoBehaviour
+@@ -458,7 +461,10 @@
  		Row(new string[1] { "Wheel" }, "scope magnification (aiming through a scope)");
  		Row(new string[1] { "H" }, "drag a wounded comrade (again — let go)");
  		Row(new string[2] { "V", "F" }, "first-person view / leave the soldier");
@@ -690,7 +680,7 @@ index 9fd3d6c..749d05d 100644
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +701,44 @@ public sealed class GameMenu : MonoBehaviour
+@@ -695,6 +701,44 @@
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -703,11 +693,11 @@ index 9fd3d6c..749d05d 100644
 +		{
 +			GameSettings.Blood = i;
 +		});
-+		SwitchRow("Tanks", "A T-72 for one side and an M1 Abrams for the other at the start of the battle (from the next battle).", GameSettings.Tanks, delegate(bool b)
++		SwitchRow("Tanks", "Tanks and infantry fighting vehicles: T-72, T-90M and BMP-2 for one side, M1 Abrams, Leopard 2A6 and M2 Bradley for the other (from the next battle).", GameSettings.Tanks, delegate(bool b)
 +		{
 +			GameSettings.Tanks = b;
 +		});
-+		SwitchRow("Helicopters", "A Mi-8 for one side and a UH-60 Black Hawk for the other: they carry troops and support with the chin gun (from the next battle).", GameSettings.Helicopters, delegate(bool b)
++		SwitchRow("Helicopters", "Mi-8 and Mi-24 for one side, UH-60 Black Hawk and AH-64 Apache for the other: transports carry troops, gunships strike with rockets and cannon (from the next battle).", GameSettings.Helicopters, delegate(bool b)
 +		{
 +			GameSettings.Helicopters = b;
 +		});
@@ -736,10 +726,9 @@ index 9fd3d6c..749d05d 100644
  		{
  			GameSettings.Reset();
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
-index d817002..2d376e9 100644
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,34 @@ public static class GameSettings
+@@ -9,6 +9,34 @@
  {
  	public static float Volume = 0.9f;
  
@@ -774,7 +763,7 @@ index d817002..2d376e9 100644
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +214,15 @@ public static class GameSettings
+@@ -186,6 +214,15 @@
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
@@ -790,7 +779,7 @@ index d817002..2d376e9 100644
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +295,15 @@ public static class GameSettings
+@@ -258,6 +295,15 @@
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
@@ -806,7 +795,7 @@ index d817002..2d376e9 100644
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +350,14 @@ public static class GameSettings
+@@ -304,6 +350,14 @@
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
@@ -822,10 +811,9 @@ index d817002..2d376e9 100644
  	}
  
 diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
-index 25a7bcd..565eea2 100644
 --- a/CombatSandbox.Demo/GunMount.cs
 +++ b/CombatSandbox.Demo/GunMount.cs
-@@ -107,6 +107,44 @@ public sealed class GunMount
+@@ -107,6 +107,50 @@
  
  	public bool Casings = true;
  
@@ -858,19 +846,25 @@ index 25a7bcd..565eea2 100644
 +
 +	public static readonly string[] ShellNames = new string[2] { "HE-FRAG", "APFSDS" };
 +
++	public static readonly string[] AutoNames = new string[2] { "HEI-T", "AP-T" };
++
++	public bool Autocannon;
++
++	public float ApEnergy = 24f;
++
 +	public int Shell;
 +
 +	[NonSerialized]
 +	public int PendingShell = -1;
 +
-+	public string ShellName => ShellNames[Shell];
++	public string ShellName => Autocannon ? AutoNames[Shell] : ShellNames[Shell];
 +
-+	public float ShellSpeed => (Shell == 1) ? 1700f : Def.MuzzleVelocity;
++	public float ShellSpeed => Autocannon ? (Def.MuzzleVelocity * ((Shell == 1) ? 1.12f : 1f)) : ((Shell == 1) ? 1700f : Def.MuzzleVelocity);
 +
  	public Transform Turret;
  
  	public Transform Cradle;
-@@ -149,7 +187,9 @@ public sealed class GunMount
+@@ -149,7 +193,9 @@
  
  	public Quaternion BoreRotation => Bore;
  
@@ -881,7 +875,7 @@ index 25a7bcd..565eea2 100644
  
  	public float Kick => kick;
  
-@@ -246,9 +286,13 @@ public sealed class GunMount
+@@ -246,9 +292,13 @@
  			wantPitch = Mathf.Clamp(-8f, Lowest(yaw), MaxPitch);
  		}
  		float num2 = ((MaxTraverse >= 180f) ? Mathf.DeltaAngle(yaw, wantYaw) : (wantYaw - yaw));
@@ -896,7 +890,7 @@ index 25a7bcd..565eea2 100644
  		yaw += yawVelocity * dt;
  		if (MaxTraverse >= 180f)
  		{
-@@ -261,6 +305,13 @@ public sealed class GunMount
+@@ -261,6 +311,13 @@
  		}
  		pitch = Mathf.MoveTowards(pitch, Mathf.Max(wantPitch, Lowest(yaw)), dt * (flag ? (90f * num) : 20f));
  		kick = Mathf.MoveTowards(kick, 0f, dt * 0.9f);
@@ -904,13 +898,13 @@ index 25a7bcd..565eea2 100644
 +		{
 +			Shell = PendingShell;
 +			Rounds = 0;
-+			reloadUntil = Time.time + Def.Reload;
++			reloadUntil = Time.time + (Autocannon ? 1.5f : Def.Reload);
 +		}
 +		PendingShell = -1;
  		if (Rounds <= 0 && flag)
  		{
  			if (reloadUntil <= 0f)
-@@ -273,7 +324,26 @@ public sealed class GunMount
+@@ -273,7 +330,26 @@
  				reloadUntil = 0f;
  			}
  		}
@@ -938,7 +932,7 @@ index 25a7bcd..565eea2 100644
  		{
  			Shoot(arenaTarget);
  		}
-@@ -292,6 +362,11 @@ public sealed class GunMount
+@@ -292,6 +368,11 @@
  			Vector2 vector4 = UnityEngine.Random.insideUnitCircle * num;
  			Vector3 normalized2 = (vector2 + normalized * vector4.x + vector3 * vector4.y).normalized;
  			Vector3 inherit = vehicle.PointVelocity(vector);
@@ -950,7 +944,7 @@ index 25a7bcd..565eea2 100644
  			instance.Report(vector, Def, gunner);
  			if ((bool)Ballistics.Instance)
  			{
-@@ -314,6 +389,60 @@ public sealed class GunMount
+@@ -314,6 +395,91 @@
  		}
  	}
  
@@ -982,6 +976,11 @@ index 25a7bcd..565eea2 100644
 +
 +	private void FireShell(ReconstructionDemo instance, ArenaTarget gunner, Vector3 muzzle, Vector3 direction, Vector3 inherit)
 +	{
++		if (Autocannon)
++		{
++			FireRound(instance, gunner, muzzle, direction, inherit);
++			return;
++		}
 +		float num = Mathf.Clamp(Vector3.Distance(Aim, muzzle), 20f, 3000f);
 +		float num2 = num / ShellSpeed;
 +		direction = (direction * num + Vector3.up * 4.905f * num2 * num2).normalized;
@@ -1008,14 +1007,39 @@ index 25a7bcd..565eea2 100644
 +		nextShot = Time.time + Def.Interval;
 +	}
 +
++	private void FireRound(ReconstructionDemo instance, ArenaTarget gunner, Vector3 muzzle, Vector3 direction, Vector3 inherit)
++	{
++		float num = Mathf.Clamp(Vector3.Distance(Aim, muzzle), 20f, 2500f);
++		float num2 = num / ShellSpeed;
++		direction = (direction * num + Vector3.up * 4.905f * num2 * num2).normalized;
++		bool tracer = fired % 2 == 0;
++		if (Shell == 1)
++		{
++			TankShell.Fire(gunner, vehicle, muzzle, direction * ShellSpeed + inherit, 2, ApEnergy, tracer, 5f);
++		}
++		else
++		{
++			TankShell.Fire(gunner, vehicle, muzzle, direction * ShellSpeed + inherit, 3, 0.4f, tracer, 5f);
++		}
++		instance.Report(muzzle, Def, gunner);
++		if ((bool)ShotEffects.Instance)
++		{
++			ShotEffects.Instance.Flash(muzzle, direction, Def.Flash);
++		}
++		vehicle.Body.AddForceAtPosition(-direction * 12f * Def.Recoil, muzzle, ForceMode.Impulse);
++		kick = Mathf.Min(0.08f, kick + 0.03f);
++		Rounds--;
++		fired++;
++		nextShot = Time.time + Def.Interval * UnityEngine.Random.Range(1f, 1.04f);
++	}
++
  	public void Visual()
  	{
  		if ((bool)Turret)
 diff --git a/CombatSandbox.Demo/GunnerSight.cs b/CombatSandbox.Demo/GunnerSight.cs
-index cf704f9..1388976 100644
 --- a/CombatSandbox.Demo/GunnerSight.cs
 +++ b/CombatSandbox.Demo/GunnerSight.cs
-@@ -260,9 +260,9 @@ public sealed class GunnerSight : MonoBehaviour
+@@ -260,9 +260,9 @@
  		Text(num30 - 40f * u, num31 + num33 * 0.5f + 12f * u, "BRG " + ((num34 >= 0f) ? "+" : "-") + Mathf.Abs(Mathf.RoundToInt(num34)).ToString("000"), small);
  		float num35 = num2 - num14 - 150f * u;
  		Text(num14 + 14f * u, num35, "RNG " + ((range < 0f) ? "----" : Mathf.RoundToInt(range).ToString("0000")) + " m", big);
@@ -1027,7 +1051,7 @@ index cf704f9..1388976 100644
  		bool flag2 = Mathf.Repeat(Time.unscaledTime, 1f) < 0.6f;
  		Text(num - num14 - 14f * u, num14 + 14f * u, (flag2 ? "● " : "  ") + "REC  " + DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss"), small, TextAnchor.UpperRight);
  		Text(num - num14 - 14f * u, num14 + 38f * u, Vehicle.Kind.ToUpperInvariant() + "  RWS  CH1  " + (Time.time - since).ToString("000.0"), small, TextAnchor.UpperRight);
-@@ -280,6 +280,7 @@ public sealed class GunnerSight : MonoBehaviour
+@@ -280,6 +280,7 @@
  		void Text(float x, float y, string s, GUIStyle st, TextAnchor a = TextAnchor.UpperLeft)
  		{
  			st.alignment = a;
@@ -1036,10 +1060,9 @@ index cf704f9..1388976 100644
  			{
  				TextAnchor.UpperRight => 400f * u, 
 diff --git a/CombatSandbox.Demo/Motorpool.cs b/CombatSandbox.Demo/Motorpool.cs
-index 1642108..6f5a058 100644
 --- a/CombatSandbox.Demo/Motorpool.cs
 +++ b/CombatSandbox.Demo/Motorpool.cs
-@@ -43,6 +43,12 @@ public sealed class Motorpool : MonoBehaviour
+@@ -43,6 +43,12 @@
  
  		public float Unmanned;
  
@@ -1052,7 +1075,7 @@ index 1642108..6f5a058 100644
  		public bool Moving
  		{
  			get
-@@ -327,6 +333,10 @@ public sealed class Motorpool : MonoBehaviour
+@@ -327,6 +333,10 @@
  			Say(t.Team, v.Kind + " has lost its driver - the men get out");
  			return;
  		}
@@ -1063,7 +1086,7 @@ index 1642108..6f5a058 100644
  		switch (t.Stage)
  		{
  		case Stage.Loading:
-@@ -366,6 +376,182 @@ public sealed class Motorpool : MonoBehaviour
+@@ -366,6 +376,182 @@
  		}
  	}
  
@@ -1246,7 +1269,7 @@ index 1642108..6f5a058 100644
  	private void Go(Task t, Stage s)
  	{
  		t.Stage = s;
-@@ -401,7 +587,7 @@ public sealed class Motorpool : MonoBehaviour
+@@ -401,7 +587,7 @@
  			select c.p).FirstOrDefault();
  		if (num == 0 && num2 == 0)
  		{
@@ -1255,7 +1278,7 @@ index 1642108..6f5a058 100644
  				select (b: b, goal: Goal(b))).ToList();
  			if ((bool)capturePoint)
  			{
-@@ -410,7 +596,7 @@ public sealed class Motorpool : MonoBehaviour
+@@ -410,7 +596,7 @@
  			}
  			else if (list.Count > 0)
  			{
@@ -1264,7 +1287,7 @@ index 1642108..6f5a058 100644
  					group g by Key(g.goal) into g
  					orderby g.Count() descending
  					select g).First();
-@@ -447,7 +633,7 @@ public sealed class Motorpool : MonoBehaviour
+@@ -447,7 +633,7 @@
  			}
  		}
  		bool flag = v.Riders.Any((ArenaTarget r) => (bool)r && r.Boarding);
@@ -1273,7 +1296,7 @@ index 1642108..6f5a058 100644
  		bool flag2 = !flag && ((num >= 2 && num2 == 0 && age > 8f) || (num >= 1 && num2 == 0 && age > 18f) || (num >= 1 && (bool)capturePoint && t.Point == capturePoint && age > 12f && num2 == 0) || (num >= 1 && age > 40f));
  		if (num5 || flag2)
  		{
-@@ -496,6 +682,10 @@ public sealed class Motorpool : MonoBehaviour
+@@ -496,6 +682,10 @@
  	{
  		Vehicle v = t.V;
  		t.HasSuppress = KnownEnemy(t.Team, t.Point ? t.Point.transform.position : t.Target, 70f, out t.Suppress);
@@ -1285,10 +1308,9 @@ index 1642108..6f5a058 100644
  			where c.team == t.Team && c.p != t.Point
  			orderby Flat(c.p.transform.position - v.transform.position).magnitude
 diff --git a/CombatSandbox.Demo/ReconstructionDemo.cs b/CombatSandbox.Demo/ReconstructionDemo.cs
-index d0e18db..e38c37b 100644
 --- a/CombatSandbox.Demo/ReconstructionDemo.cs
 +++ b/CombatSandbox.Demo/ReconstructionDemo.cs
-@@ -1355,6 +1355,11 @@ public sealed class ReconstructionDemo : MonoBehaviour
+@@ -1355,6 +1355,11 @@
  				component.LastAttacker = attacker;
  				component.LastAttackTime = Time.time;
  			}
@@ -1300,17 +1322,16 @@ index d0e18db..e38c37b 100644
  			component.Hit(zone, point, direction, normal, energy);
  			bool arterial = (component.LastOrgans & Organ.Artery) != 0;
  			bool venous = (component.LastOrgans & Organ.Vein) != 0;
-@@ -1450,13 +1455,20 @@ public sealed class ReconstructionDemo : MonoBehaviour
+@@ -1450,13 +1455,20 @@
  			component.Rifle.Spatter(traces, position, direction, 0.025f);
  		}
  		BloodRng.Eject();
 -		for (int i = 0; i < 22; i++)
--		{
--			Vector3 vector = new Vector3(BloodRng.Range(-1f, 1f), BloodRng.Range(-0.4f, 1.2f), BloodRng.Range(-1f, 1f));
--			float num = ((i < 12) ? BloodRng.Range(0.0013f, 0.0028f) : ((i < 19) ? BloodRng.Range(0.0028f, 0.0045f) : BloodRng.Range(0.0045f, 0.0062f)));
 +		int num3 = Mathf.RoundToInt(22f * GameSettings.BloodSplash[Mathf.Clamp(GameSettings.Blood, 0, 2)]);
 +		for (int i = 0; i < num3; i++)
-+		{
+ 		{
+-			Vector3 vector = new Vector3(BloodRng.Range(-1f, 1f), BloodRng.Range(-0.4f, 1.2f), BloodRng.Range(-1f, 1f));
+-			float num = ((i < 12) ? BloodRng.Range(0.0013f, 0.0028f) : ((i < 19) ? BloodRng.Range(0.0028f, 0.0045f) : BloodRng.Range(0.0045f, 0.0062f)));
 +			int num4 = i % 22;
 +			float num5 = ((i < 22) ? 1f : BloodRng.Range(0.7f, 1.45f));
 +			Vector3 vector = new Vector3(BloodRng.Range(-1f, 1f), BloodRng.Range(-0.4f, 1.2f), BloodRng.Range(-1f, 1f)) * num5;
@@ -1328,10 +1349,9 @@ index d0e18db..e38c37b 100644
  				zone.Owner.GetComponent<ArenaTarget>()?.ApplyBloodLoss(num2);
  			}
 diff --git a/CombatSandbox.Demo/UIKit.cs b/CombatSandbox.Demo/UIKit.cs
-index be2ff84..b0ac6a0 100644
 --- a/CombatSandbox.Demo/UIKit.cs
 +++ b/CombatSandbox.Demo/UIKit.cs
-@@ -66,6 +66,7 @@ public static class UIKit
+@@ -66,6 +66,7 @@
  	{
  		get
  		{
@@ -1339,7 +1359,7 @@ index be2ff84..b0ac6a0 100644
  			if ((bool)font)
  			{
  				return font;
-@@ -466,7 +467,7 @@ public static class UIKit
+@@ -466,7 +467,7 @@
  			text2.fontSize = size;
  			text2.color = color;
  			text2.alignment = align;
@@ -1348,7 +1368,7 @@ index be2ff84..b0ac6a0 100644
  			text2.raycastTarget = false;
  			text2.supportRichText = true;
  			text2.fontStyle = (bold ? FontStyle.Bold : FontStyle.Normal);
-@@ -707,6 +708,7 @@ public static class UIKit
+@@ -707,6 +708,7 @@
  
  	public static float KeyCap(Transform parent, string key, Vector2 position, Vector2 anchor, int size = 15)
  	{
@@ -1357,10 +1377,9 @@ index be2ff84..b0ac6a0 100644
  		Image image = Box(parent, "Key " + key, new Color(0.85f, 0.87f, 0.86f, 0.95f));
  		Place(image.rectTransform, anchor, position, new Vector2(num, 28f));
 diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
-index 3a35c45..af3163a 100644
 --- a/CombatSandbox.Demo/Vehicle.cs
 +++ b/CombatSandbox.Demo/Vehicle.cs
-@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
+@@ -9,7 +9,7 @@
  namespace CombatSandbox.Demo;
  
  [DefaultExecutionOrder(10)]
@@ -1369,7 +1388,7 @@ index 3a35c45..af3163a 100644
  {
  	public struct Wheel
  	{
-@@ -486,6 +486,24 @@ public abstract class Vehicle : MonoBehaviour
+@@ -486,6 +486,27 @@
  					typeof(QuadBike),
  					typeof(QuadBike)
  				});
@@ -1378,23 +1397,26 @@ index 3a35c45..af3163a 100644
 +				bool flag = attacker >= 0 && attacker != i;
 +				Type item = ((i == 0) ? typeof(T72) : typeof(Abrams));
 +				Type item2 = ((i == 0) ? typeof(M113) : typeof(Btr));
++				Type item3 = ((i == 0) ? typeof(T90) : typeof(Leopard2));
++				Type item4 = ((i == 0) ? typeof(Bmp2) : typeof(Bradley));
++				Type item5 = ((i == 0) ? typeof(Mi24) : typeof(Apache));
 +				if (GameSettings.Helicopters && !flag)
 +				{
-+					list.Insert(0, typeof(Helicopter));
++					list.InsertRange(0, new Type[2] { item5, typeof(Helicopter) });
 +				}
 +				if (GameSettings.Tanks && !flag)
 +				{
-+					list.Insert(0, item);
++					list.InsertRange(0, new Type[3] { item, item3, item4 });
 +				}
 +				if (attacker == i)
 +				{
-+					list.InsertRange(0, new Type[4] { item, item, item2, item2 });
++					list.InsertRange(0, new Type[4] { item, item3, item4, item2 });
 +				}
 +				array = list.ToArray();
  				for (int j = 0; j < array.Length; j++)
  				{
  					Place(array[j], i, @base.position, toward);
-@@ -497,7 +515,7 @@ public abstract class Vehicle : MonoBehaviour
+@@ -497,7 +518,7 @@
  	private static bool Place(Type kind, int team, Vector3 centre, Vector3 toward)
  	{
  		Vector3 vector = HalfSize(kind);
@@ -1403,7 +1425,7 @@ index 3a35c45..af3163a 100644
  		{
  			for (int i = 0; i < 11; i++)
  			{
-@@ -518,6 +536,18 @@ public abstract class Vehicle : MonoBehaviour
+@@ -518,6 +539,42 @@
  
  	private static Vector3 HalfSize(Type kind)
  	{
@@ -1419,10 +1441,34 @@ index 3a35c45..af3163a 100644
 +		{
 +			return new Vector3(1.9f, 1.25f, 4.1f);
 +		}
++		if (kind == typeof(T90))
++		{
++			return new Vector3(1.85f, 1.2f, 3.6f);
++		}
++		if (kind == typeof(Leopard2))
++		{
++			return new Vector3(1.95f, 1.25f, 4.4f);
++		}
++		if (kind == typeof(Bmp2))
++		{
++			return new Vector3(1.5f, 1.1f, 3.4f);
++		}
++		if (kind == typeof(Bradley))
++		{
++			return new Vector3(1.75f, 1.4f, 3.3f);
++		}
++		if (kind == typeof(Mi24))
++		{
++			return new Vector3(3.4f, 1.9f, 9.2f);
++		}
++		if (kind == typeof(Apache))
++		{
++			return new Vector3(2.6f, 1.9f, 8.2f);
++		}
  		if (!(kind == typeof(Btr)))
  		{
  			if (!(kind == typeof(M113)))
-@@ -1002,12 +1032,49 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1002,12 +1059,49 @@
  		}
  	}
  
@@ -1472,7 +1518,7 @@ index 3a35c45..af3163a 100644
  		if (spec.Armoured)
  		{
  			if (energy < spec.ArmourEnergy)
-@@ -1015,11 +1082,16 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1015,11 +1109,16 @@
  				return;
  			}
  			energy = (energy - spec.ArmourEnergy) * 0.6f;
@@ -1489,7 +1535,7 @@ index 3a35c45..af3163a 100644
  		Vector3 vector = Local(point + direction.normalized * 0.05f) - spec.EngineCentre;
  		Vector3 vector2 = spec.EngineSize * 0.5f + Vector3.one * 0.06f;
  		bool flag = Mathf.Abs(vector.x) < vector2.x && Mathf.Abs(vector.y) < vector2.y && Mathf.Abs(vector.z) < vector2.z;
-@@ -1063,6 +1135,7 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1063,6 +1162,7 @@
  
  	public static void Blast(Vector3 centre, float power)
  	{
@@ -1497,7 +1543,7 @@ index 3a35c45..af3163a 100644
  		Vehicle[] array = All.ToArray();
  		foreach (Vehicle vehicle in array)
  		{
-@@ -1092,12 +1165,13 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1092,12 +1192,13 @@
  				continue;
  			}
  			float num4 = Mathf.Clamp01(1f - num3 / num2);
@@ -1512,7 +1558,7 @@ index 3a35c45..af3163a 100644
  				if (flag)
  				{
  					vehicle.Spall(vector);
-@@ -1311,6 +1385,7 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1311,6 +1412,7 @@
  				Passing();
  			}
  			ClearDead(fixedDeltaTime);
@@ -1520,7 +1566,7 @@ index 3a35c45..af3163a 100644
  			if (Time.time < unstickUntil && !Wrecked)
  			{
  				unstickHelp = Mathf.MoveTowards(unstickHelp, 1f, fixedDeltaTime / 3f);
-@@ -1446,8 +1521,10 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1446,8 +1548,10 @@
  				{
  					num11 *= 1f - Steer / spec.MaxSteer * 0.6f * Mathf.Sign(wheel.At.x);
  				}
@@ -1534,10 +1580,9 @@ index 3a35c45..af3163a 100644
  			}
  			if (spec.Tracked && flag)
 diff --git a/CombatSandbox/BloodDroplets.cs b/CombatSandbox/BloodDroplets.cs
-index 32950e7..69cfe9c 100644
 --- a/CombatSandbox/BloodDroplets.cs
 +++ b/CombatSandbox/BloodDroplets.cs
-@@ -7,9 +7,9 @@ namespace CombatSandbox;
+@@ -7,9 +7,9 @@
  
  public sealed class BloodDroplets : IDisposable
  {
@@ -1549,7 +1594,7 @@ index 32950e7..69cfe9c 100644
  
  	private readonly ParticleSystem system;
  
-@@ -70,7 +70,7 @@ public sealed class BloodDroplets : IDisposable
+@@ -70,7 +70,7 @@
  		ParticleSystem.MainModule main = system.main;
  		main.loop = true;
  		main.playOnAwake = false;
@@ -1559,10 +1604,9 @@ index 32950e7..69cfe9c 100644
  		main.startSpeed = 0f;
  		main.startLifetime = 1000f;
 diff --git a/CombatSandbox/Physiology.cs b/CombatSandbox/Physiology.cs
-index c126827..5dcf3fa 100644
 --- a/CombatSandbox/Physiology.cs
 +++ b/CombatSandbox/Physiology.cs
-@@ -51,6 +51,10 @@ public sealed class Physiology
+@@ -51,6 +51,10 @@
  
  	public DeathCause Cause { get; private set; }
  
@@ -1573,7 +1617,7 @@ index c126827..5dcf3fa 100644
  	public float HeartPhase { get; private set; }
  
  	public float Stun { get; private set; }
-@@ -85,6 +89,8 @@ public sealed class Physiology
+@@ -85,6 +89,8 @@
  		bool legsParalyzed = (ArmsParalyzed = flag2);
  		LegsParalyzed = legsParalyzed;
  		Cause = DeathCause.None;
@@ -1582,7 +1626,7 @@ index c126827..5dcf3fa 100644
  		Stun = 0f;
  		InShock = false;
  	}
-@@ -95,7 +101,18 @@ public sealed class Physiology
+@@ -95,7 +101,18 @@
  		Stress(Mathf.Clamp01(0.35f + severity * 0.4f));
  		if ((organs & Organ.Brain) != 0)
  		{
@@ -1602,7 +1646,7 @@ index c126827..5dcf3fa 100644
  		}
  		if ((organs & Organ.CervicalSpine) != 0)
  		{
-@@ -180,7 +197,17 @@ public sealed class Physiology
+@@ -180,7 +197,17 @@
  		float num2 = (BreathingParalyzed ? 0f : Mathf.Clamp01(1f - LungDamage * 0.42f));
  		Oxygen = Mathf.MoveTowards(Oxygen, num2, dt * ((!(num2 < Oxygen)) ? 0.02f : (BreathingParalyzed ? 0.018f : 0.012f)));
  		Stun = Mathf.MoveTowards(Stun, 0f, dt / 14f);
@@ -1621,7 +1665,7 @@ index c126827..5dcf3fa 100644
  		Consciousness = Mathf.MoveTowards(Consciousness, num3, dt * ((num3 < Consciousness) ? 0.35f : 0.12f));
  		Adrenaline = Mathf.MoveTowards(Adrenaline, 0f, dt / 45f);
  		float num4 = 72f + Adrenaline * 55f + (1f - num) * 190f + LungDamage * 20f;
-@@ -198,6 +225,10 @@ public sealed class Physiology
+@@ -198,6 +225,10 @@
  		{
  			b = Mathf.Lerp(5f, b, Consciousness * 4f);
  		}
@@ -1632,7 +1676,7 @@ index c126827..5dcf3fa 100644
  		BreathRate = Mathf.Lerp(BreathRate, b, dt * 0.6f);
  		HeartPhase += dt * HeartRate / 60f;
  		BreathPhase += dt * BreathRate / 60f;
-@@ -230,6 +261,7 @@ public sealed class Physiology
+@@ -230,6 +261,7 @@
  			}
  			organRate *= 0.6f;
  			gutRate *= 0.6f;
@@ -1641,10 +1685,9 @@ index c126827..5dcf3fa 100644
  	}
  
 diff --git a/CombatSandbox/WoundBleeding.cs b/CombatSandbox/WoundBleeding.cs
-index 503ec9f..804992e 100644
 --- a/CombatSandbox/WoundBleeding.cs
 +++ b/CombatSandbox/WoundBleeding.cs
-@@ -101,6 +101,8 @@ public sealed class WoundBleeding : MonoBehaviour
+@@ -101,6 +101,8 @@
  
  	private System.Random random;
  
@@ -1653,7 +1696,7 @@ index 503ec9f..804992e 100644
  	public int WoundCount { get; private set; }
  
  	public float BloodLostMl { get; private set; }
-@@ -286,7 +288,7 @@ public sealed class WoundBleeding : MonoBehaviour
+@@ -286,7 +288,7 @@
  		{
  			deadAge += num;
  		}
