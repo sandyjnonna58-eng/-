@@ -52,7 +52,7 @@ public sealed class Leopard2 : Tank
 			MaxTorque = 100000f,
 			ReverseTorque = 46000f,
 			Power = 810000f,
-			TopSpeed = 19f,
+			TopSpeed = 18f,
 			ReverseTop = 8f,
 			BrakeTorque = 15000f,
 			EngineBrake = 1800f,
@@ -66,9 +66,9 @@ public sealed class Leopard2 : Tank
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 1f, -2.6f),
 			EngineSize = new Vector3(2f, 0.8f, 1.6f),
-			EngineHealth = 1300f,
+			EngineHealth = 1250f,
 			Armoured = true,
-			ArmourEnergy = 36f,
+			ArmourEnergy = 35f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0.5f, 1.45f, 2.7f),

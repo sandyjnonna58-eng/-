@@ -53,7 +53,7 @@ public sealed class Bradley : Ifv
 			MaxTorque = 55000f,
 			ReverseTorque = 24000f,
 			Power = 330000f,
-			TopSpeed = 17f,
+			TopSpeed = 17.5f,
 			ReverseTop = 6f,
 			BrakeTorque = 9000f,
 			EngineBrake = 1000f,
@@ -67,9 +67,9 @@ public sealed class Bradley : Ifv
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0.55f, 1.3f, 2f),
 			EngineSize = new Vector3(1f, 0.9f, 1.4f),
-			EngineHealth = 600f,
+			EngineHealth = 520f,
 			Armoured = true,
-			ArmourEnergy = 16f,
+			ArmourEnergy = 15f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(-0.68f, 2.15f, 1.25f),

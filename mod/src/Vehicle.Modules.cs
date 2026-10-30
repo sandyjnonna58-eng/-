@@ -525,6 +525,11 @@ public abstract partial class Vehicle
 
 	public float ArmourRating => spec.ArmourEnergy;
 
+	public static void ResetArea()
+	{
+		area = default(Bounds);
+	}
+
 	public static bool Pierce(Collider c, Vector3 point, Vector3 direction, float energy)
 	{
 		if (!c || !byCollider.TryGetValue(c, out var value) || !value)

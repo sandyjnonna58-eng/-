@@ -254,6 +254,10 @@ internal sealed class PolyMesh
 		{
 			name = name
 		};
+		if (v.Count > 65000)
+		{
+			mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+		}
 		mesh.SetVertices(v);
 		mesh.SetTriangles(t, 0);
 		mesh.RecalculateNormals();

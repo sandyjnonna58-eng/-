@@ -105,7 +105,7 @@ public sealed class Abrams : Tank
 			MaxTorque = 85000f,
 			ReverseTorque = 36000f,
 			Power = 840000f,
-			TopSpeed = 18f,
+			TopSpeed = 17f,
 			ReverseTop = 5f,
 			BrakeTorque = 14000f,
 			EngineBrake = 1800f,
@@ -119,9 +119,9 @@ public sealed class Abrams : Tank
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 0.95f, -2.9f),
 			EngineSize = new Vector3(2f, 0.8f, 1.6f),
-			EngineHealth = 1300f,
+			EngineHealth = 1200f,
 			Armoured = true,
-			ArmourEnergy = 35f,
+			ArmourEnergy = 33f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0f, 1.42f, 2.6f),

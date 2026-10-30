@@ -20,7 +20,7 @@ public sealed class Apache : Gunship
 
 	protected override Vector3[] Pods => ApacheMeshes.Pods;
 
-	protected override int RocketLoad => 38;
+	protected override int RocketLoad => 40;
 
 	protected override Vector3 FlagMount => new Vector3(0f, 2.5f, -8.2f);
 
@@ -81,9 +81,9 @@ public sealed class Apache : Gunship
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 2.45f, -0.8f),
 			EngineSize = new Vector3(2.2f, 0.7f, 2.9f),
-			EngineHealth = 360f,
+			EngineHealth = 400f,
 			Armoured = true,
-			ArmourEnergy = 6f,
+			ArmourEnergy = 8f,
 			Hatches = new Vector3[2]
 			{
 				new Vector3(0f, 2.9f, 0.4f),
@@ -118,7 +118,7 @@ public sealed class Apache : Gunship
 				Lean = 6f
 			}
 		};
-		atgmLoad = 8;
+		atgmLoad = 6;
 		atgmRails = new Vector3[8]
 		{
 			new Vector3(-2.3f, 1.45f, 1.3f),

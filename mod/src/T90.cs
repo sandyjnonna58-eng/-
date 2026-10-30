@@ -52,7 +52,7 @@ public sealed class T90 : Tank
 			MaxTorque = 76000f,
 			ReverseTorque = 32000f,
 			Power = 620000f,
-			TopSpeed = 17f,
+			TopSpeed = 18f,
 			ReverseTop = 4.5f,
 			BrakeTorque = 12500f,
 			EngineBrake = 1500f,
@@ -66,9 +66,9 @@ public sealed class T90 : Tank
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 1f, -2.4f),
 			EngineSize = new Vector3(1.9f, 0.8f, 1.6f),
-			EngineHealth = 1200f,
+			EngineHealth = 1250f,
 			Armoured = true,
-			ArmourEnergy = 33f,
+			ArmourEnergy = 35f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0f, 1.55f, 2.45f),

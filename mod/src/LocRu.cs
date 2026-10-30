@@ -1062,5 +1062,9 @@ internal static class LocRu
 		yield return ("Air support not ready:", "Авиаподдержка не готова:");
 		yield return ("call an air strike where you aim (once in 90 s)", "вызвать авиаудар туда, куда целитесь (раз в 90 с)");
 		yield return ("launch an ATGM (BMP-2, Bradley, Mi-24, Apache): it flies where you keep the sight", "пуск ПТУР (БМП-2, «Брэдли», Ми-24, «Апач»): ракета летит туда, куда вы держите прицел");
+		yield return ("Equal forces", "Равные силы");
+		yield return ("Both sides get the same number of soldiers (the smaller team is filled up), and each tank, IFV and helicopter has an equal counterpart on the other side (from the next battle).", "У обеих сторон одинаковое число бойцов (меньший отряд дополняется), а у каждого танка, БМП и вертолёта есть равный по силе противник на другой стороне (со следующего боя).");
+		yield return ("Big map", "Большая карта");
+		yield return ("A large generated battlefield, a kilometre across: hills, tree belts, ruined villages, rocks and sandbag lines, the bases about 800 m apart (from the next battle, not in the capture mode; loading takes longer).", "Большое поле боя километр на километр: холмы, лесополосы, разрушенные деревни, камни и позиции из мешков, базы примерно в 800 м друг от друга (со следующего боя, не в режиме захвата; загрузка дольше).");
 	}
 }

@@ -111,9 +111,9 @@ public sealed class Mi24 : Gunship
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 3.05f, 0.1f),
 			EngineSize = new Vector3(1.7f, 0.6f, 4.2f),
-			EngineHealth = 420f,
+			EngineHealth = 400f,
 			Armoured = true,
-			ArmourEnergy = 9f,
+			ArmourEnergy = 8f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0f, 3.1f, 0.4f),
@@ -153,7 +153,7 @@ public sealed class Mi24 : Gunship
 			Bench(1, 1.8f),
 			Bench(1, 0.9f)
 		};
-		atgmLoad = 4;
+		atgmLoad = 6;
 		atgmRails = new Vector3[4]
 		{
 			new Vector3(-3.36f, 1.2f, 0.7f),

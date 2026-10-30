@@ -41,7 +41,32 @@ diff --git a/CombatSandbox.Demo/ArenaTarget.cs b/CombatSandbox.Demo/ArenaTarget.
 diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDirector.cs
 --- a/CombatSandbox.Demo/BattleDirector.cs
 +++ b/CombatSandbox.Demo/BattleDirector.cs
-@@ -469,6 +469,8 @@
+@@ -454,13 +454,23 @@
+ 		{
+ 			base.gameObject.AddComponent<Atmosphere>();
+ 		}
+-		if (SceneManager.GetActiveScene().name == "DeadGround" && !UnityEngine.Object.FindFirstObjectByType<Panorama>())
++		if (SceneManager.GetActiveScene().name == "DeadGround" && !BigMap.Wanted && !UnityEngine.Object.FindFirstObjectByType<Panorama>())
+ 		{
+ 			new GameObject("Panorama").AddComponent<Panorama>();
+ 		}
+ 		Host.Friendly = (ArenaTarget shooter, ArenaTarget listener) => (bool)shooter && (bool)listener && (bool)shooter.Brain && (bool)listener.Brain && shooter.Brain.Team == listener.Brain.Team;
+ 		ReconstructionDemo host = Host;
+ 		host.ShotFired = (Action<Vector3, ArenaTarget>)Delegate.Combine(host.ShotFired, new Action<Vector3, ArenaTarget>(CombatBrain.HearShot));
++		Vehicle.ResetArea();
++		if (BigMap.Setup(this))
++		{
++			foreach (CombatBrain item in Soldiers.ToList())
++			{
++				CombatBrain.All.Remove(item);
++				Host.Unregister(item.Body);
++				UnityEngine.Object.Destroy(item.gameObject);
++			}
++		}
+ 		foreach (CombatBrain soldier in Soldiers)
+ 		{
+ 			Dress(soldier.gameObject, Mathf.Clamp(soldier.Team, 0, 1));
+@@ -469,6 +479,8 @@
  		}
  		ApplyRosters();
  		WarStart();
@@ -50,7 +75,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		if (Vehicle.MapHasVehicles)
  		{
  			VehicleNav.Build();
-@@ -507,6 +509,10 @@
+@@ -507,6 +519,10 @@
  		{
  			base.gameObject.AddComponent<CommandWheel>();
  		}
@@ -61,7 +86,58 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		if ((bool)Acoustics.Instance)
  		{
  			Acoustics.Instance.Ambience = AmbientBattle && GameSettings.Ambience;
-@@ -593,6 +599,20 @@
+@@ -532,6 +548,15 @@
+ 
+ 	private void ApplyRosters()
+ 	{
++		int equal = 0;
++		if (GameSettings.EqualForces)
++		{
++			MaxSoldiers = Mathf.Max(MaxSoldiers, Strength(0) + Strength(1) + 4);
++			for (int e = 0; e < 2; e++)
++			{
++				equal = Mathf.Max(equal, (BattleSetup.Teams[e] ?? ((Rosters.Teams.Count > e) ? Rosters.Teams[e] : Rosters.Squad(Teams[e].Name, Teams[e].Name))).Units.Count);
++			}
++		}
+ 		int t;
+ 		for (t = 0; t < 2; t++)
+ 		{
+@@ -554,9 +579,10 @@
+ 				}
+ 			}
+ 			List<CombatBrain> list = Soldiers.Where((CombatBrain b) => b.Team == t).OrderBy((CombatBrain b) => b.name, StringComparer.Ordinal).ToList();
+-			for (int i = 0; i < Mathf.Max(list.Count, teamRoster.Units.Count); i++)
++			int strength = ((teamRoster.Units.Count > 0) ? Mathf.Max(teamRoster.Units.Count, equal) : 0);
++			for (int i = 0; i < Mathf.Max(list.Count, strength); i++)
+ 			{
+-				if (i >= teamRoster.Units.Count)
++				if (i >= strength)
+ 				{
+ 					CombatBrain combatBrain = list[i];
+ 					CombatBrain.All.Remove(combatBrain);
+@@ -564,15 +590,17 @@
+ 					UnityEngine.Object.Destroy(combatBrain.gameObject);
+ 					continue;
+ 				}
+-				UnitLoadout unitLoadout = teamRoster.Units[i];
+-				CombatBrain combatBrain2 = ((i < list.Count) ? list[i] : Spawn(t, BasePoint(t), unitLoadout.Duty));
++				UnitLoadout unitLoadout = teamRoster.Units[i % teamRoster.Units.Count];
++				bool spare = i >= teamRoster.Units.Count;
++				CombatBrain.Role duty = ((spare && unitLoadout.Duty == CombatBrain.Role.Commander) ? CombatBrain.Role.Rifleman : unitLoadout.Duty);
++				CombatBrain combatBrain2 = ((i < list.Count) ? list[i] : Spawn(t, BasePoint(t), duty));
+ 				if (!combatBrain2)
+ 				{
+ 					break;
+ 				}
+-				combatBrain2.name = unitLoadout.Name;
++				combatBrain2.name = (spare ? (unitLoadout.Name + " " + (i / teamRoster.Units.Count + 1)) : unitLoadout.Name);
+ 				combatBrain2.RosterIndex = i;
+-				combatBrain2.PlannedRole = unitLoadout.Duty;
++				combatBrain2.PlannedRole = duty;
+ 				combatBrain2.Equip(unitLoadout.Primary, unitLoadout.Pistol, unitLoadout.Grenades);
+ 			}
+ 		}
+@@ -593,6 +621,20 @@
  		brain.SightRange = 120f * Mathf.Min(num, 1.8f);
  		brain.SpotDistance = 28f * Mathf.Pow(num, 0.55f);
  		brain.EngageRange = 65f * Mathf.Lerp(1f, num, 0.45f);
@@ -82,7 +158,36 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  	}
  
  	public Vector3 BasePoint(int team)
-@@ -915,7 +935,7 @@
+@@ -688,6 +730,16 @@
+ 		return (TeamRoster)obj;
+ 	}
+ 
++	public int Strength(int team)
++	{
++		int num = RosterOf(team).Units.Count;
++		if (GameSettings.EqualForces && num > 0)
++		{
++			num = Mathf.Max(num, RosterOf(1 - team).Units.Count);
++		}
++		return num;
++	}
++
+ 	public CombatBrain SpawnUnit(int team, int index, Vector3 at)
+ 	{
+ 		TeamRoster teamRoster = RosterOf(team);
+@@ -695,9 +747,9 @@
+ 		{
+ 			return Spawn(team, at);
+ 		}
+-		UnitLoadout unitLoadout = teamRoster.Units[Mathf.Clamp(index, 0, teamRoster.Units.Count - 1)];
++		UnitLoadout unitLoadout = teamRoster.Units[Mathf.Max(0, index) % teamRoster.Units.Count];
+ 		CombatBrain.Role role = unitLoadout.Duty;
+-		if (role == CombatBrain.Role.Commander && (bool)CommanderOf(team))
++		if (role == CombatBrain.Role.Commander && ((bool)CommanderOf(team) || index >= teamRoster.Units.Count))
+ 		{
+ 			role = CombatBrain.Role.Rifleman;
+ 		}
+@@ -915,7 +967,7 @@
  			return;
  		}
  		bool overUI = (bool)EventSystem.current && EventSystem.current.IsPointerOverGameObject();
@@ -91,7 +196,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1323,33 @@
+@@ -1303,6 +1355,33 @@
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
@@ -125,7 +230,7 @@ diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDir
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1643,40 @@
+@@ -1596,6 +1675,40 @@
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -285,6 +390,29 @@ diff --git a/CombatSandbox.Demo/Buggy.cs b/CombatSandbox.Demo/Buggy.cs
 diff --git a/CombatSandbox.Demo/CaptureMode.cs b/CombatSandbox.Demo/CaptureMode.cs
 --- a/CombatSandbox.Demo/CaptureMode.cs
 +++ b/CombatSandbox.Demo/CaptureMode.cs
+@@ -184,11 +184,11 @@
+ 		TicketsAtStart = ((StartTickets > 0) ? StartTickets : Mathf.RoundToInt((float)(Mathf.Clamp(num * 9, 60, 220) * GameSettings.TicketsPercent) / 100f));
+ 		ApplySettings();
+ 		Tickets[0] = (Tickets[1] = TicketsAtStart);
+-		director.MaxSoldiers = Mathf.Max(director.MaxSoldiers, director.RosterOf(0).Units.Count + director.RosterOf(1).Units.Count + 6);
++		director.MaxSoldiers = Mathf.Max(director.MaxSoldiers, director.Strength(0) + director.Strength(1) + 6);
+ 		for (int i = 0; i < 2; i++)
+ 		{
+ 			unitOf[i].Clear();
+-			int count = director.RosterOf(i).Units.Count;
++			int count = director.Strength(i);
+ 			for (int j = 0; j < count; j++)
+ 			{
+ 				unitOf[i].Add(null);
+@@ -259,7 +259,7 @@
+ 		BodiesKept = GameSettings.BodiesKept;
+ 		if ((bool)Director)
+ 		{
+-			Director.MaxSoldiers = Mathf.Max(GameSettings.SoldierLimit, Director.RosterOf(0).Units.Count + Director.RosterOf(1).Units.Count + 6);
++			Director.MaxSoldiers = Mathf.Max(GameSettings.SoldierLimit, Director.Strength(0) + Director.Strength(1) + 6);
+ 		}
+ 	}
+ 
 @@ -763,7 +763,7 @@
  		bool flag = list3.Count > 1 && posture != Posture.Defensive && (float)num3 >= Mathf.Max(6f, (float)num4 * 1.35f);
  		CapturePoint secondary = (flag ? list3[1].Item1 : null);
@@ -711,7 +839,7 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +703,44 @@
+@@ -695,6 +703,52 @@
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -753,13 +881,21 @@ diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
 +		{
 +			GameSettings.BodyArmour = b;
 +		});
++		SwitchRow("Equal forces", "Both sides get the same number of soldiers (the smaller team is filled up), and each tank, IFV and helicopter has an equal counterpart on the other side (from the next battle).", GameSettings.EqualForces, delegate(bool b)
++		{
++			GameSettings.EqualForces = b;
++		});
++		SwitchRow("Big map", "A large generated battlefield, a kilometre across: hills, tree belts, ruined villages, rocks and sandbag lines, the bases about 800 m apart (from the next battle, not in the capture mode; loading takes longer).", GameSettings.BigMap, delegate(bool b)
++		{
++			GameSettings.BigMap = b;
++		});
  		UIKit.Place((RectTransform)UIKit.MakeButton(panel.transform, "Reset all", "restart", UIKit.Muted, delegate
  		{
  			GameSettings.Reset();
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,34 @@
+@@ -9,6 +9,38 @@
  {
  	public static float Volume = 0.9f;
  
@@ -774,6 +910,10 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +	public static bool SlowBrainDeath = true;
 +
 +	public static bool BodyArmour = true;
++
++	public static bool EqualForces = true;
++
++	public static bool BigMap = false;
 +
 +	public static int BattleType = 0;
 +
@@ -794,7 +934,7 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +214,15 @@
+@@ -186,6 +218,17 @@
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
@@ -804,13 +944,15 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +			Helicopters = B("helicopters", Helicopters);
 +			SlowBrainDeath = B("slowbrain", SlowBrainDeath);
 +			BodyArmour = B("armour", BodyArmour);
++			EqualForces = B("equal", EqualForces);
++			BigMap = B("bigmap", BigMap);
 +			BattleType = Mathf.Clamp(I("battletype", BattleType), 0, 2);
 +			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
 +			Language = Mathf.Clamp(I("language", Language), 0, 1);
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +295,15 @@
+@@ -258,6 +301,17 @@
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
@@ -820,13 +962,15 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		B("helicopters", Helicopters);
 +		B("slowbrain", SlowBrainDeath);
 +		B("armour", BodyArmour);
++		B("equal", EqualForces);
++		B("bigmap", BigMap);
 +		I("battletype", BattleType);
 +		I("blood", Blood);
 +		I("language", Language);
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +350,14 @@
+@@ -304,6 +358,16 @@
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
@@ -836,6 +980,8 @@ diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSetting
 +		Helicopters = true;
 +		SlowBrainDeath = true;
 +		BodyArmour = true;
++		EqualForces = true;
++		BigMap = false;
 +		BattleType = 0;
 +		Blood = 1;
  		Apply();
@@ -1424,6 +1570,24 @@ diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
  {
  	public struct Wheel
  	{
+@@ -386,7 +386,7 @@
+ 	{
+ 		get
+ 		{
+-			if (!(Scene == "DeadGround"))
++			if (!(Scene == "DeadGround") && !BigMap.Active)
+ 			{
+ 				return Scene == "EasternBattle";
+ 			}
+@@ -473,7 +473,7 @@
+ 				{
+ 					toward = Vector3.forward;
+ 				}
+-				Type[] array = ((!(Scene == "EasternBattle")) ? new Type[5]
++				Type[] array = ((!(Scene == "EasternBattle") || BigMap.Active) ? new Type[5]
+ 				{
+ 					(i == 0) ? typeof(M113) : typeof(Btr),
+ 					typeof(Buggy),
 @@ -486,6 +486,27 @@
  					typeof(QuadBike),
  					typeof(QuadBike)

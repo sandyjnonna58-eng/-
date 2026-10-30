@@ -53,7 +53,7 @@ public sealed class Bmp2 : Ifv
 			MaxTorque = 36000f,
 			ReverseTorque = 16000f,
 			Power = 175000f,
-			TopSpeed = 18f,
+			TopSpeed = 17.5f,
 			ReverseTop = 5f,
 			BrakeTorque = 6000f,
 			EngineBrake = 700f,
@@ -67,9 +67,9 @@ public sealed class Bmp2 : Ifv
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0.5f, 1f, 2.2f),
 			EngineSize = new Vector3(1f, 0.8f, 1.3f),
-			EngineHealth = 450f,
+			EngineHealth = 520f,
 			Armoured = true,
-			ArmourEnergy = 13f,
+			ArmourEnergy = 15f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(-0.62f, 1.6f, 1.15f),

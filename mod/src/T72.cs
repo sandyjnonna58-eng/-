@@ -137,7 +137,7 @@ public sealed class T72 : Tank
 			MaxTorque = 70000f,
 			ReverseTorque = 30000f,
 			Power = 560000f,
-			TopSpeed = 16f,
+			TopSpeed = 17f,
 			ReverseTop = 4.5f,
 			BrakeTorque = 12000f,
 			EngineBrake = 1500f,
@@ -151,9 +151,9 @@ public sealed class T72 : Tank
 			SteerArms = 300f,
 			EngineCentre = new Vector3(0f, 1f, -2.4f),
 			EngineSize = new Vector3(1.9f, 0.8f, 1.6f),
-			EngineHealth = 1100f,
+			EngineHealth = 1200f,
 			Armoured = true,
-			ArmourEnergy = 30f,
+			ArmourEnergy = 33f,
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0f, 1.55f, 2.45f),

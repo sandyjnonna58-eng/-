@@ -5,9 +5,9 @@ namespace CombatSandbox.Demo;
 
 public abstract class Ifv : Tank
 {
-	public static readonly WeaponDef Gun2A42 = Autocannon("2a42", "2A42 30 mm", "30×165 mm", 980f, 0.39f, 300f, 40, 30f, 0.45f, 2.6f, 3.5f);
+	public static readonly WeaponDef Gun2A42 = Autocannon("2a42", "2A42 30 mm", "30×165 mm", 980f, 0.39f, 260f, 45, 30f, 0.45f, 2.6f, 3.5f);
 
-	public static readonly WeaponDef M242 = Autocannon("m242", "M242 Bushmaster 25 mm", "25×137 mm", 1100f, 0.18f, 220f, 50, 22f, 0.5f, 2.4f, 3f);
+	public static readonly WeaponDef M242 = Autocannon("m242", "M242 Bushmaster 25 mm", "25×137 mm", 1100f, 0.18f, 260f, 45, 22f, 0.5f, 2.4f, 3f);
 
 	public static WeaponDef Autocannon(string id, string name, string caliber, float velocity, float mass, float rpm, int magazine, float recoil, float pitch, float loudness, float flash)
 	{
