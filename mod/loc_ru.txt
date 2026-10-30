@@ -964,3 +964,25 @@ fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)|режим о�
 ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand|регдолл: обмякнуть / встать   Shift / Alt — хвататься левой / правой рукой
 call artillery where you aim|вызвать артиллерию туда, куда целитесь
 moves on to point|выдвигается к точке
+# ===== v3: order wheel
+DRIVE THERE|ЕХАТЬ ТУДА
+MOUNT UP|ПО МАШИНАМ
+DISMOUNT|ВЫСАДКА
+FIRE THERE|ОГОНЬ ТУДА
+ARTILLERY|АРТИЛЛЕРИЯ
+into the nearest vehicle|в ближайшую машину
+out of the vehicle|из машины
+Point at an order, let go of Tab (or click) to give it  ·  back to the middle or RMB: cancel|Наведите на приказ и отпустите Tab (или щёлкните), чтобы отдать его  ·  в центр или ПКМ: отмена
+order wheel (hold, point, let go): attack, drive there, mount up, fire there...|колесо приказов (держать, навести, отпустить): атака, ехать туда, по машинам, огонь туда...
+no vehicle to send|некого отправить: нет техники
+drive there!|езжай туда!
+no vehicle to mount|нет техники для посадки
+mount up on the|по машинам, в
+nobody near to mount up|рядом нет бойцов для посадки
+nobody to get out|некому высаживаться
+everybody out!|все из машины!
+open fire there!|огонь туда!
+artillery, fire mission on my mark!|артиллерия, огонь по моей отметке!
+artillery not ready|артиллерия не готова
+- the men get out|— бойцы высаживаются
+drive there|езжай туда

@@ -957,5 +957,26 @@ internal static class LocRu
 		yield return ("ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand", "регдолл: обмякнуть / встать   Shift / Alt — хвататься левой / правой рукой");
 		yield return ("call artillery where you aim", "вызвать артиллерию туда, куда целитесь");
 		yield return ("moves on to point", "выдвигается к точке");
+		yield return ("DRIVE THERE", "ЕХАТЬ ТУДА");
+		yield return ("MOUNT UP", "ПО МАШИНАМ");
+		yield return ("DISMOUNT", "ВЫСАДКА");
+		yield return ("FIRE THERE", "ОГОНЬ ТУДА");
+		yield return ("ARTILLERY", "АРТИЛЛЕРИЯ");
+		yield return ("into the nearest vehicle", "в ближайшую машину");
+		yield return ("out of the vehicle", "из машины");
+		yield return ("Point at an order, let go of Tab (or click) to give it  ·  back to the middle or RMB: cancel", "Наведите на приказ и отпустите Tab (или щёлкните), чтобы отдать его  ·  в центр или ПКМ: отмена");
+		yield return ("order wheel (hold, point, let go): attack, drive there, mount up, fire there...", "колесо приказов (держать, навести, отпустить): атака, ехать туда, по машинам, огонь туда...");
+		yield return ("no vehicle to send", "некого отправить: нет техники");
+		yield return ("drive there!", "езжай туда!");
+		yield return ("no vehicle to mount", "нет техники для посадки");
+		yield return ("mount up on the", "по машинам, в");
+		yield return ("nobody near to mount up", "рядом нет бойцов для посадки");
+		yield return ("nobody to get out", "некому высаживаться");
+		yield return ("everybody out!", "все из машины!");
+		yield return ("open fire there!", "огонь туда!");
+		yield return ("artillery, fire mission on my mark!", "артиллерия, огонь по моей отметке!");
+		yield return ("artillery not ready", "артиллерия не готова");
+		yield return ("- the men get out", "— бойцы высаживаются");
+		yield return ("drive there", "езжай туда");
 	}
 }
