@@ -32,7 +32,7 @@ index ab8d31b..5a3a75a 100644
  			{
  			case ActiveRagdollPhase.Riding:
 diff --git a/CombatSandbox.Demo/BattleDirector.cs b/CombatSandbox.Demo/BattleDirector.cs
-index 36fa06c..551e555 100644
+index 36fa06c..c1c99ca 100644
 --- a/CombatSandbox.Demo/BattleDirector.cs
 +++ b/CombatSandbox.Demo/BattleDirector.cs
 @@ -469,6 +469,7 @@ public sealed class BattleDirector : MonoBehaviour
@@ -43,7 +43,18 @@ index 36fa06c..551e555 100644
  		if (Vehicle.MapHasVehicles)
  		{
  			VehicleNav.Build();
-@@ -593,6 +594,20 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -507,6 +508,10 @@ public sealed class BattleDirector : MonoBehaviour
+ 		{
+ 			base.gameObject.AddComponent<CommandWheel>();
+ 		}
++		if (!GetComponent<ModuleHud>())
++		{
++			base.gameObject.AddComponent<ModuleHud>();
++		}
+ 		if ((bool)Acoustics.Instance)
+ 		{
+ 			Acoustics.Instance.Ambience = AmbientBattle && GameSettings.Ambience;
+@@ -593,6 +598,20 @@ public sealed class BattleDirector : MonoBehaviour
  		brain.SightRange = 120f * Mathf.Min(num, 1.8f);
  		brain.SpotDistance = 28f * Mathf.Pow(num, 0.55f);
  		brain.EngageRange = 65f * Mathf.Lerp(1f, num, 0.45f);
@@ -64,7 +75,7 @@ index 36fa06c..551e555 100644
  	}
  
  	public Vector3 BasePoint(int team)
-@@ -915,7 +930,7 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -915,7 +934,7 @@ public sealed class BattleDirector : MonoBehaviour
  			return;
  		}
  		bool overUI = (bool)EventSystem.current && EventSystem.current.IsPointerOverGameObject();
@@ -73,10 +84,14 @@ index 36fa06c..551e555 100644
  		{
  			ShowPanels = !ShowPanels;
  		}
-@@ -1303,6 +1318,11 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1303,6 +1322,15 @@ public sealed class BattleDirector : MonoBehaviour
  		Vehicle vehicle = possessed.Body.Vehicle;
  		bool flag2 = (bool)vehicle && possessed.Body.Seated && possessed.Body.SeatRole == SeatRole.Gunner && vehicle.Gun != null && !vehicle.Wrecked;
  		bool flag3 = flag2 && vehicle is Btr;
++		if (flag2 && vehicle.Gun.Coax != null)
++		{
++			vehicle.Gun.FireCoax = Input.GetKey(KeyCode.Space) && Cursor.lockState == CursorLockMode.Locked && !CommandWheel.Open;
++		}
 +		if (flag2 && vehicle.Gun.Cannon && Input.GetKeyDown(KeyCode.B))
 +		{
 +			vehicle.Gun.PendingShell = 1 - vehicle.Gun.Shell;
@@ -85,7 +100,7 @@ index 36fa06c..551e555 100644
  		InGunSight = flag2 && (aimOn || TestAim || (flag3 && FirstPerson));
  		InPeriscope = InGunSight && flag3;
  		bool flag4 = InGunSight && !flag3;
-@@ -1596,6 +1616,27 @@ public sealed class BattleDirector : MonoBehaviour
+@@ -1596,6 +1624,29 @@ public sealed class BattleDirector : MonoBehaviour
  			InjectAt = injectPressedAt,
  			MedicAt = medicPressedAt
  		};
@@ -93,11 +108,13 @@ index 36fa06c..551e555 100644
 +		if (Input.GetKeyDown(KeyCode.Z) && !body2.Vehicle)
 +		{
 +			body2.Ragdolled = !body2.Ragdolled;
-+			Notice?.Invoke(body2.Ragdolled ? "Ragdoll: Shift - grab with the left hand, Alt - with the right, WASD - crawl and climb, Z - get up" : "Ragdoll off");
++			Notice?.Invoke(body2.Ragdolled ? "Ragdoll: RMB - arms forward, Shift / Alt - grab with the left / right hand, Space - pull up, WASD - crawl, Z - get up" : "Ragdoll off");
 +		}
 +		body2.GrabWant[0] = body2.Ragdolled && Input.GetKey(KeyCode.LeftShift);
 +		body2.GrabWant[1] = body2.Ragdolled && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt));
 +		body2.LimpMove = possessed.Input.Move;
++		body2.ReachBoth = body2.Ragdolled && Input.GetMouseButton(1);
++		body2.PullUp = body2.Ragdolled && Input.GetKey(KeyCode.Space);
 +		body2.ReachAt = aimPoint;
 +		if (Input.GetKeyDown(KeyCode.J) && (bool)Artillery.Instance)
 +		{
@@ -161,6 +178,77 @@ index 3fbed81..6986e8b 100644
  		GameSettings.Load();
  		Cursor.visible = false;
  		Camera main = Camera.main;
+diff --git a/CombatSandbox.Demo/Buggy.cs b/CombatSandbox.Demo/Buggy.cs
+index 989fd35..4901ed4 100644
+--- a/CombatSandbox.Demo/Buggy.cs
++++ b/CombatSandbox.Demo/Buggy.cs
+@@ -57,28 +57,44 @@ public sealed class Buggy : Vehicle
+ 
+ 	protected override float FlagLength => 1.5f;
+ 
++	protected override void FixedUpdate()
++	{
++		base.FixedUpdate();
++		if ((bool)base.Body && !base.Wrecked && base.WheelsDown >= 2)
++		{
++			float magnitude = base.Body.velocity.magnitude;
++			base.Body.AddForce(-(base.Rotation * Vector3.up) * magnitude * magnitude * 9f);
++			Vector3 vector = base.Rotation * Vector3.up;
++			if (vector.y > 0.3f)
++			{
++				base.Body.AddTorque(Vector3.Cross(vector, Vector3.up) * base.Body.mass * 1.2f);
++			}
++		}
++	}
++
+ 	protected override void Describe()
+ 	{
+ 		spec = new Spec
+ 		{
+ 			Name = "Buggy",
+-			Mass = 950f,
+-			CentreOfMass = new Vector3(0f, 0.55f, -0.1f),
++			Mass = 2200f,
++			CentreOfMass = new Vector3(0f, 0.38f, 0f),
++			Grip = 1.3f,
+ 			Wheels = Vehicle.FourWheels(0.4f, 0.3f, 0.82f, 1.2f, -1.15f),
+ 			Suspension = 0.3f,
+-			Spring = 62000f,
+-			Damper = 5600f,
+-			WheelMass = 30f,
+-			MaxTorque = 3400f,
+-			ReverseTorque = 1500f,
+-			Power = 75000f,
++			Spring = 115000f,
++			Damper = 9800f,
++			WheelMass = 45f,
++			MaxTorque = 7600f,
++			ReverseTorque = 3600f,
++			Power = 140000f,
+ 			TopSpeed = 24f,
+ 			ReverseTop = 5f,
+-			BrakeTorque = 3000f,
+-			EngineBrake = 80f,
+-			MaxSteer = 30f,
+-			AntiRoll = 16000f,
+-			Drag = 0.9f,
++			BrakeTorque = 6000f,
++			EngineBrake = 220f,
++			MaxSteer = 28f,
++			AntiRoll = 52000f,
++			Drag = 1.3f,
+ 			SteerPivot = SteerPivot,
+ 			SteerAxis = new Vector3(0f, 0.5f, -0.866f),
+ 			GripL = SteerPivot + new Vector3(-0.18f, 0f, 0f),
+@@ -88,7 +104,7 @@ public sealed class Buggy : Vehicle
+ 			SteerArms = 600f,
+ 			EngineCentre = new Vector3(0f, 0.85f, -1.38f),
+ 			EngineSize = new Vector3(1.1f, 0.55f, 0.7f),
+-			EngineHealth = 90f,
++			EngineHealth = 140f,
+ 			EnginePitch = 0.72f,
+ 			EngineLoudness = 1.25f,
+ 			CameraOffset = new Vector3(0f, 1.7f, -6.5f)
 diff --git a/CombatSandbox.Demo/CaptureMode.cs b/CombatSandbox.Demo/CaptureMode.cs
 index 7233289..6a42e5b 100644
 --- a/CombatSandbox.Demo/CaptureMode.cs
@@ -184,7 +272,7 @@ index 7233289..6a42e5b 100644
  			CombatBrain key = item12.Key;
  			(CapturePoint, bool) value = item12.Value;
 diff --git a/CombatSandbox.Demo/CombatBrain.cs b/CombatSandbox.Demo/CombatBrain.cs
-index f9b15b7..ac8fe72 100644
+index f9b15b7..6c87f7f 100644
 --- a/CombatSandbox.Demo/CombatBrain.cs
 +++ b/CombatSandbox.Demo/CombatBrain.cs
 @@ -7,7 +7,7 @@ namespace CombatSandbox.Demo;
@@ -230,7 +318,21 @@ index f9b15b7..ac8fe72 100644
  		if ((bool)cover && !AtCover)
  		{
  			orders.Speed = target.RunSpeed * 0.75f;
-@@ -7743,18 +7756,28 @@ public sealed class CombatBrain : MonoBehaviour
+@@ -7230,6 +7243,13 @@ public sealed class CombatBrain : MonoBehaviour
+ 
+ 	private void DriveVehicle(Vehicle v)
+ 	{
++		if (v is Helicopter)
++		{
++			v.Throttle = 0f;
++			v.SteerInput = 0f;
++			v.Brake = false;
++			return;
++		}
+ 		float fixedDeltaTime = Time.fixedDeltaTime;
+ 		float speed = v.Speed;
+ 		if (!target.Seated)
+@@ -7743,18 +7763,28 @@ public sealed class CombatBrain : MonoBehaviour
  		Vector3 point = (((bool)enemy && EnemyVisible) ? enemy.target.Body.Chest.Body.position : default(Vector3));
  		GunMount gun = v.Gun;
  		bool flag3 = EnemyVisible && EnemyRange < ((role == SeatRole.Gunner && gun != null) ? Mathf.Clamp(gun.Def.EffectiveRange * 0.4f, 300f, 700f) : (MyEngageRange * 1.2f));
@@ -528,7 +630,7 @@ index b75fd2c..89ad27a 100644
  		})));
  	}
 diff --git a/CombatSandbox.Demo/GameMenu.cs b/CombatSandbox.Demo/GameMenu.cs
-index 9fd3d6c..aa2f04f 100644
+index 9fd3d6c..bf7ce5b 100644
 --- a/CombatSandbox.Demo/GameMenu.cs
 +++ b/CombatSandbox.Demo/GameMenu.cs
 @@ -38,14 +38,15 @@ public sealed class GameMenu : MonoBehaviour
@@ -545,7 +647,7 @@ index 9fd3d6c..aa2f04f 100644
  		("Game", "flag", "How the battle plays: the enemy, the time, the numbers."),
 -		("Performance", "gear", "Keeping the frame rate up in a big battle.")
 +		("Performance", "gear", "Keeping the frame rate up in a big battle."),
-+		("Extra", "drop", "Language, blood, tanks and artillery.")
++		("Extra", "drop", "Language, blood, tanks, helicopters and artillery.")
  	};
  
  	private readonly List<RectTransform> settingsPages = new List<RectTransform>();
@@ -578,7 +680,7 @@ index 9fd3d6c..aa2f04f 100644
  		void Action(string label, string iconName, Color accent, Action act)
  		{
  			UIKit.Place((RectTransform)UIKit.MakeButton(side.transform, label, iconName, accent, act, 22, big: true).Button.transform, new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(390f, 62f));
-@@ -695,6 +700,27 @@ public sealed class GameMenu : MonoBehaviour
+@@ -695,6 +700,31 @@ public sealed class GameMenu : MonoBehaviour
  		{
  			GameSettings.BodiesKept = GameSettings.BodyChoices[i];
  		});
@@ -595,6 +697,10 @@ index 9fd3d6c..aa2f04f 100644
 +		{
 +			GameSettings.Tanks = b;
 +		});
++		SwitchRow("Helicopters", "A Mi-8 for one side and a UH-60 Black Hawk for the other: they carry troops and support with the chin gun (from the next battle).", GameSettings.Helicopters, delegate(bool b)
++		{
++			GameSettings.Helicopters = b;
++		});
 +		SwitchRow("Smart soldiers", "Wider eyes and ears, quicker to cover, flanking, short aimed bursts; tank gunners hunt armour, everyone ducks from tanks and shelling (from the next battle).", GameSettings.SmartAI, delegate(bool b)
 +		{
 +			GameSettings.SmartAI = b;
@@ -607,10 +713,10 @@ index 9fd3d6c..aa2f04f 100644
  		{
  			GameSettings.Reset();
 diff --git a/CombatSandbox.Demo/GameSettings.cs b/CombatSandbox.Demo/GameSettings.cs
-index d817002..55f9ed6 100644
+index d817002..329d71f 100644
 --- a/CombatSandbox.Demo/GameSettings.cs
 +++ b/CombatSandbox.Demo/GameSettings.cs
-@@ -9,6 +9,24 @@ public static class GameSettings
+@@ -9,6 +9,26 @@ public static class GameSettings
  {
  	public static float Volume = 0.9f;
  
@@ -619,6 +725,8 @@ index d817002..55f9ed6 100644
 +	public static bool Artillery = true;
 +
 +	public static bool SmartAI = true;
++
++	public static bool Helicopters = true;
 +
 +	public static int Blood = 1;
 +
@@ -635,50 +743,74 @@ index d817002..55f9ed6 100644
  	public static float Sensitivity = 2.2f;
  
  	public static float FieldOfView = 65f;
-@@ -186,6 +204,11 @@ public static class GameSettings
+@@ -186,6 +206,12 @@ public static class GameSettings
  			RespawnWait = I("respawn", RespawnWait);
  			Waves = Mathf.Clamp(I("waves", Waves), 0, 2);
  			BodiesKept = I("bodies", BodiesKept);
 +			Tanks = B("tanks", Tanks);
 +			Artillery = B("artillery", Artillery);
 +			SmartAI = B("smartai", SmartAI);
++			Helicopters = B("helicopters", Helicopters);
 +			Blood = Mathf.Clamp(I("blood", Blood), 0, 2);
 +			Language = Mathf.Clamp(I("language", Language), 0, 1);
  			DesperateActs = PlayerPrefs.GetInt("cs.desperate", 1) == 1;
  			CleanUp = PlayerPrefs.GetInt("cs.cleanup", 1) == 1;
  			TargetFps = PlayerPrefs.GetInt("cs.targetfps", TargetFps);
-@@ -258,6 +281,11 @@ public static class GameSettings
+@@ -258,6 +284,12 @@ public static class GameSettings
  		I("respawn", RespawnWait);
  		I("waves", Waves);
  		I("bodies", BodiesKept);
 +		B("tanks", Tanks);
 +		B("artillery", Artillery);
 +		B("smartai", SmartAI);
++		B("helicopters", Helicopters);
 +		I("blood", Blood);
 +		I("language", Language);
  		PlayerPrefs.Save();
  		static void B(string k, bool v)
  		{
-@@ -304,6 +332,10 @@ public static class GameSettings
+@@ -304,6 +336,11 @@ public static class GameSettings
  		RespawnWait = 7;
  		Waves = 1;
  		BodiesKept = 16;
 +		Tanks = true;
 +		Artillery = true;
 +		SmartAI = true;
++		Helicopters = true;
 +		Blood = 1;
  		Apply();
  	}
  
 diff --git a/CombatSandbox.Demo/GunMount.cs b/CombatSandbox.Demo/GunMount.cs
-index 25a7bcd..eca9be0 100644
+index 25a7bcd..565eea2 100644
 --- a/CombatSandbox.Demo/GunMount.cs
 +++ b/CombatSandbox.Demo/GunMount.cs
-@@ -107,6 +107,23 @@ public sealed class GunMount
+@@ -107,6 +107,44 @@ public sealed class GunMount
  
  	public bool Casings = true;
  
 +	public bool Cannon;
++
++	[NonSerialized]
++	public float Traverse = 1f;
++
++	[NonSerialized]
++	public bool Disabled;
++
++	public WeaponDef Coax;
++
++	public Vector3 CoaxMuzzle;
++
++	[NonSerialized]
++	public bool FireCoax;
++
++	private float nextCoax;
++
++	private int coaxRounds = 250;
++
++	private float coaxReload;
++
++	private int coaxFired;
 +
 +	public const int HighExplosive = 0;
 +
@@ -698,7 +830,7 @@ index 25a7bcd..eca9be0 100644
  	public Transform Turret;
  
  	public Transform Cradle;
-@@ -149,7 +166,9 @@ public sealed class GunMount
+@@ -149,7 +187,9 @@ public sealed class GunMount
  
  	public Quaternion BoreRotation => Bore;
  
@@ -709,7 +841,22 @@ index 25a7bcd..eca9be0 100644
  
  	public float Kick => kick;
  
-@@ -261,6 +280,13 @@ public sealed class GunMount
+@@ -246,9 +286,13 @@ public sealed class GunMount
+ 			wantPitch = Mathf.Clamp(-8f, Lowest(yaw), MaxPitch);
+ 		}
+ 		float num2 = ((MaxTraverse >= 180f) ? Mathf.DeltaAngle(yaw, wantYaw) : (wantYaw - yaw));
+-		float num3 = num * (Laying * num2 * (MathF.PI / 180f) - Damping * yawVelocity * (MathF.PI / 180f)) - 8f * yawVelocity * (MathF.PI / 180f) + handTorque * (1f - 0.85f * num);
++		float num3 = num * (Laying * Traverse * num2 * (MathF.PI / 180f) - Damping * yawVelocity * (MathF.PI / 180f)) - 8f * yawVelocity * (MathF.PI / 180f) + handTorque * (1f - 0.85f * num);
+ 		handTorque = 0f;
+ 		yawVelocity += num3 / Inertia * dt * 57.29578f;
++		if (Traverse <= 0f)
++		{
++			yawVelocity = 0f;
++		}
+ 		yaw += yawVelocity * dt;
+ 		if (MaxTraverse >= 180f)
+ 		{
+@@ -261,6 +305,13 @@ public sealed class GunMount
  		}
  		pitch = Mathf.MoveTowards(pitch, Mathf.Max(wantPitch, Lowest(yaw)), dt * (flag ? (90f * num) : 20f));
  		kick = Mathf.MoveTowards(kick, 0f, dt * 0.9f);
@@ -723,7 +870,35 @@ index 25a7bcd..eca9be0 100644
  		if (Rounds <= 0 && flag)
  		{
  			if (reloadUntil <= 0f)
-@@ -292,6 +318,11 @@ public sealed class GunMount
+@@ -273,7 +324,26 @@ public sealed class GunMount
+ 				reloadUntil = 0f;
+ 			}
+ 		}
+-		if (Fire && flag && num > 0.3f && Rounds > 0 && !Reloading && Time.time >= nextShot && Mathf.Abs(Mathf.DeltaAngle(yaw, wantYaw)) < 4f && Mathf.Abs(wantPitch - pitch) < 4f)
++		if (Coax != null && FireCoax && flag && num > 0.3f && !Disabled && Time.time >= nextCoax)
++		{
++			if (coaxRounds <= 0)
++			{
++				if (coaxReload <= 0f)
++				{
++					coaxReload = Time.time + Coax.Reload;
++				}
++				else if (Time.time >= coaxReload)
++				{
++					coaxRounds = 250;
++					coaxReload = 0f;
++				}
++			}
++			else
++			{
++				ShootCoax(arenaTarget);
++			}
++		}
++		if (Fire && !Disabled && flag && num > 0.3f && Rounds > 0 && !Reloading && Time.time >= nextShot && Mathf.Abs(Mathf.DeltaAngle(yaw, wantYaw)) < 4f && Mathf.Abs(wantPitch - pitch) < 4f)
+ 		{
+ 			Shoot(arenaTarget);
+ 		}
+@@ -292,6 +362,11 @@ public sealed class GunMount
  			Vector2 vector4 = UnityEngine.Random.insideUnitCircle * num;
  			Vector3 normalized2 = (vector2 + normalized * vector4.x + vector3 * vector4.y).normalized;
  			Vector3 inherit = vehicle.PointVelocity(vector);
@@ -735,10 +910,36 @@ index 25a7bcd..eca9be0 100644
  			instance.Report(vector, Def, gunner);
  			if ((bool)Ballistics.Instance)
  			{
-@@ -314,6 +345,34 @@ public sealed class GunMount
+@@ -314,6 +389,60 @@ public sealed class GunMount
  		}
  	}
  
++	private void ShootCoax(ArenaTarget gunner)
++	{
++		ReconstructionDemo instance = ReconstructionDemo.Instance;
++		if ((bool)instance)
++		{
++			Vector3 vector = At(CoaxMuzzle);
++			Vector3 vector2 = Bore * Vector3.forward;
++			Vector2 vector3 = UnityEngine.Random.insideUnitCircle * (Mathf.Tan(Coax.Dispersion / 60f * (MathF.PI / 180f)) + 0.002f);
++			Vector3 normalized = Vector3.Cross(Vector3.up, vector2).normalized;
++			Vector3 normalized2 = (vector2 + normalized * vector3.x + Vector3.Cross(vector2, normalized) * vector3.y).normalized;
++			Vector3 inherit = vehicle.PointVelocity(vector);
++			instance.Report(vector, Coax, gunner);
++			if ((bool)Ballistics.Instance)
++			{
++				Ballistics.Instance.Fire(gunner, vector, normalized2, Coax, coaxFired % 4 == 3, inherit);
++			}
++			if ((bool)ShotEffects.Instance)
++			{
++				ShotEffects.Instance.Flash(vector, normalized2, Coax.Flash * 0.8f);
++			}
++			coaxRounds--;
++			coaxFired++;
++			nextCoax = Time.time + Coax.Interval * UnityEngine.Random.Range(1f, 1.05f);
++		}
++	}
++
 +	private void FireShell(ReconstructionDemo instance, ArenaTarget gunner, Vector3 muzzle, Vector3 direction, Vector3 inherit)
 +	{
 +		float num = Mathf.Clamp(Vector3.Distance(Aim, muzzle), 20f, 3000f);
@@ -771,7 +972,7 @@ index 25a7bcd..eca9be0 100644
  	{
  		if ((bool)Turret)
 diff --git a/CombatSandbox.Demo/GunnerSight.cs b/CombatSandbox.Demo/GunnerSight.cs
-index cf704f9..2115e35 100644
+index cf704f9..1388976 100644
 --- a/CombatSandbox.Demo/GunnerSight.cs
 +++ b/CombatSandbox.Demo/GunnerSight.cs
 @@ -260,9 +260,9 @@ public sealed class GunnerSight : MonoBehaviour
@@ -782,7 +983,7 @@ index cf704f9..2115e35 100644
 +		Text(num14 + 14f * u, num35 + 32f * u, (gun.Cannon ? (gun.ShellName + "  ") : "") + (gun.Reloading ? "RELOADING" : ("AMMO " + gun.Rounds.ToString("000") + "  RDY")), big);
  		Text(num14 + 14f * u, num35 + 64f * u, "x" + Magnification.ToString("0.0") + "   " + Modes[Mode] + "   " + gun.Def.Name.ToUpperInvariant(), big);
 -		Text(num14 + 14f * u, num35 + 98f * u, "WHEEL zoom   N mode   LMB fire   RMB exit", small);
-+		Text(num14 + 14f * u, num35 + 98f * u, gun.Cannon ? "WHEEL zoom   N mode   B shell   LMB fire   RMB exit" : "WHEEL zoom   N mode   LMB fire   RMB exit", small);
++		Text(num14 + 14f * u, num35 + 98f * u, gun.Cannon ? "WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   RMB exit" : "WHEEL zoom   N mode   LMB fire   RMB exit", small);
  		bool flag2 = Mathf.Repeat(Time.unscaledTime, 1f) < 0.6f;
  		Text(num - num14 - 14f * u, num14 + 14f * u, (flag2 ? "● " : "  ") + "REC  " + DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss"), small, TextAnchor.UpperRight);
  		Text(num - num14 - 14f * u, num14 + 38f * u, Vehicle.Kind.ToUpperInvariant() + "  RWS  CH1  " + (Time.time - since).ToString("000.0"), small, TextAnchor.UpperRight);
@@ -1104,13 +1305,29 @@ index be2ff84..b0ac6a0 100644
  		Image image = Box(parent, "Key " + key, new Color(0.85f, 0.87f, 0.86f, 0.95f));
  		Place(image.rectTransform, anchor, position, new Vector2(num, 28f));
 diff --git a/CombatSandbox.Demo/Vehicle.cs b/CombatSandbox.Demo/Vehicle.cs
-index 3a35c45..874fae4 100644
+index 3a35c45..50635b9 100644
 --- a/CombatSandbox.Demo/Vehicle.cs
 +++ b/CombatSandbox.Demo/Vehicle.cs
-@@ -486,6 +486,13 @@ public abstract class Vehicle : MonoBehaviour
+@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
+ namespace CombatSandbox.Demo;
+ 
+ [DefaultExecutionOrder(10)]
+-public abstract class Vehicle : MonoBehaviour
++public abstract partial class Vehicle : MonoBehaviour
+ {
+ 	public struct Wheel
+ 	{
+@@ -486,6 +486,20 @@ public abstract class Vehicle : MonoBehaviour
  					typeof(QuadBike),
  					typeof(QuadBike)
  				});
++				if (GameSettings.Helicopters)
++				{
++					Type[] array3 = new Type[array.Length + 1];
++					array3[0] = typeof(Helicopter);
++					Array.Copy(array, 0, array3, 1, array.Length);
++					array = array3;
++				}
 +				if (GameSettings.Tanks)
 +				{
 +					Type[] array2 = new Type[array.Length + 1];
@@ -1121,13 +1338,17 @@ index 3a35c45..874fae4 100644
  				for (int j = 0; j < array.Length; j++)
  				{
  					Place(array[j], i, @base.position, toward);
-@@ -518,6 +525,14 @@ public abstract class Vehicle : MonoBehaviour
+@@ -518,6 +532,18 @@ public abstract class Vehicle : MonoBehaviour
  
  	private static Vector3 HalfSize(Type kind)
  	{
 +		if (kind == typeof(T72))
 +		{
 +			return new Vector3(1.8f, 1.2f, 3.7f);
++		}
++		if (kind == typeof(Helicopter))
++		{
++			return new Vector3(2.2f, 1.6f, 5f);
 +		}
 +		if (kind == typeof(Abrams))
 +		{
@@ -1136,7 +1357,7 @@ index 3a35c45..874fae4 100644
  		if (!(kind == typeof(Btr)))
  		{
  			if (!(kind == typeof(M113)))
-@@ -1002,6 +1017,41 @@ public abstract class Vehicle : MonoBehaviour
+@@ -1002,12 +1028,49 @@ public abstract class Vehicle : MonoBehaviour
  		}
  	}
  
@@ -1163,6 +1384,7 @@ index 3a35c45..874fae4 100644
 +			Acoustics.Instance.Impact(point, ImpactSound.Metal, 2f);
 +		}
 +		value.Body.AddForceAtPosition(direction.normalized * 1800f, point, ForceMode.Impulse);
++		value.ModulesAlongPath(point, direction, 60f, 60f, 4.5f);
 +		if (value.spec.Armoured)
 +		{
 +			value.Spall(point);
@@ -1178,7 +1400,37 @@ index 3a35c45..874fae4 100644
  	private void Hit(Vector3 point, Vector3 direction, float energy)
  	{
  		if (Wrecked)
-@@ -1097,7 +1147,7 @@ public abstract class Vehicle : MonoBehaviour
+ 		{
+ 			return;
+ 		}
++		ModulesAlongPath(point, direction, energy, 0f, 1f);
+ 		if (spec.Armoured)
+ 		{
+ 			if (energy < spec.ArmourEnergy)
+@@ -1015,11 +1078,16 @@ public abstract class Vehicle : MonoBehaviour
+ 				return;
+ 			}
+ 			energy = (energy - spec.ArmourEnergy) * 0.6f;
++			ModulesAlongPath(point, direction, 0f, energy, 1.6f);
+ 			if ((bool)Ballistics.Instance)
+ 			{
+ 				Ballistics.Instance.Fragment(null, point + direction.normalized * 0.14f, direction + UnityEngine.Random.insideUnitSphere * 0.15f, UnityEngine.Random.Range(250, 450), 0.006f);
+ 			}
+ 		}
++		else
++		{
++			ModulesAlongPath(point, direction, 0f, energy, 1.2f);
++		}
+ 		Vector3 vector = Local(point + direction.normalized * 0.05f) - spec.EngineCentre;
+ 		Vector3 vector2 = spec.EngineSize * 0.5f + Vector3.one * 0.06f;
+ 		bool flag = Mathf.Abs(vector.x) < vector2.x && Mathf.Abs(vector.y) < vector2.y && Mathf.Abs(vector.z) < vector2.z;
+@@ -1092,12 +1160,13 @@ public abstract class Vehicle : MonoBehaviour
+ 				continue;
+ 			}
+ 			float num4 = Mathf.Clamp01(1f - num3 / num2);
++			vehicle.ModulesInBlast(centre, power);
+ 			Vector3 normalized = ((vehicle.Body.worldCenterOfMass - centre).normalized + Vector3.up * 0.35f).normalized;
+ 			vehicle.Body.AddForceAtPosition(normalized * 900f * power * num4 * num4 * num4, vector, ForceMode.Impulse);
  			if (vehicle.spec.Armoured)
  			{
  				bool flag = num3 < 0.7f && power > 1.4f;
@@ -1187,6 +1439,27 @@ index 3a35c45..874fae4 100644
  				if (flag)
  				{
  					vehicle.Spall(vector);
+@@ -1311,6 +1380,7 @@ public abstract class Vehicle : MonoBehaviour
+ 				Passing();
+ 			}
+ 			ClearDead(fixedDeltaTime);
++			ModuleStep(fixedDeltaTime);
+ 			if (Time.time < unstickUntil && !Wrecked)
+ 			{
+ 				unstickHelp = Mathf.MoveTowards(unstickHelp, 1f, fixedDeltaTime / 3f);
+@@ -1446,8 +1516,10 @@ public abstract class Vehicle : MonoBehaviour
+ 				{
+ 					num11 *= 1f - Steer / spec.MaxSteer * 0.6f * Mathf.Sign(wheel.At.x);
+ 				}
+-				wheels[j].motorTorque = num11;
+-				wheels[j].brakeTorque = num9;
++				float drag;
++				bool flag6 = WheelLost(j, out drag);
++				wheels[j].motorTorque = (flag6 ? 0f : (num11 * DriveFactor));
++				wheels[j].brakeTorque = Mathf.Max(num9, drag);
+ 				wheels[j].steerAngle = Steer * wheel.Steer;
+ 			}
+ 			if (spec.Tracked && flag)
 diff --git a/CombatSandbox/BloodDroplets.cs b/CombatSandbox/BloodDroplets.cs
 index 32950e7..69cfe9c 100644
 --- a/CombatSandbox/BloodDroplets.cs

@@ -229,7 +229,9 @@ public sealed class T72 : Tank
 			Inertia = 30f,
 			Laying = 150f,
 			Damping = 135f,
-			Cannon = true
+			Cannon = true,
+			Coax = WeaponCatalog.Get("pkm"),
+			CoaxMuzzle = new Vector3(0.24f, -0.02f, 0.66f)
 		};
 	}
 

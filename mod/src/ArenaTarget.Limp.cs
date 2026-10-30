@@ -16,6 +16,12 @@ public sealed partial class ArenaTarget
 	[System.NonSerialized]
 	public Vector3 ReachAt;
 
+	[System.NonSerialized]
+	public bool ReachBoth;
+
+	[System.NonSerialized]
+	public bool PullUp;
+
 	private readonly ConfigurableJoint[] grabs = new ConfigurableJoint[2];
 
 	private static readonly Collider[] grabNear = new Collider[16];
@@ -65,31 +71,33 @@ public sealed partial class ArenaTarget
 	private bool Grab(int side)
 	{
 		HitZone hitZone = Body.Hands[side];
-		if (!hitZone || hitZone.Lost || !hitZone.Body || !GrabWant[side] || !ArmsWork(side))
+		if (!hitZone || hitZone.Lost || !hitZone.Body || (!GrabWant[side] && !ReachBoth) || !ArmsWork(side))
 		{
 			Drop(side);
 			return false;
 		}
+		if (!GrabWant[side])
+		{
+			Drop(side);
+			Reach(side, hitZone, 1.3f);
+			return false;
+		}
 		if ((bool)grabs[side])
 		{
-			if (LimpMove.sqrMagnitude > 0.01f)
+			Vector3 vector = hitZone.Body.position - Body.Chest.Body.position;
+			if (PullUp)
 			{
-				Vector3 vector = hitZone.Body.position - Body.Chest.Body.position;
+				Vector3 vector6 = hitZone.Body.position + Vector3.up * 0.45f - Body.Chest.Body.position;
+				Body.Chest.Body.AddForce(Vector3.ClampMagnitude(vector6 * 1400f, 1100f) - Body.Chest.Body.velocity * 60f + Vector3.up * 260f);
+				Body.Pelvis.Body.AddForce(Vector3.ClampMagnitude((hitZone.Body.position - Body.Pelvis.Body.position) * 500f, 420f));
+			}
+			else if (LimpMove.sqrMagnitude > 0.01f)
+			{
 				Body.Chest.Body.AddForce(vector.normalized * 380f + Vector3.up * 140f);
 			}
 			return true;
 		}
-		HitZone hitZone2 = Body.UpperArms[side];
-		Vector3 vector2 = (hitZone2 ? hitZone2.Body.position : Body.Chest.Body.position);
-		Vector3 vector3 = ReachAt - vector2;
-		Vector3 vector4 = ((vector3.sqrMagnitude > 0.0001f) ? (vector2 + Vector3.ClampMagnitude(vector3, 0.7f)) : (vector2 + Body.Chest.transform.forward * 0.6f));
-		Vector3 vector5 = (vector4 - hitZone.Body.position) * 70f - hitZone.Body.velocity * 6f;
-		hitZone.Body.AddForce(Vector3.ClampMagnitude(vector5, 120f), ForceMode.Acceleration);
-		HitZone hitZone3 = Body.Forearms[side];
-		if ((bool)hitZone3 && !hitZone3.Lost)
-		{
-			hitZone3.Body.AddForce(Vector3.ClampMagnitude(vector5 * 0.5f, 60f), ForceMode.Acceleration);
-		}
+		Reach(side, hitZone, 1f);
 		Vector3 worldCenterOfMass = hitZone.Body.worldCenterOfMass;
 		int num = Physics.OverlapSphereNonAlloc(worldCenterOfMass, 0.12f, grabNear, -5, QueryTriggerInteraction.Ignore);
 		Collider collider = null;
@@ -128,6 +136,25 @@ public sealed partial class ArenaTarget
 		configurableJoint.breakTorque = float.PositiveInfinity;
 		grabs[side] = configurableJoint;
 		return true;
+	}
+
+	private void Reach(int side, HitZone hand, float strength)
+	{
+		HitZone hitZone = Body.UpperArms[side];
+		Vector3 vector = (hitZone ? hitZone.Body.position : Body.Chest.Body.position);
+		Vector3 vector2 = ReachAt - vector;
+		Vector3 vector3 = ((vector2.sqrMagnitude > 0.0001f) ? (vector + Vector3.ClampMagnitude(vector2, 0.72f)) : (vector + Body.Chest.transform.forward * 0.6f));
+		Vector3 vector4 = (vector3 - hand.Body.position) * 70f * strength - hand.Body.velocity * 6f;
+		hand.Body.AddForce(Vector3.ClampMagnitude(vector4, 120f * strength), ForceMode.Acceleration);
+		HitZone hitZone2 = Body.Forearms[side];
+		if ((bool)hitZone2 && !hitZone2.Lost)
+		{
+			hitZone2.Body.AddForce(Vector3.ClampMagnitude(vector4 * 0.5f, 60f * strength), ForceMode.Acceleration);
+		}
+		if ((bool)hitZone && !hitZone.Lost)
+		{
+			hitZone.Body.AddForce(Vector3.ClampMagnitude(vector4 * 0.25f, 30f * strength), ForceMode.Acceleration);
+		}
 	}
 
 	private void Drop(int side)

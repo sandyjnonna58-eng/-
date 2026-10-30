@@ -27,6 +27,10 @@ public sealed partial class CombatBrain
 			engage = true;
 			flag2 = armourTarget.Armoured;
 		}
+		if (gun.Coax != null)
+		{
+			gun.FireCoax = engage && !flag2 && !flag && (point - gun.SightAt).magnitude < 450f && Mathf.Repeat(Time.time + (float)(GetInstanceID() % 7) * 0.37f, 3f) < 1.3f;
+		}
 		int num = ((flag2 || flag) ? 1 : 0);
 		if (gun.Shell != num && !gun.Reloading)
 		{

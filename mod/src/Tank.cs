@@ -45,6 +45,8 @@ public abstract class Tank : Vehicle
 
 	private bool tossed;
 
+	private bool detonated;
+
 	private float nextScare;
 
 	protected abstract Vector3 TurretPivot { get; }
@@ -190,10 +192,16 @@ public abstract class Tank : Vehicle
 		}
 	}
 
+	protected override void Detonated()
+	{
+		detonated = true;
+		wreckedAt = Time.time + 0.4f;
+	}
+
 	private void TossTurret()
 	{
 		tossed = true;
-		if (gun == null || !gun.Turret || UnityEngine.Random.value > 0.65f)
+		if (gun == null || !gun.Turret || (!detonated && UnityEngine.Random.value > 0.65f))
 		{
 			return;
 		}

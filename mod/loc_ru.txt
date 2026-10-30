@@ -986,3 +986,36 @@ artillery, fire mission on my mark!|артиллерия, огонь по мое
 artillery not ready|артиллерия не готова
 - the men get out|— бойцы высаживаются
 drive there|езжай туда
+# ===== v5: modules, coax, helicopters, ragdoll
+MODULES|МОДУЛИ
+Engine|Двигатель
+Transmission|Трансмиссия
+Fuel tank|Топливный бак
+Ammo rack|Боеукладка
+Turret ring|Погон башни
+Gun|Орудие
+Left track|Левая гусеница
+Right track|Правая гусеница
+Front left wheel|Переднее левое колесо
+Front right wheel|Переднее правое колесо
+Rear left wheel|Заднее левое колесо
+Rear right wheel|Заднее правое колесо
+Left wheel|Левое колесо
+Right wheel|Правое колесо
+OK|ИСПРАВЕН
+DAMAGED|ПОВРЕЖДЁН
+DESTROYED|УНИЧТОЖЕН
+Module destroyed:|Модуль уничтожен:
+Module damaged:|Модуль повреждён:
+Module repaired:|Модуль отремонтирован:
+WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   RMB exit|КОЛЕСО зум   N режим   B снаряд   ЛКМ огонь   ПРОБЕЛ пулемёт   ПКМ выход
+Ragdoll: RMB - arms forward, Shift / Alt - grab with the left / right hand, Space - pull up, WASD - crawl, Z - get up|Регдолл: ПКМ — руки вперёд, Shift / Alt — хвататься левой / правой рукой, Пробел — подтянуться, WASD — ползти, Z — встать
+Helicopter: W / S - forward / back, A / D - turn, Space - up, Ctrl - down|Вертолёт: W / S — вперёд / назад, A / D — поворот, Пробел — вверх, Ctrl — вниз
+Helicopters|Вертолёты
+A Mi-8 for one side and a UH-60 Black Hawk for the other: they carry troops and support with the chin gun (from the next battle).|Ми-8 у одной стороны и UH-60 «Блэк Хок» у другой: возят десант и поддерживают огнём носового пулемёта (со следующего боя).
+Language, blood, tanks, helicopters and artillery.|Язык, кровь, танки, вертолёты и артиллерия.
+UH-60 Black Hawk|UH-60 «Блэк Хок»
+Mi-8AMTSh|Ми-8АМТШ
+Buggy|Багги
+ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand|регдолл: обмякнуть / встать   ПКМ — руки вперёд, Shift / Alt — хвататься, Пробел — подтянуться
+fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)|режим огня: автоматический / одиночный (в танке: ОФС / БОПС, Пробел — спаренный пулемёт)

@@ -180,7 +180,7 @@ public sealed class TankShell : MonoBehaviour
 			Dart(hit, normalized);
 			return;
 		}
-		Vehicle.Struck(hit.collider, hit.point, normalized, 300f);
+		Vehicle.Struck(hit.collider, hit.point, normalized, 40f);
 		Burst(hit.point + hit.normal * 0.1f);
 	}
 

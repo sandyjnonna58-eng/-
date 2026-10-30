@@ -170,7 +170,9 @@ public sealed class Abrams : Tank
 			Inertia = 30f,
 			Laying = 170f,
 			Damping = 145f,
-			Cannon = true
+			Cannon = true,
+			Coax = WeaponCatalog.Get("pkm"),
+			CoaxMuzzle = new Vector3(0.26f, 0.02f, 0.42f)
 		};
 	}
 

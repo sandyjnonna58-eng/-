@@ -978,5 +978,37 @@ internal static class LocRu
 		yield return ("artillery not ready", "артиллерия не готова");
 		yield return ("- the men get out", "— бойцы высаживаются");
 		yield return ("drive there", "езжай туда");
+		yield return ("MODULES", "МОДУЛИ");
+		yield return ("Engine", "Двигатель");
+		yield return ("Transmission", "Трансмиссия");
+		yield return ("Fuel tank", "Топливный бак");
+		yield return ("Ammo rack", "Боеукладка");
+		yield return ("Turret ring", "Погон башни");
+		yield return ("Gun", "Орудие");
+		yield return ("Left track", "Левая гусеница");
+		yield return ("Right track", "Правая гусеница");
+		yield return ("Front left wheel", "Переднее левое колесо");
+		yield return ("Front right wheel", "Переднее правое колесо");
+		yield return ("Rear left wheel", "Заднее левое колесо");
+		yield return ("Rear right wheel", "Заднее правое колесо");
+		yield return ("Left wheel", "Левое колесо");
+		yield return ("Right wheel", "Правое колесо");
+		yield return ("OK", "ИСПРАВЕН");
+		yield return ("DAMAGED", "ПОВРЕЖДЁН");
+		yield return ("DESTROYED", "УНИЧТОЖЕН");
+		yield return ("Module destroyed:", "Модуль уничтожен:");
+		yield return ("Module damaged:", "Модуль повреждён:");
+		yield return ("Module repaired:", "Модуль отремонтирован:");
+		yield return ("WHEEL zoom   N mode   B shell   LMB fire   SPACE coax   RMB exit", "КОЛЕСО зум   N режим   B снаряд   ЛКМ огонь   ПРОБЕЛ пулемёт   ПКМ выход");
+		yield return ("Ragdoll: RMB - arms forward, Shift / Alt - grab with the left / right hand, Space - pull up, WASD - crawl, Z - get up", "Регдолл: ПКМ — руки вперёд, Shift / Alt — хвататься левой / правой рукой, Пробел — подтянуться, WASD — ползти, Z — встать");
+		yield return ("Helicopter: W / S - forward / back, A / D - turn, Space - up, Ctrl - down", "Вертолёт: W / S — вперёд / назад, A / D — поворот, Пробел — вверх, Ctrl — вниз");
+		yield return ("Helicopters", "Вертолёты");
+		yield return ("A Mi-8 for one side and a UH-60 Black Hawk for the other: they carry troops and support with the chin gun (from the next battle).", "Ми-8 у одной стороны и UH-60 «Блэк Хок» у другой: возят десант и поддерживают огнём носового пулемёта (со следующего боя).");
+		yield return ("Language, blood, tanks, helicopters and artillery.", "Язык, кровь, танки, вертолёты и артиллерия.");
+		yield return ("UH-60 Black Hawk", "UH-60 «Блэк Хок»");
+		yield return ("Mi-8AMTSh", "Ми-8АМТШ");
+		yield return ("Buggy", "Багги");
+		yield return ("ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand", "регдолл: обмякнуть / встать   ПКМ — руки вперёд, Shift / Alt — хвататься, Пробел — подтянуться");
+		yield return ("fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)", "режим огня: автоматический / одиночный (в танке: ОФС / БОПС, Пробел — спаренный пулемёт)");
 	}
 }
