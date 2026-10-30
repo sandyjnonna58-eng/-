@@ -932,5 +932,30 @@ internal static class LocRu
 		yield return ("reinforcements", "подкрепление");
 		yield return ("support", "поддержку");
 		yield return ("Gunner's sight", "Прицел наводчика");
+		yield return ("went limp", "обмяк");
+		yield return ("Ragdoll: Shift - grab with the left hand, Alt - with the right, WASD - crawl and climb, Z - get up", "Регдолл: Shift — хвататься левой рукой, Alt — правой, WASD — ползти и карабкаться, Z — встать");
+		yield return ("Ragdoll off", "Регдолл выключен");
+		yield return ("HE-FRAG", "ОФС");
+		yield return ("APFSDS", "БОПС");
+		yield return ("Loading HE-FRAG", "Заряжается ОФС");
+		yield return ("Loading APFSDS", "Заряжается БОПС");
+		yield return ("WHEEL zoom   N mode   B shell   LMB fire   RMB exit", "КОЛЕСО зум   N режим   B снаряд   ЛКМ огонь   ПКМ выход");
+		yield return ("artillery fire mission", "огневой налёт артиллерии");
+		yield return ("Artillery: fire mission on your mark", "Артиллерия: огонь по вашей отметке");
+		yield return ("Artillery not ready:", "Артиллерия не готова:");
+		yield return ("Artillery is off in the settings", "Артиллерия выключена в настройках");
+		yield return ("Artillery", "Артиллерия");
+		yield return ("Batteries off the map shell gatherings of the enemy; J calls a fire mission where you aim.", "Батареи за картой накрывают скопления противника; J — вызвать огонь туда, куда целитесь.");
+		yield return ("Smart soldiers", "Умные бойцы");
+		yield return ("Wider eyes and ears, quicker to cover, flanking, short aimed bursts; tank gunners hunt armour, everyone ducks from tanks and shelling (from the next battle).", "Шире обзор и слух, быстрее уходят в укрытие, обходят с флангов, бьют короткими прицельными очередями; наводчики танков охотятся за техникой, пехота прячется от танков и обстрела (со следующего боя).");
+		yield return ("A T-72 for one side and an M1 Abrams for the other at the start of the battle (from the next battle).", "Т-72 у одной стороны и M1 «Абрамс» у другой в начале боя (со следующего боя).");
+		yield return ("Language, blood, tanks and artillery.", "Язык, кровь, танки и артиллерия.");
+		yield return ("moves on to", "выдвигается к");
+		yield return ("M1A2 Abrams", "M1A2 «Абрамс»");
+		yield return ("M256 120 mm", "M256 120 мм");
+		yield return ("fire mode: automatic / single shots (in a tank: HE-FRAG / APFSDS)", "режим огня: автоматический / одиночный (в танке: ОФС / БОПС)");
+		yield return ("ragdoll: go limp / get up   Shift / Alt — grab with the left / right hand", "регдолл: обмякнуть / встать   Shift / Alt — хвататься левой / правой рукой");
+		yield return ("call artillery where you aim", "вызвать артиллерию туда, куда целитесь");
+		yield return ("moves on to point", "выдвигается к точке");
 	}
 }

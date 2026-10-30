@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 namespace CombatSandbox.Demo;
 
-public sealed class T72 : Vehicle
+public sealed class T72 : Tank
 {
 	public const int Gunner = 1;
 
@@ -37,56 +37,11 @@ public sealed class T72 : Vehicle
 
 	private static readonly Vector3 Rear = new Vector3(0f, 0.72f, -2.95f);
 
-	private static readonly Vector3 TurretPivot = new Vector3(0f, 1.5f, 0.2f);
+	private static readonly Vector3 Pivot = new Vector3(0f, 1.5f, 0.2f);
 
-	public static readonly WeaponDef Cannon125 = new WeaponDef
-	{
-		Id = "2a46m",
-		Name = "2A46M 125 mm",
-		Caliber = "125 mm",
-		Class = WeaponClass.MachineGun,
-		MuzzleVelocity = 850f,
-		BulletMass = 23f,
-		Drag = 0f,
-		Rpm = 10f,
-		Magazine = 1,
-		Reload = 6.5f,
-		Auto = false,
-		Semi = true,
-		Recoil = 300f,
-		Dispersion = 1.5f,
-		Mass = 2500f,
-		Zero = 1000f,
-		TracerEvery = 0,
-		Sound = GunSound.Sniper,
-		Pitch = 0.35f,
-		Loudness = 3.5f,
-		Flash = 9f,
-		Burst = new Vector2Int(1, 1),
-		EffectiveRange = 2500f
-	};
+	protected override Vector3 TurretPivot => Pivot;
 
-	private static readonly List<Vector2> loop = new List<Vector2>();
-
-	private static readonly List<float> along = new List<float>();
-
-	private Transform[] wheelModelsCache;
-
-	private Transform sprocketL;
-
-	private Transform sprocketR;
-
-	private Transform idlerL;
-
-	private Transform idlerR;
-
-	private Transform[] shoesL;
-
-	private Transform[] shoesR;
-
-	private float wreckedAt = -1f;
-
-	private bool tossed;
+	public static readonly WeaponDef Cannon125 = Tank.Cannon("2a46m", "2A46M 125 mm", "125 mm");
 
 	private static Mesh hull;
 
@@ -142,6 +97,14 @@ public sealed class T72 : Vehicle
 
 	protected override void Describe()
 	{
+		stations = Stations;
+		idlerAt = Front;
+		sprocketAt = Rear;
+		idlerR = 0.3f;
+		sprocketR = 0.32f;
+		wheelR = 0.35f;
+		trackX = 1.4f;
+		shoeCount = 82;
 		Wheel[] array = new Wheel[Stations.Length * 2];
 		for (int i = 0; i < Stations.Length; i++)
 		{
@@ -194,8 +157,8 @@ public sealed class T72 : Vehicle
 			Hatches = new Vector3[3]
 			{
 				new Vector3(0f, 1.55f, 2.45f),
-				TurretPivot + new Vector3(0.45f, 0.72f, -0.15f),
-				TurretPivot + new Vector3(-0.45f, 0.72f, -0.1f)
+				Pivot + new Vector3(0.45f, 0.72f, -0.15f),
+				Pivot + new Vector3(-0.45f, 0.72f, -0.1f)
 			},
 			EnginePitch = 0.42f,
 			EngineLoudness = 2.2f,
@@ -249,7 +212,7 @@ public sealed class T72 : Vehicle
 			}
 		}
 		places = list.ToArray();
-		gun = new GunMount(this, 1, TurretPivot, Cannon125)
+		gun = new GunMount(this, 1, Pivot, Cannon125)
 		{
 			MaxTraverse = 180f,
 			MinPitch = -5f,
@@ -267,145 +230,6 @@ public sealed class T72 : Vehicle
 			Damping = 135f,
 			Cannon = true
 		};
-	}
-
-	protected override void Update()
-	{
-		base.Update();
-		if ((bool)sprocketL)
-		{
-			sprocketL.localRotation = Quaternion.Euler(base.RolledLeft / 0.34f * 57.29578f, 0f, 0f);
-			sprocketR.localRotation = Quaternion.Euler(base.RolledRight / 0.34f * 57.29578f, 0f, 0f);
-			idlerL.localRotation = Quaternion.Euler(base.RolledLeft / 0.32f * 57.29578f, 0f, 0f);
-			idlerR.localRotation = Quaternion.Euler(base.RolledRight / 0.32f * 57.29578f, 0f, 0f);
-			LayTrack(shoesL, -1, base.RolledLeft);
-			LayTrack(shoesR, 1, base.RolledRight);
-		}
-		if (base.Wrecked && !tossed)
-		{
-			if (wreckedAt < 0f)
-			{
-				wreckedAt = Time.time + UnityEngine.Random.Range(2.5f, 4.5f);
-			}
-			else if (Time.time >= wreckedAt)
-			{
-				TossTurret();
-			}
-		}
-	}
-
-	private void TossTurret()
-	{
-		tossed = true;
-		if (gun == null || !gun.Turret || UnityEngine.Random.value > 0.65f)
-		{
-			return;
-		}
-		Transform turret = gun.Turret;
-		gun.Turret = null;
-		gun.Cradle = null;
-		gun.Gun = null;
-		Vector3 position = turret.position;
-		turret.SetParent(null, worldPositionStays: true);
-		Rigidbody rigidbody = turret.gameObject.AddComponent<Rigidbody>();
-		rigidbody.mass = 12000f;
-		rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-		rigidbody.velocity = (base.Body ? base.Body.velocity : Vector3.zero) + Vector3.up * UnityEngine.Random.Range(9f, 14f) + UnityEngine.Random.insideUnitSphere * 2.5f;
-		rigidbody.angularVelocity = UnityEngine.Random.insideUnitSphere * 2.5f;
-		if ((bool)ShotEffects.Instance)
-		{
-			ShotEffects.Instance.Explosion(position, 2.6f);
-			ShotEffects.Instance.Flare(position, 1.6f);
-		}
-		if ((bool)Acoustics.Instance)
-		{
-			Acoustics.Instance.Explosion(position, rocket: true);
-		}
-		if ((bool)BattleDirector.Instance)
-		{
-			BattleDirector.Instance.Shake(position, 1.5f);
-		}
-		Transform obj = new GameObject("Turret ring fire").transform;
-		obj.SetParent(base.transform, worldPositionStays: false);
-		obj.localPosition = TurretPivot + Vector3.up * 0.1f;
-		Plumes.Fire(obj, 0.9f, light: true);
-		UnityEngine.Object.Destroy(obj.gameObject, UnityEngine.Random.Range(40, 70));
-		UnityEngine.Object.Destroy(turret.gameObject, 300f);
-	}
-
-	private void LayTrack(Transform[] shoes, int side, float rolled)
-	{
-		loop.Clear();
-		Vector2 vector = new Vector2(Front.z, Front.y);
-		Vector2 vector2 = new Vector2(Rear.z, Rear.y);
-		float num = 0.325f;
-		float num2 = 0.345f;
-		for (int i = 0; i <= 10; i++)
-		{
-			float num3 = (float)i / 10f;
-			loop.Add(Vector2.Lerp(vector + Vector2.up * num, vector2 + Vector2.up * num2, num3) + Vector2.down * Mathf.Sin(num3 * MathF.PI) * 0.04f);
-		}
-		for (int j = 1; j <= 8; j++)
-		{
-			float f = (float)j / 8f * MathF.PI;
-			loop.Add(vector2 + new Vector2(0f - Mathf.Sin(f), Mathf.Cos(f)) * num2);
-		}
-		for (int num4 = Stations.Length - 1; num4 >= 0; num4--)
-		{
-			Transform transform = WheelModel(num4 * 2 + ((side >= 0) ? 1 : 0));
-			Vector3 vector3 = (transform ? base.transform.InverseTransformPoint(transform.position) : new Vector3(0f, 0.4f, Stations[num4]));
-			float y = vector3.y - 0.35f - 0.01f;
-			loop.Add(new Vector2(vector3.z - 0.16f, y));
-			loop.Add(new Vector2(vector3.z + 0.16f, y));
-		}
-		for (int k = 0; k < 8; k++)
-		{
-			float f2 = (float)k / 8f * MathF.PI;
-			loop.Add(vector + new Vector2(Mathf.Sin(f2), 0f - Mathf.Cos(f2)) * num);
-		}
-		along.Clear();
-		float num5 = 0f;
-		for (int l = 0; l < loop.Count; l++)
-		{
-			along.Add(num5);
-			num5 += Vector2.Distance(loop[l], loop[(l + 1) % loop.Count]);
-		}
-		float num6 = num5 / (float)shoes.Length;
-		float num7 = Mathf.Repeat(0f - rolled, num5);
-		int m = 0;
-		float x = (float)side * 1.4f;
-		for (int n = 0; n < shoes.Length; n++)
-		{
-			float num8 = Mathf.Repeat((float)n * num6 + num7, num5);
-			while (m > 0 && along[m] > num8)
-			{
-				m--;
-			}
-			for (; m + 1 < loop.Count && along[m + 1] <= num8; m++)
-			{
-			}
-			Vector2 vector4 = loop[m];
-			Vector2 vector5 = loop[(m + 1) % loop.Count];
-			float num9 = Vector2.Distance(vector4, vector5);
-			Vector2 vector6 = ((num9 > 0.0001f) ? Vector2.Lerp(vector4, vector5, (num8 - along[m]) / num9) : vector4);
-			Vector2 vector7 = ((num9 > 0.0001f) ? ((vector5 - vector4) / num9) : Vector2.right);
-			Vector2 vector8 = new Vector2(vector7.y, 0f - vector7.x);
-			shoes[n].localPosition = new Vector3(x, vector6.y, vector6.x);
-			shoes[n].localRotation = Quaternion.LookRotation(new Vector3(0f, vector7.y, vector7.x), new Vector3(0f, vector8.y, vector8.x));
-			if (n + 1 < shoes.Length && Mathf.Repeat((float)(n + 1) * num6 + num7, num5) < num8)
-			{
-				m = 0;
-			}
-		}
-	}
-
-	private Transform WheelModel(int i)
-	{
-		if (wheelModelsCache == null || i >= wheelModelsCache.Length)
-		{
-			return null;
-		}
-		return wheelModelsCache[i];
 	}
 
 	protected override void Colliders()
@@ -451,61 +275,8 @@ public sealed class T72 : Vehicle
 		Vehicle.Draw(gun.Turret, "Turret fittings", turretKit, dark);
 		Vehicle.Draw(parent, "Mantlet", mantlet, material);
 		Vehicle.Draw(parent, "2A46M", barrel, gunMetal);
-		wheelModels = new Transform[spec.Wheels.Length];
-		for (int i = 0; i < wheelModels.Length; i++)
-		{
-			Transform transform = new GameObject("Road wheel " + i).transform;
-			transform.SetParent(base.transform, worldPositionStays: false);
-			Transform transform2 = new GameObject("Wheel").transform;
-			transform2.SetParent(transform, worldPositionStays: false);
-			if (spec.Wheels[i].At.x < 0f)
-			{
-				transform2.localScale = new Vector3(-1f, 1f, 1f);
-			}
-			Vehicle.Draw(transform2, "Tyres", roadRubber, rubber);
-			Vehicle.Draw(transform2, "Hub", roadHub, material);
-			wheelModels[i] = transform;
-		}
-		wheelModelsCache = wheelModels;
-		sprocketL = Spin("Sprocket", sprocketMesh, Rear, -1);
-		sprocketR = Spin("Sprocket", sprocketMesh, Rear, 1);
-		idlerL = Spin("Idler", idlerMesh, Front, -1);
-		idlerR = Spin("Idler", idlerMesh, Front, 1);
-		shoesL = Shoes(model, "Left track");
-		shoesR = Shoes(model, "Right track");
+		BuildRunningGear(model, roadRubber, roadHub, material, sprocketMesh, idlerMesh, steel, rubber, shoeMesh, trackSteel, out wheelModels);
 		steering = null;
-		Transform Spin(string name, Mesh mesh, Vector3 at, int sx)
-		{
-			Transform transform3 = new GameObject(name).transform;
-			transform3.SetParent(model, worldPositionStays: false);
-			transform3.localPosition = new Vector3((float)sx * 1.4f, at.y, at.z);
-			Transform transform4 = new GameObject("Wheel").transform;
-			transform4.SetParent(transform3, worldPositionStays: false);
-			if (sx < 0)
-			{
-				transform4.localScale = new Vector3(-1f, 1f, 1f);
-			}
-			Vehicle.Draw(transform4, name, mesh, steel);
-			return transform3;
-		}
-	}
-
-	private static Transform[] Shoes(Transform model, string name)
-	{
-		Transform transform = new GameObject(name).transform;
-		transform.SetParent(model, worldPositionStays: false);
-		Transform[] array = new Transform[82];
-		for (int i = 0; i < array.Length; i++)
-		{
-			GameObject gameObject = new GameObject("Shoe");
-			gameObject.transform.SetParent(transform, worldPositionStays: false);
-			gameObject.AddComponent<MeshFilter>().sharedMesh = shoeMesh;
-			MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-			meshRenderer.sharedMaterial = trackSteel;
-			meshRenderer.shadowCastingMode = ((i % 2 == 0) ? ShadowCastingMode.On : ShadowCastingMode.Off);
-			array[i] = gameObject.transform;
-		}
-		return array;
 	}
 
 	private static Material Armour(int team)

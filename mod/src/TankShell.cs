@@ -1,15 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CombatSandbox.Demo;
 
 public sealed class TankShell : MonoBehaviour
 {
-	public const float Power = 2.4f;
-
-	public const float Penetration = 300f;
-
-	private const float Life = 6f;
-
 	private static readonly int Hits = -5;
 
 	private static readonly RaycastHit[] cast = new RaycastHit[16];
@@ -24,24 +19,35 @@ public sealed class TankShell : MonoBehaviour
 
 	private Vehicle own;
 
+	private int kind;
+
+	private float power = 2.4f;
+
+	private float life = 6f;
+
 	private float age;
 
 	private bool done;
 
-	public static TankShell Fire(ArenaTarget shooter, Vehicle own, Vector3 at, Vector3 velocity)
+	private readonly HashSet<Collider> pierced = new HashSet<Collider>();
+
+	public static TankShell Fire(ArenaTarget shooter, Vehicle own, Vector3 at, Vector3 velocity, int kind, float power = 2.4f, bool tracer = true, float life = 6f)
 	{
-		GameObject gameObject = new GameObject("125 mm HE-FRAG shell");
+		GameObject gameObject = new GameObject((kind == 1) ? "APFSDS dart" : "HE-FRAG shell");
 		gameObject.layer = 2;
 		gameObject.transform.SetPositionAndRotation(at, Quaternion.LookRotation(velocity));
 		TankShell tankShell = gameObject.AddComponent<TankShell>();
 		tankShell.shooter = shooter;
 		tankShell.own = own;
 		tankShell.velocity = velocity;
-		tankShell.Build();
+		tankShell.kind = kind;
+		tankShell.power = power;
+		tankShell.life = life;
+		tankShell.Build(tracer);
 		return tankShell;
 	}
 
-	private void Build()
+	private void Build(bool tracer)
 	{
 		if (!shellPaint)
 		{
@@ -55,25 +61,28 @@ public sealed class TankShell : MonoBehaviour
 		Object.Destroy(obj.GetComponent<Collider>());
 		obj.layer = 2;
 		obj.transform.SetParent(base.transform, worldPositionStays: false);
-		obj.transform.localScale = new Vector3(0.125f, 0.3f, 0.125f);
+		obj.transform.localScale = ((kind == 1) ? new Vector3(0.035f, 0.35f, 0.035f) : new Vector3(0.125f, 0.3f, 0.125f));
 		obj.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
 		obj.GetComponent<Renderer>().sharedMaterial = shellPaint;
-		TrailRenderer trailRenderer = base.gameObject.AddComponent<TrailRenderer>();
-		trailRenderer.sharedMaterial = tracerPaint;
-		trailRenderer.time = 0.09f;
-		trailRenderer.startWidth = 0.14f;
-		trailRenderer.endWidth = 0.02f;
-		trailRenderer.minVertexDistance = 0.5f;
-		trailRenderer.startColor = new Color(1f, 0.75f, 0.35f, 0.9f);
-		trailRenderer.endColor = new Color(1f, 0.5f, 0.2f, 0f);
-		trailRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-		Light light = new GameObject("Tracer light").AddComponent<Light>();
-		light.transform.SetParent(base.transform, worldPositionStays: false);
-		light.type = LightType.Point;
-		light.color = new Color(1f, 0.7f, 0.4f);
-		light.range = 6f;
-		light.intensity = 1.6f;
-		light.shadows = LightShadows.None;
+		if (tracer)
+		{
+			TrailRenderer trailRenderer = base.gameObject.AddComponent<TrailRenderer>();
+			trailRenderer.sharedMaterial = tracerPaint;
+			trailRenderer.time = ((kind == 1) ? 0.05f : 0.09f);
+			trailRenderer.startWidth = ((kind == 1) ? 0.09f : 0.14f);
+			trailRenderer.endWidth = 0.02f;
+			trailRenderer.minVertexDistance = 0.5f;
+			trailRenderer.startColor = ((kind == 1) ? new Color(1f, 0.9f, 0.6f, 1f) : new Color(1f, 0.75f, 0.35f, 0.9f));
+			trailRenderer.endColor = new Color(1f, 0.5f, 0.2f, 0f);
+			trailRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+			Light light = new GameObject("Tracer light").AddComponent<Light>();
+			light.transform.SetParent(base.transform, worldPositionStays: false);
+			light.type = LightType.Point;
+			light.color = new Color(1f, 0.7f, 0.4f);
+			light.range = 6f;
+			light.intensity = 1.6f;
+			light.shadows = LightShadows.None;
+		}
 	}
 
 	private void Update()
@@ -106,13 +115,25 @@ public sealed class TankShell : MonoBehaviour
 		{
 			base.transform.position = hit.point;
 			Strike(hit);
+			if (!done)
+			{
+				base.transform.position = vector;
+			}
 		}
 		else
 		{
 			base.transform.position = vector;
-			if (age >= 6f)
+			if (age >= life)
 			{
-				Burst(vector, null);
+				if (kind == 1)
+				{
+					done = true;
+					Object.Destroy(base.gameObject);
+				}
+				else
+				{
+					Burst(vector);
+				}
 			}
 		}
 	}
@@ -132,7 +153,7 @@ public sealed class TankShell : MonoBehaviour
 		for (int i = 0; i < num; i++)
 		{
 			Collider collider = cast[i].collider;
-			if (!(cast[i].distance >= num2) && (!own || !own.Holds(collider)) && !ShotQuery.IsShooter(collider))
+			if (!(cast[i].distance >= num2) && !pierced.Contains(collider) && (!own || !own.Holds(collider)) && !ShotQuery.IsShooter(collider))
 			{
 				HitZone hitZone = ShotQuery.ZoneOf(collider);
 				if (!hitZone || !shooter || !(hitZone.Owner == shooter.Body))
@@ -149,21 +170,55 @@ public sealed class TankShell : MonoBehaviour
 	private void Strike(RaycastHit hit)
 	{
 		Vector3 normalized = velocity.normalized;
-		Vehicle.Struck(hit.collider, hit.point, normalized, 300f);
 		GlassPane component = hit.collider.GetComponent<GlassPane>();
 		if ((bool)component)
 		{
 			component.Blast(hit.point, 1.5f);
 		}
-		Burst(hit.point + hit.normal * 0.1f, hit.collider);
+		if (kind == 1)
+		{
+			Dart(hit, normalized);
+			return;
+		}
+		Vehicle.Struck(hit.collider, hit.point, normalized, 300f);
+		Burst(hit.point + hit.normal * 0.1f);
 	}
 
-	private void Burst(Vector3 centre, Collider struck)
+	private void Dart(RaycastHit hit, Vector3 direction)
+	{
+		HitZone hitZone = ShotQuery.ZoneOf(hit.collider);
+		if ((bool)hitZone)
+		{
+			pierced.Add(hit.collider);
+			if ((bool)ReconstructionDemo.Instance)
+			{
+				ReconstructionDemo.Instance.Strike(shooter, hitZone, hit.point, hit.normal, direction, 14f, exits: true);
+			}
+			velocity *= 0.9f;
+			return;
+		}
+		done = true;
+		if (!Vehicle.Penetrate(hit.collider, hit.point, direction))
+		{
+			if ((bool)ReconstructionDemo.Instance)
+			{
+				ReconstructionDemo.Instance.SurfaceHit(hit, direction);
+			}
+			if ((bool)ShotEffects.Instance)
+			{
+				ShotEffects.Instance.Sparks(hit.point, hit.normal, 20, 10f);
+				ShotEffects.Instance.Explosion(hit.point + hit.normal * 0.1f, 0.35f);
+			}
+		}
+		Object.Destroy(base.gameObject);
+	}
+
+	private void Burst(Vector3 centre)
 	{
 		done = true;
 		if ((bool)ReconstructionDemo.Instance)
 		{
-			ReconstructionDemo.Instance.Detonate(centre, shooter, 2.4f);
+			ReconstructionDemo.Instance.Detonate(centre, shooter, power);
 		}
 		if ((bool)Ballistics.Instance)
 		{
